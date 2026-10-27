@@ -43,6 +43,8 @@ test('web app links its manifest, install metadata and service worker registrati
   assert.match(html, /apple-mobile-web-app-title" content="محفظتي"/);
   assert.match(html, /<span class="quote-caption">إجمالي محفظتي<\/span>/);
   assert.match(html, /id="share-price"/);
+  assert.match(html, /id="ayrade-header-logo" src="https:\/\/www\.ayrade\.com\/wp-content\/uploads\/2026\/04\/logo-ayrade-lion\.png"/);
+  assert.match(html, /id="ayrade-header-fallback"/);
   const app = read('app.js');
   const vercel = JSON.parse(read('vercel.json'));
   assert.ok(app.includes('portfolio.totalValue(values)'));
@@ -54,6 +56,7 @@ test('web app links its manifest, install metadata and service worker registrati
   assert.ok(app.includes('logoWrap.appendChild(logo)'));
   assert.ok(app.includes("logo.addEventListener('error'"));
   assert.ok(app.includes('company-logo-fallback'));
+  assert.ok(app.includes('showAyradeFallback'));
   assert.ok(app.includes("localStorage.setItem(PORTFOLIO_KEY, JSON.stringify(positions))"));
   const contentSecurityPolicy = vercel.headers.find(rule => rule.source === '/(.*)').headers.find(header => header.key === 'Content-Security-Policy').value;
   for (const host of ['https://www.ayrade.com', 'https://www.biopharmdz.com', 'https://www.saidalgroup.dz', 'https://moustachir.dz']) assert.ok(contentSecurityPolicy.includes(host));

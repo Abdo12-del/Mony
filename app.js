@@ -10,6 +10,7 @@
     chartCount: $('observation-count'), chartFirst: $('chart-first'), chartLast: $('chart-last'), activity: $('activity-list'),
     portfolioTotal: $('portfolio-total'), portfolioFeedback: $('portfolio-feedback'), quoteFeedback: $('quote-refresh-feedback'),
     companySelect: $('company-select'), addCompany: $('add-company'), companyList: $('company-list'),
+    ayradeHeaderLogo: $('ayrade-header-logo'), ayradeHeaderFallback: $('ayrade-header-fallback'),
     installButton: $('install-app')
   };
   const CACHE_KEY = 'nabd-ayrad-last-success-v1';
@@ -324,6 +325,11 @@
     } finally {
       ui.button.disabled = false; ui.button.classList.remove('loading');
     }
+  }
+  if (ui.ayradeHeaderLogo && ui.ayradeHeaderFallback) {
+    const showAyradeFallback = () => { ui.ayradeHeaderLogo.hidden = true; ui.ayradeHeaderFallback.hidden = false; };
+    ui.ayradeHeaderLogo.addEventListener('error', showAyradeFallback, { once: true });
+    if (ui.ayradeHeaderLogo.complete && ui.ayradeHeaderLogo.naturalWidth === 0) showAyradeFallback();
   }
   renderCompanyPicker();
   showCached(); renderChart(readHistory()); renderActivity(readHistory()); renderPortfolio();
