@@ -99,5 +99,9 @@
   }
   showCached(); renderChart(readHistory());
   ui.button.addEventListener('click', refresh);
+  document.querySelectorAll('.bottom-nav a').forEach(link => link.addEventListener('click', () => {
+    document.querySelectorAll('.bottom-nav a').forEach(item => item.classList.remove('active'));
+    link.classList.add('active');
+  }));
   refresh();
 })();

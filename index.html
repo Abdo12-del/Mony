@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <meta name="theme-color" content="#102c25">
+  <meta name="theme-color" content="#0b0b0e">
   <meta name="description" content="نبض أيراد — متابعة السعر المنشور لسهم AYRADE (AYRD) من بورصة الجزائر.">
   <title>نبض أيراد | متابعة AYRD</title>
   <link rel="icon" href="/favicon.svg" type="image/svg+xml">
@@ -13,7 +13,7 @@
   <link rel="stylesheet" href="/styles.css">
 </head>
 <body>
-  <header class="topbar">
+  <header class="topbar" id="top">
     <a class="brand" href="/" aria-label="نبض أيراد الصفحة الرئيسية">
       <img class="brand-mark" src="/logo.svg" alt="">
       <span class="brand-name">نبض <b>أيراد</b></span>
@@ -41,9 +41,9 @@
         </div>
         <div class="quote-unit"><span class="unit-icon">د.ج</span><span>دينار جزائري</span></div>
       </div>
-      <div class="chart-panel">
+      <div class="chart-panel" id="chart-section">
         <div class="chart-heading"><div><strong>سجل الفحوصات</strong><span>القيم التي رُصدت في هذا المتصفح</span></div><span class="chart-count" id="observation-count">٠ فحص</span></div>
-        <div class="chart-wrap"><svg id="price-chart" viewBox="0 0 720 150" preserveAspectRatio="none" role="img" aria-label="رسم يوضح الأسعار التي رُصدت في الفحوصات السابقة"><defs><linearGradient id="chart-fill" x1="0" x2="0" y1="0" y2="1"><stop offset="0%" stop-color="#87d6a7" stop-opacity=".34"/><stop offset="100%" stop-color="#87d6a7" stop-opacity="0"/></linearGradient></defs><path id="chart-area" d=""/><path id="chart-line" d=""/><circle id="chart-point" cx="0" cy="0" r="4"/></svg><div class="chart-empty" id="chart-empty"><span class="empty-bars">▁ ▃ ▂ ▅ ▄</span><span>يظهر المسار بعد تسجيل فحصين ناجحين على الأقل</span></div></div>
+        <div class="chart-wrap"><svg id="price-chart" viewBox="0 0 720 150" preserveAspectRatio="none" role="img" aria-label="رسم يوضح الأسعار التي رُصدت في الفحوصات السابقة"><defs><linearGradient id="chart-fill" x1="0" x2="0" y1="0" y2="1"><stop offset="0%" stop-color="#b995ff" stop-opacity=".34"/><stop offset="100%" stop-color="#b995ff" stop-opacity="0"/></linearGradient></defs><path id="chart-area" d=""/><path id="chart-line" d=""/><circle id="chart-point" cx="0" cy="0" r="4"/></svg><div class="chart-empty" id="chart-empty"><span class="empty-bars">▁ ▃ ▂ ▅ ▄</span><span>يظهر المسار بعد تسجيل فحصين ناجحين على الأقل</span></div></div>
         <div class="chart-foot"><span id="chart-first">—</span><span class="chart-disclaimer">ليس رسماً تاريخياً رسمياً</span><span id="chart-last">—</span></div>
       </div>
       <div class="instrument-bottom">
@@ -56,7 +56,7 @@
       <div id="refresh-status" class="refresh-status" aria-live="polite">يتم التحقق من بيانات المصدر</div>
     </section>
 
-    <section class="detail-grid">
+    <section class="detail-grid" id="details">
       <article class="detail-card quote-details">
         <div class="section-title"><div><span class="section-kicker">بيانات التداول</span><h2>تفاصيل السعر</h2></div><span class="section-icon">▤</span></div>
         <div class="detail-row"><span>سعر الافتتاح المنشور</span><strong id="opening-price">—</strong></div>
@@ -85,6 +85,12 @@
     <section class="disclaimer"><span class="disclaimer-mark">!</span><p><strong>إخلاء مسؤولية</strong><br>«نبض أيراد» مشروع مستقل غير تابع لبورصة الجزائر أو شركة AYRADE، والبيانات للمتابعة فقط وليست نصيحة استثمارية.</p></section>
   </main>
 
+  <nav class="bottom-nav" aria-label="التنقل السريع">
+    <a class="active" href="#top"><span>⌂</span><small>الرئيسية</small></a>
+    <a href="#chart-section"><span>⌁</span><small>الرسم</small></a>
+    <a href="#android"><span>◉</span><small>التنبيهات</small></a>
+    <a href="#details"><span>≡</span><small>التفاصيل</small></a>
+  </nav>
   <footer><span>نبض أيراد <span class="footer-dot">·</span> AYRD</span><a href="https://www.sgbv.dz/" target="_blank" rel="noopener">بورصة الجزائر ↗</a></footer>
   <script src="/app.js" defer></script>
 </body>

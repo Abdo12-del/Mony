@@ -2,6 +2,7 @@ package com.nabd.ayrad
 
 import android.Manifest
 import android.app.Activity
+import android.content.res.ColorStateList
 import android.content.pm.PackageManager
 import android.graphics.Color
 import android.graphics.Typeface
@@ -39,19 +40,23 @@ class MainActivity : Activity() {
     private lateinit var alertSwitch: Switch
     private var pendingAlertPermission = false
 
-    private val forest = 0xFF112F26.toInt()
-    private val green = 0xFF16885A.toInt()
-    private val ink = 0xFF182A21.toInt()
-    private val muted = 0xFF748078.toInt()
-    private val pageColor = 0xFFF2F5F2.toInt()
+    private lateinit var screenScroll: ScrollView
+    private val navEntries = mutableListOf<LinearLayout>()
+    private val forest = 0xFF09090C.toInt()
+    private val green = 0xFF43C77B.toInt()
+    private val purple = 0xFF8B5CF6.toInt()
+    private val ink = 0xFFF5F2FA.toInt()
+    private val muted = 0xFFA19BA9.toInt()
+    private val pageColor = 0xFF0B0B0E.toInt()
     private val white = Color.WHITE
+    private val darkInk = 0xFF211A2B.toInt()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         WindowCompat.setDecorFitsSystemWindows(window, true)
         window.statusBarColor = pageColor
         window.navigationBarColor = pageColor
-        window.decorView.systemUiVisibility = View.SYSTEM_UI_FLAG_LIGHT_STATUS_BAR or View.SYSTEM_UI_FLAG_LIGHT_NAVIGATION_BAR
+        window.decorView.systemUiVisibility = 0
         buildScreen()
         loadSavedData()
         if (QuoteStorage.alertsEnabled(this)) AlertScheduler.enable(this)
@@ -59,13 +64,12 @@ class MainActivity : Activity() {
     }
 
     private fun buildScreen() {
-        val page = LinearLayout(this).apply {
-            orientation = LinearLayout.VERTICAL
-            setPadding(dp(18), dp(14), dp(18), dp(28))
+        val root = vertical().apply { setBackgroundColor(pageColor) }
+        val page = vertical().apply {
+            setPadding(dp(18), dp(14), dp(18), dp(24))
             setBackgroundColor(pageColor)
-            layoutDirection = View.LAYOUT_DIRECTION_RTL
         }
-        setContentView(ScrollView(this).apply { clipToPadding = false; addView(page) })
+        screenScroll = ScrollView(this).apply { clipToPadding = false; addView(page) }
 
         val header = horizontal().apply { gravity = Gravity.CENTER_VERTICAL }
         val brandMark = ImageView(this).apply {
@@ -90,29 +94,29 @@ class MainActivity : Activity() {
 
         val quoteCard = vertical().apply {
             setPadding(dp(18), dp(17), dp(18), dp(16))
-            background = rounded(forest, 19)
-            elevation = dp(5).toFloat()
+            background = purpleGradient()
+            elevation = dp(7).toFloat()
         }
         page.addView(quoteCard, marginParams(bottom = 13))
 
         val quoteHeader = horizontal().apply { gravity = Gravity.CENTER_VERTICAL }
         val companyMark = text("أ", 16, 0xFFB8EBC8.toInt(), true).apply {
             gravity = Gravity.CENTER
-            background = rounded(0xFF244B39.toInt(), 11)
+            background = rounded(0xFF7448D4.toInt(), 11)
         }
         quoteHeader.addView(companyMark, LinearLayout.LayoutParams(dp(36), dp(36)))
         val companyCopy = vertical().apply {
             addView(text("أيراد  AYRADE", 13, white, true))
-            addView(text("الرمز AYRD  ·  DZD", 9, 0xFF9AB2A2.toInt()))
+            addView(text("الرمز AYRD  ·  DZD", 9, 0xFFE5DAFA.toInt()))
         }
         quoteHeader.addView(companyCopy, LinearLayout.LayoutParams(0, -2, 1f).apply { marginStart = dp(9) })
         quoteHeader.addView(text("●  منشور", 9, 0xFFBFE8CC.toInt(), true).apply {
-            background = rounded(0xFF244B39.toInt(), 16)
+            background = rounded(0xFF7448D4.toInt(), 16)
             setPadding(dp(8), dp(5), dp(8), dp(5))
         })
         quoteCard.addView(quoteHeader)
 
-        quoteCard.addView(text("آخر سعر متاح", 10, 0xFF9BB1A2.toInt()).apply { setPadding(0, dp(19), 0, 0) })
+        quoteCard.addView(text("آخر سعر متاح", 10, 0xFFE3D8F7.toInt()).apply { setPadding(0, dp(19), 0, 0) })
         val priceRow = horizontal().apply { gravity = Gravity.CENTER_VERTICAL }
         priceText = text("—", 42, white, true).apply {
             textDirection = View.TEXT_DIRECTION_LTR
@@ -120,12 +124,12 @@ class MainActivity : Activity() {
             letterSpacing = -.035f
         }
         priceRow.addView(priceText, LinearLayout.LayoutParams(0, -2, 1f))
-        priceRow.addView(text("دج", 14, 0xFFB3C8B9.toInt(), true).apply { setPadding(dp(7), 0, 0, 0) })
+        priceRow.addView(text("دج", 14, 0xFFE8DFFF.toInt(), true).apply { setPadding(dp(7), 0, 0, 0) })
         quoteCard.addView(priceRow)
 
         val stateRow = horizontal().apply { gravity = Gravity.CENTER_VERTICAL }
-        typeText = text("بانتظار السعر", 9, 0xFFBFE8CC.toInt()).apply {
-            background = rounded(0xFF244B39.toInt(), 6)
+        typeText = text("بانتظار السعر", 9, 0xFFF0E8FF.toInt()).apply {
+            background = rounded(0xFF7047D1.toInt(), 6)
             setPadding(dp(8), dp(4), dp(8), dp(4))
             maxLines = 1; ellipsize = android.text.TextUtils.TruncateAt.END; maxWidth = dp(245)
         }
@@ -136,12 +140,12 @@ class MainActivity : Activity() {
 
         val chartHeader = horizontal().apply { gravity = Gravity.CENTER_VERTICAL }
         val chartTitle = vertical().apply {
-            addView(text("سجل قراءاتك", 10, 0xFFDFEAE1.toInt(), true))
-            addView(text("مخطط محلي، وليس تاريخاً رسمياً", 8, 0xFF8DA595.toInt()))
+            addView(text("سجل قراءاتك", 10, 0xFFF2EDFA.toInt(), true))
+            addView(text("مخطط محلي، وليس تاريخاً رسمياً", 8, 0xFFB6AFC2.toInt()))
         }
         chartHeader.addView(chartTitle, LinearLayout.LayoutParams(0, -2, 1f))
-        observationsCount = text("٠ فحص", 8, 0xFFA8BEAE.toInt()).apply {
-            background = rounded(0xFF244B39.toInt(), 6)
+        observationsCount = text("٠ فحص", 8, 0xFFE8DCFF.toInt()).apply {
+            background = rounded(0xFF7047D1.toInt(), 6)
             setPadding(dp(7), dp(4), dp(7), dp(4))
         }
         chartHeader.addView(observationsCount)
@@ -149,7 +153,7 @@ class MainActivity : Activity() {
         sparkline = SparklineView(this)
         quoteCard.addView(sparkline, LinearLayout.LayoutParams(-1, dp(91)))
 
-        val divider = View(this).apply { setBackgroundColor(0x334D6958) }
+        val divider = View(this).apply { setBackgroundColor(0x33FFFFFF) }
         quoteCard.addView(divider, LinearLayout.LayoutParams(-1, dp(1)).apply { topMargin = dp(5); bottomMargin = dp(11) })
         val facts = horizontal()
         val sessionFact = fact("تاريخ الجلسة", "غير متاح من المصدر")
@@ -169,7 +173,7 @@ class MainActivity : Activity() {
             setOnClickListener { refreshQuote() }
         }
         quoteCard.addView(refreshButton, LinearLayout.LayoutParams(-1, dp(44)).apply { topMargin = dp(15) })
-        statusText = text("يتم التحقق من المصدر الرسمي…", 9, 0xFF8FA899.toInt()).apply { setPadding(0, dp(8), 0, 0) }
+        statusText = text("يتم التحقق من المصدر الرسمي…", 9, 0xFFD5C7F0.toInt()).apply { setPadding(0, dp(8), 0, 0) }
         quoteCard.addView(statusText)
 
         val marketCard = vertical().apply {
@@ -179,7 +183,7 @@ class MainActivity : Activity() {
         }
         page.addView(marketCard, marginParams(bottom = 12))
         val marketHeading = horizontal().apply { gravity = Gravity.CENTER_VERTICAL }
-        marketHeading.addView(text("أسعار الجلسة", 14, ink, true), LinearLayout.LayoutParams(0, -2, 1f))
+        marketHeading.addView(text("أسعار الجلسة", 14, darkInk, true), LinearLayout.LayoutParams(0, -2, 1f))
         marketHeading.addView(text("بيانات المصدر", 9, green).apply {
             background = rounded(0xFFEAF4EC.toInt(), 6)
             setPadding(dp(7), dp(4), dp(7), dp(4))
@@ -195,13 +199,14 @@ class MainActivity : Activity() {
         closingText = closingBlock.second
         marketPrices.addView(closingBlock.first, LinearLayout.LayoutParams(0, -2, 1f))
         marketCard.addView(marketPrices)
-        marketCard.addView(text("إذا لم تنشر البورصة إغلاقاً، لا نعرض سعر الافتتاح على أنه إغلاق.", 9, muted).apply {
+        marketCard.addView(text("إذا لم تنشر البورصة إغلاقاً، لا نعرض سعر الافتتاح على أنه إغلاق.", 9, 0xFF746D7C.toInt()).apply {
             setPadding(0, dp(10), 0, 0)
         })
 
         val alertCard = vertical().apply {
             setPadding(dp(15), dp(14), dp(15), dp(14))
-            background = rounded(white, 15)
+            background = rounded(0xFF17171C.toInt(), 15)
+            elevation = dp(1).toFloat()
             elevation = dp(1).toFloat()
         }
         page.addView(alertCard, marginParams(bottom = 12))
@@ -214,6 +219,8 @@ class MainActivity : Activity() {
         alertSwitch = Switch(this).apply {
             isChecked = QuoteStorage.alertsEnabled(this@MainActivity)
             contentDescription = "تفعيل فحص الخلفية والتنبيهات"
+            thumbTintList = ColorStateList(arrayOf(intArrayOf(android.R.attr.state_checked), intArrayOf()), intArrayOf(purple, 0xFF817B89.toInt()))
+            trackTintList = ColorStateList(arrayOf(intArrayOf(android.R.attr.state_checked), intArrayOf()), intArrayOf(0x887E57D1.toInt(), 0xFF3B3941.toInt()))
         }
         alertSwitch.setOnCheckedChangeListener { _, checked -> onAlertToggle(checked) }
         alertHeading.addView(alertSwitch)
@@ -228,12 +235,25 @@ class MainActivity : Activity() {
             elevation = dp(1).toFloat()
         }
         page.addView(historyCard, marginParams(bottom = 13))
-        historyCard.addView(text("التغيرات المرصودة", 14, ink, true), marginParams(bottom = 7))
-        historyText = text("لا توجد تغيرات مسجلة بعد.", 10, muted)
+        historyCard.addView(text("التغيرات المرصودة", 14, darkInk, true), marginParams(bottom = 7))
+        historyText = text("لا توجد تغيرات مسجلة بعد.", 10, 0xFF756D7D.toInt())
         historyCard.addView(historyText)
 
         page.addView(text("المصدر الرسمي: sgbv.dz", 9, green, true).apply { gravity = Gravity.CENTER }, marginParams(bottom = 8))
         page.addView(text("هذا التطبيق مستقل وغير تابع لبورصة الجزائر أو AYRADE. البيانات للمتابعة فقط وليست نصيحة استثمارية.", 9, muted).apply { gravity = Gravity.CENTER }, marginParams(bottom = 7))
+
+        val navBar = horizontal().apply {
+            setPadding(dp(7), dp(7), dp(7), dp(7))
+            background = rounded(0xFF17171C.toInt(), 22)
+            elevation = dp(8).toFloat()
+        }
+        navBar.addView(navItem("⌂", "الرئيسية", page, true), LinearLayout.LayoutParams(0, dp(52), 1f))
+        navBar.addView(navItem("⌁", "الرسم", quoteCard), LinearLayout.LayoutParams(0, dp(52), 1f))
+        navBar.addView(navItem("◉", "التنبيهات", alertCard), LinearLayout.LayoutParams(0, dp(52), 1f))
+        navBar.addView(navItem("≡", "السجل", historyCard), LinearLayout.LayoutParams(0, dp(52), 1f))
+        root.addView(screenScroll, LinearLayout.LayoutParams(-1, 0, 1f))
+        root.addView(navBar, marginParams(top = 4, bottom = 5).apply { marginStart = dp(14); marginEnd = dp(14) })
+        setContentView(root)
     }
 
     private fun onAlertToggle(enabled: Boolean) {
@@ -321,19 +341,45 @@ class MainActivity : Activity() {
 
     private fun fact(label: String, initial: String): Pair<LinearLayout, TextView> {
         val box = vertical()
-        box.addView(text(label, 8, 0xFF91A899.toInt()))
-        val value = text(initial, 9, 0xFFE1EBE3.toInt(), true).apply { maxLines = 1 }
+        box.addView(text(label, 8, 0xFFD9C9F8.toInt()))
+        val value = text(initial, 9, 0xFFFFFCFF.toInt(), true).apply { maxLines = 1 }
         box.addView(value)
         return box to value
     }
 
     private fun priceFact(label: String): Pair<LinearLayout, TextView> {
         val box = vertical().apply { setPadding(dp(5), dp(3), dp(5), dp(3)) }
-        box.addView(text(label, 9, muted).apply { gravity = Gravity.CENTER })
-        val value = text("غير منشور", 13, ink, true).apply { gravity = Gravity.CENTER; setPadding(0, dp(3), 0, 0) }
+        box.addView(text(label, 9, 0xFF766E7F.toInt()).apply { gravity = Gravity.CENTER })
+        val value = text("غير منشور", 13, darkInk, true).apply { gravity = Gravity.CENTER; setPadding(0, dp(3), 0, 0) }
         box.addView(value)
         return box to value
     }
+
+    private fun navItem(icon: String, label: String, target: View, selected: Boolean = false): LinearLayout {
+        val item = vertical().apply {
+            gravity = Gravity.CENTER
+            setPadding(dp(3), dp(3), dp(3), dp(3))
+            background = rounded(if (selected) purple else 0xFF17171C.toInt(), 17)
+            addView(text(icon, 17, if (selected) white else 0xFFAAA4B2.toInt()).apply { gravity = Gravity.CENTER })
+            addView(text(label, 8, if (selected) white else 0xFFAAA4B2.toInt(), selected).apply { gravity = Gravity.CENTER })
+        }
+        navEntries.add(item)
+        item.setOnClickListener {
+            navEntries.forEach { entry ->
+                val active = entry === item
+                entry.background = rounded(if (active) purple else 0xFF17171C.toInt(), 17)
+                (entry.getChildAt(0) as TextView).setTextColor(if (active) white else 0xFFAAA4B2.toInt())
+                (entry.getChildAt(1) as TextView).setTextColor(if (active) white else 0xFFAAA4B2.toInt())
+            }
+            screenScroll.post { screenScroll.smoothScrollTo(0, (target.top - dp(8)).coerceAtLeast(0)) }
+        }
+        return item
+    }
+
+    private fun purpleGradient() = GradientDrawable(
+        GradientDrawable.Orientation.TL_BR,
+        intArrayOf(0xFF986CFF.toInt(), 0xFF8858EF.toInt(), 0xFF6E45CB.toInt())
+    ).apply { cornerRadius = dp(19).toFloat() }
 
     private fun vertical() = LinearLayout(this).apply { orientation = LinearLayout.VERTICAL; layoutDirection = View.LAYOUT_DIRECTION_RTL }
     private fun horizontal() = LinearLayout(this).apply { orientation = LinearLayout.HORIZONTAL; layoutDirection = View.LAYOUT_DIRECTION_RTL }

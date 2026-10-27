@@ -15,10 +15,10 @@ internal class SparklineView @JvmOverloads constructor(
 ) : View(context, attrs) {
     private var prices: List<Double> = emptyList()
     private val linePaint = Paint(Paint.ANTI_ALIAS_FLAG).apply {
-        color = 0xFF83E2A5.toInt(); style = Paint.Style.STROKE; strokeWidth = dp(2f); strokeCap = Paint.Cap.ROUND; strokeJoin = Paint.Join.ROUND
+        color = 0xFFBEA1FF.toInt(); style = Paint.Style.STROKE; strokeWidth = dp(2f); strokeCap = Paint.Cap.ROUND; strokeJoin = Paint.Join.ROUND
     }
     private val fillPaint = Paint(Paint.ANTI_ALIAS_FLAG).apply { style = Paint.Style.FILL }
-    private val dotPaint = Paint(Paint.ANTI_ALIAS_FLAG).apply { color = 0xFFB8F3C9.toInt(); style = Paint.Style.FILL }
+    private val dotPaint = Paint(Paint.ANTI_ALIAS_FLAG).apply { color = 0xFFE0D2FF.toInt(); style = Paint.Style.FILL }
     private val gridPaint = Paint(Paint.ANTI_ALIAS_FLAG).apply { color = 0x22FFFFFF; strokeWidth = dp(1f) }
     private val emptyPaint = Paint(Paint.ANTI_ALIAS_FLAG).apply { color = 0xFF9BB0A2.toInt(); textSize = dp(12f); textAlign = Paint.Align.CENTER }
 
@@ -47,7 +47,7 @@ internal class SparklineView @JvmOverloads constructor(
             points.forEachIndexed { index, point -> if (index == 0) moveTo(point.first, point.second) else lineTo(point.first, point.second) }
         }
         val area = Path(line).apply { lineTo(points.last().first, bottom); lineTo(points.first().first, bottom); close() }
-        fillPaint.shader = LinearGradient(0f, top, 0f, bottom, 0x5577D99A, 0x0077D99A, Shader.TileMode.CLAMP)
+        fillPaint.shader = LinearGradient(0f, top, 0f, bottom, 0x558B5CF6, 0x008B5CF6, Shader.TileMode.CLAMP)
         canvas.drawPath(area, fillPaint)
         fillPaint.shader = null
         canvas.drawPath(line, linePaint)
