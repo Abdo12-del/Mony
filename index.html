@@ -96,30 +96,15 @@
       <div id="activity-list" class="activity-list"></div>
     </section>
 
-    <section class="detail-grid">
-      <article class="detail-card quote-details">
-        <div class="section-title"><div><span class="section-kicker">مصدر موثوق</span><h2>كيف نعرض السعر؟</h2></div><span class="section-icon">✓</span></div>
-        <p>إذا لم تنشر البورصة سعر إغلاق، نعرض السعر المتاح مع وصفه كسعر افتتاح/مرجعي ولا نسميه إغلاقاً.</p>
-        <a class="app-link" href="https://www.sgbv.dz/" target="_blank" rel="noopener">فتح موقع SGBV <span>↗</span></a>
-      </article>
-      <article class="detail-card background-card">
-        <div class="section-title"><div><span class="section-kicker">تنبيه مهم</span><h2>تابع خارج المتصفح</h2></div><span class="section-icon">◉</span></div>
-        <p>صفحة الويب وحدها لا ترسل تنبيهات في الخلفية. يلزم تثبيت تطبيق أندرويد وتفعيل الإشعارات.</p>
-        <a class="app-link" href="#android">تعليمات التطبيق <span>←</span></a>
-      </article>
-    </section>
-
-    <section class="app-section" id="android">
-      <div class="section-heading"><span class="section-kicker">متابعة مستمرة</span><h2>تطبيق نبض أيراد لأندرويد</h2><p>فحص دوري ومقارنة محلية للسعر عند تفعيل التنبيهات.</p></div>
-      <div class="app-grid">
-        <article class="app-feature"><span class="feature-num">01</span><div><strong>نزّل التطبيق</strong><p>يتطلب Android 8 أو أحدث. لا يتوفر ملف APK موقّع في هذا الإصدار.</p><button class="download-button" type="button" disabled>APK غير متاح حالياً</button></div></article>
-        <article class="app-feature"><span class="feature-num">02</span><div><strong>اسمح بالإشعارات</strong><p>فعّل التنبيهات من التطبيق واسمح بإذن الإشعارات عند طلبه.</p></div></article>
-        <article class="app-feature"><span class="feature-num">03</span><div><strong>اعرف حدود الفحص</strong><p>يُجدول كل ١٥ دقيقة تقريباً؛ قد يؤخر أندرويد الفحص أو يفوّت تغيراً بين فحصين. الإيقاف الإجباري يوقفه حتى إعادة فتح التطبيق.</p></div></article>
+    <details class="extra-info" id="android">
+      <summary><span><small>تفاصيل اختيارية</small><strong>عن السعر والتنبيهات</strong></span><span class="disclosure-icon" aria-hidden="true">⌄</span></summary>
+      <div class="extra-info-content">
+        <section><strong>مصدر السعر</strong><p>المصدر هو <a href="https://www.sgbv.dz/" target="_blank" rel="noopener">بورصة الجزائر (SGBV)</a>. إذا لم يُنشر سعر إغلاق، نعرض السعر المتاح بوصفه افتتاحاً أو سعراً مرجعياً، ولا نسميه إغلاقاً.</p></section>
+        <section><strong>حدود التنبيهات</strong><p>صفحة الويب لا ترسل تنبيهات في الخلفية. تطبيق Android غير متاح للتنزيل حالياً؛ وعند توفره، قد يؤخر النظام الفحص الدوري أو يفوّت تغيراً، كما يوقفه الإيقاف الإجباري حتى فتح التطبيق مجدداً.</p></section>
+        <section><strong>مقارنة الأسعار</strong><p>التغير المعروض يقارن آخر فحصين ناجحين فقط، ولا يعني تغيراً لحظياً أو تغير جلسة البورصة.</p></section>
       </div>
-    </section>
-
-    <section class="notice"><span class="notice-icon">i</span><p><strong>ملاحظة عن التغير:</strong> الفرق في الواجهة هو بين آخر فحصين ناجحين، وليس بالضرورة تغير جلسة البورصة أو تغيراً لحظياً.</p></section>
-    <section class="disclaimer"><span class="disclaimer-mark">!</span><p><strong>إخلاء مسؤولية</strong><br>«نبض أيراد» مشروع مستقل غير تابع لبورصة الجزائر أو شركة AYRADE، والبيانات للمتابعة فقط وليست نصيحة استثمارية.</p></section>
+    </details>
+    <p class="trust-line">«نبض أيراد» مشروع مستقل غير تابع لبورصة الجزائر أو AYRADE، ولا يقدم نصيحة استثمارية.</p>
   </main>
 
   <nav class="bottom-nav" aria-label="التنقل السريع">

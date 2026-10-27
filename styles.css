@@ -142,6 +142,20 @@ body {
 .activity-value.up { color: var(--green); }
 .activity-value.down { color: var(--red); }
 .activity-empty { padding: 17px; text-align: center; border: 1px solid #29272f; border-radius: 13px; background: #151519; color: #9a94a1; font-size: 10px; }
+.extra-info { min-width: 0; border: 1px solid #302b38; border-radius: 13px; background: #141318; overflow: hidden; }
+.extra-info summary { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 12px 15px; cursor: pointer; list-style: none; }
+.extra-info summary::-webkit-details-marker { display: none; }
+.extra-info summary > span:first-child { display: grid; gap: 2px; }
+.extra-info summary small { color: #938b9c; font-size: 8px; }
+.extra-info summary strong { color: #e9e4ef; font-size: 10px; font-weight: 600; }
+.disclosure-icon { color: #b9a1e8; font-size: 15px; transition: transform .18s; }
+.extra-info[open] .disclosure-icon { transform: rotate(180deg); }
+.extra-info-content { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 12px; padding: 0 15px 14px; }
+.extra-info-content section { min-width: 0; padding-top: 11px; border-top: 1px solid #292630; }
+.extra-info-content strong { color: #d4c5ed; font-size: 9px; }
+.extra-info-content p { margin: 4px 0 0; color: #9992a0; font-size: 9px; line-height: 1.75; }
+.extra-info-content a { color: #c2a6ff; }
+.trust-line { margin: 0; color: #827c87; font-size: 8px; text-align: center; }
 .detail-grid { display: grid; grid-template-columns: 1.18fr .82fr; gap: 13px; margin-top: 14px; }
 .detail-card { border: 1px solid var(--line); border-radius: 16px; padding: 17px 19px; box-shadow: 0 5px 18px #0003; }
 .quote-details { color: #201a2b; background: #f6f3fb; border-color: #fff; }
@@ -327,6 +341,7 @@ footer a { color: #b4a3d5; text-decoration: none; }
   .dashboard > .disclaimer { margin-top: 0; }
   .dashboard > .chart-panel { margin-top: 0; }
   .dashboard > .app-section { padding-top: 12px; }
+  .extra-info-content { grid-template-columns: 1fr; gap: 8px; }
   .section-heading-inline { align-items: flex-start; gap: 8px; }
   .summary-card strong { overflow-wrap: anywhere; }
   .activity-row { grid-template-columns: 32px minmax(0, 1fr) auto; }
