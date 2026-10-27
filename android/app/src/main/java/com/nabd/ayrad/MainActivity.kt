@@ -3,7 +3,9 @@ package com.nabd.ayrad
 import android.Manifest
 import android.app.Activity
 import android.content.res.ColorStateList
+import android.content.Intent
 import android.content.pm.PackageManager
+import android.net.Uri
 import android.graphics.Color
 import android.graphics.Typeface
 import android.graphics.drawable.GradientDrawable
@@ -11,7 +13,6 @@ import android.os.Build
 import android.os.Bundle
 import android.view.Gravity
 import android.view.View
-import android.widget.Button
 import android.widget.ImageView
 import android.widget.LinearLayout
 import android.widget.ScrollView
@@ -42,7 +43,6 @@ class MainActivity : Activity() {
 
     private lateinit var screenScroll: ScrollView
     private val navEntries = mutableListOf<LinearLayout>()
-    private val forest = 0xFF09090C.toInt()
     private val green = 0xFF43C77B.toInt()
     private val purple = 0xFF8B5CF6.toInt()
     private val ink = 0xFFF5F2FA.toInt()
@@ -89,15 +89,14 @@ class MainActivity : Activity() {
         })
         page.addView(header, marginParams(bottom = 20))
 
-        page.addView(text("قائمة المتابعة  ·  تفاصيل السهم", 10, muted), marginParams(bottom = 4))
-        page.addView(text("سعر AYRD", 21, ink, true), marginParams(bottom = 10))
+        page.addView(text("لوحة المتابعة", 10, muted), marginParams(bottom = 4))
+        page.addView(text("نظرة سريعة على AYRD", 21, ink, true), marginParams(bottom = 10))
 
         val quoteCard = vertical().apply {
             setPadding(dp(18), dp(17), dp(18), dp(16))
             background = purpleGradient()
             elevation = dp(7).toFloat()
         }
-        page.addView(quoteCard, marginParams(bottom = 13))
 
         val quoteHeader = horizontal().apply { gravity = Gravity.CENTER_VERTICAL }
         val companyMark = text("أ", 16, 0xFFB8EBC8.toInt(), true).apply {
@@ -138,21 +137,6 @@ class MainActivity : Activity() {
         stateRow.addView(movementText)
         quoteCard.addView(stateRow, marginParams(top = 5))
 
-        val chartHeader = horizontal().apply { gravity = Gravity.CENTER_VERTICAL }
-        val chartTitle = vertical().apply {
-            addView(text("سجل قراءاتك", 10, 0xFFF2EDFA.toInt(), true))
-            addView(text("مخطط محلي، وليس تاريخاً رسمياً", 8, 0xFFB6AFC2.toInt()))
-        }
-        chartHeader.addView(chartTitle, LinearLayout.LayoutParams(0, -2, 1f))
-        observationsCount = text("٠ فحص", 8, 0xFFE8DCFF.toInt()).apply {
-            background = rounded(0xFF7047D1.toInt(), 6)
-            setPadding(dp(7), dp(4), dp(7), dp(4))
-        }
-        chartHeader.addView(observationsCount)
-        quoteCard.addView(chartHeader, marginParams(top = 17))
-        sparkline = SparklineView(this)
-        quoteCard.addView(sparkline, LinearLayout.LayoutParams(-1, dp(91)))
-
         val divider = View(this).apply { setBackgroundColor(0x33FFFFFF) }
         quoteCard.addView(divider, LinearLayout.LayoutParams(-1, dp(1)).apply { topMargin = dp(5); bottomMargin = dp(11) })
         val facts = horizontal()
@@ -164,17 +148,48 @@ class MainActivity : Activity() {
         facts.addView(checkedFact.first, LinearLayout.LayoutParams(0, -2, 1f).apply { marginStart = dp(8) })
         quoteCard.addView(facts)
 
-        val refreshButton = Button(this).apply {
-            text = "تحديث السعر  ↻"
-            textSize = 12f
-            isAllCaps = false
-            setTextColor(forest)
-            background = rounded(0xFFE1F3E7.toInt(), 10)
-            setOnClickListener { refreshQuote() }
-        }
-        quoteCard.addView(refreshButton, LinearLayout.LayoutParams(-1, dp(44)).apply { topMargin = dp(15) })
-        statusText = text("يتم التحقق من المصدر الرسمي…", 9, 0xFFD5C7F0.toInt()).apply { setPadding(0, dp(8), 0, 0) }
+        statusText = text("يتم التحقق من المصدر الرسمي…", 9, 0xFFD5C7F0.toInt()).apply { setPadding(0, dp(12), 0, 0) }
         quoteCard.addView(statusText)
+
+        var marketCardRef: View? = null
+        var alertCardRef: View? = null
+        val chartCard = vertical().apply {
+            setPadding(dp(15), dp(14), dp(15), dp(12))
+            background = rounded(0xFF17171C.toInt(), 15)
+            elevation = dp(1).toFloat()
+        }
+        val chartHeading = horizontal().apply { gravity = Gravity.CENTER_VERTICAL }
+        val chartCopy = vertical().apply {
+            addView(text("قراءات السعر", 12, ink, true))
+            addView(text("سجل محلي · ليس رسماً تاريخياً رسمياً", 8, muted))
+        }
+        chartHeading.addView(chartCopy, LinearLayout.LayoutParams(0, -2, 1f))
+        observationsCount = text("٠ فحص", 8, 0xFFE8DCFF.toInt()).apply {
+            background = rounded(0xFF7047D1.toInt(), 6)
+            setPadding(dp(7), dp(4), dp(7), dp(4))
+        }
+        chartHeading.addView(observationsCount)
+        chartCard.addView(chartHeading)
+        sparkline = SparklineView(this)
+        chartCard.addView(sparkline, LinearLayout.LayoutParams(-1, dp(98)))
+
+        val quickActions = horizontal().apply {
+            setPadding(dp(5), dp(6), dp(5), dp(6))
+            background = rounded(0xFF17171C.toInt(), 14)
+        }
+        quickActions.addView(actionTile("↻", "تحديث") { refreshQuote() }, LinearLayout.LayoutParams(0, dp(72), 1f))
+        quickActions.addView(actionTile("↗", "المصدر") {
+            startActivity(Intent(Intent.ACTION_VIEW, Uri.parse("https://www.sgbv.dz/")))
+        }, LinearLayout.LayoutParams(0, dp(72), 1f))
+        quickActions.addView(actionTile("▤", "الأسعار") {
+            marketCardRef?.let { screenScroll.smoothScrollTo(0, (it.top - dp(8)).coerceAtLeast(0)) }
+        }, LinearLayout.LayoutParams(0, dp(72), 1f))
+        quickActions.addView(actionTile("◉", "التنبيهات") {
+            alertCardRef?.let { screenScroll.smoothScrollTo(0, (it.top - dp(8)).coerceAtLeast(0)) }
+        }, LinearLayout.LayoutParams(0, dp(72), 1f))
+        page.addView(quoteCard, marginParams(bottom = 11))
+        page.addView(quickActions, marginParams(bottom = 11))
+        page.addView(chartCard, marginParams(bottom = 12))
 
         val marketCard = vertical().apply {
             setPadding(dp(16), dp(15), dp(16), dp(13))
@@ -182,6 +197,7 @@ class MainActivity : Activity() {
             elevation = dp(1).toFloat()
         }
         page.addView(marketCard, marginParams(bottom = 12))
+        marketCardRef = marketCard
         val marketHeading = horizontal().apply { gravity = Gravity.CENTER_VERTICAL }
         marketHeading.addView(text("أسعار الجلسة", 14, darkInk, true), LinearLayout.LayoutParams(0, -2, 1f))
         marketHeading.addView(text("بيانات المصدر", 9, green).apply {
@@ -207,9 +223,9 @@ class MainActivity : Activity() {
             setPadding(dp(15), dp(14), dp(15), dp(14))
             background = rounded(0xFF17171C.toInt(), 15)
             elevation = dp(1).toFloat()
-            elevation = dp(1).toFloat()
         }
         page.addView(alertCard, marginParams(bottom = 12))
+        alertCardRef = alertCard
         val alertHeading = horizontal().apply { gravity = Gravity.CENTER_VERTICAL }
         val alertCopy = vertical().apply {
             addView(text("التنبيهات والفحص الدوري", 14, ink, true))
@@ -248,7 +264,7 @@ class MainActivity : Activity() {
             elevation = dp(8).toFloat()
         }
         navBar.addView(navItem("⌂", "الرئيسية", page, true), LinearLayout.LayoutParams(0, dp(52), 1f))
-        navBar.addView(navItem("⌁", "الرسم", quoteCard), LinearLayout.LayoutParams(0, dp(52), 1f))
+        navBar.addView(navItem("⌁", "الرسم", chartCard), LinearLayout.LayoutParams(0, dp(52), 1f))
         navBar.addView(navItem("◉", "التنبيهات", alertCard), LinearLayout.LayoutParams(0, dp(52), 1f))
         navBar.addView(navItem("≡", "السجل", historyCard), LinearLayout.LayoutParams(0, dp(52), 1f))
         root.addView(screenScroll, LinearLayout.LayoutParams(-1, 0, 1f))
@@ -353,6 +369,23 @@ class MainActivity : Activity() {
         val value = text("غير منشور", 13, darkInk, true).apply { gravity = Gravity.CENTER; setPadding(0, dp(3), 0, 0) }
         box.addView(value)
         return box to value
+    }
+
+    private fun actionTile(icon: String, label: String, action: () -> Unit): LinearLayout {
+        val tile = vertical().apply {
+            gravity = Gravity.CENTER
+            setPadding(dp(2), dp(5), dp(2), dp(4))
+            isClickable = true
+            isFocusable = true
+            contentDescription = label
+            addView(text(icon, 18, 0xFFE5D8FF.toInt()).apply {
+                gravity = Gravity.CENTER
+                background = rounded(0xFF302440.toInt(), 50)
+            }, LinearLayout.LayoutParams(dp(36), dp(36)))
+            addView(text(label, 9, 0xFFE9E4EF.toInt(), true).apply { gravity = Gravity.CENTER; setPadding(0, dp(4), 0, 0) })
+        }
+        tile.setOnClickListener { action() }
+        return tile
     }
 
     private fun navItem(icon: String, label: String, target: View, selected: Boolean = false): LinearLayout {

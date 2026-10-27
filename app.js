@@ -5,7 +5,7 @@
     error: $('error'), button: $('refresh'), status: $('refresh-status'), movement: $('movement'),
     movementCaption: $('movement-caption'), opening: $('opening-price'), closing: $('closing-price'),
     chartLine: $('chart-line'), chartArea: $('chart-area'), chartPoint: $('chart-point'), chartEmpty: $('chart-empty'),
-    chartCount: $('observation-count'), chartFirst: $('chart-first'), chartLast: $('chart-last')
+    chartCount: $('observation-count'), chartFirst: $('chart-first'), chartLast: $('chart-last'), activity: $('activity-list')
   };
   const CACHE_KEY = 'nabd-ayrad-last-success-v1';
   const HISTORY_KEY = 'nabd-ayrad-observations-v1';
@@ -39,6 +39,32 @@
     ui.chartLast.textContent = dateTime(visible[visible.length - 1].time).split('،')[0];
   }
 
+  function renderActivity(rows) {
+    if (!ui.activity) return;
+    ui.activity.replaceChildren();
+    if (!rows.length) {
+      const empty = document.createElement('div');
+      empty.className = 'activity-empty';
+      empty.textContent = 'تظهر القراءات هنا بعد نجاح الفحص الأول.';
+      ui.activity.appendChild(empty);
+      return;
+    }
+    rows.slice(-5).reverse().forEach((row, reverseIndex) => {
+      const index = rows.length - 1 - reverseIndex;
+      const previous = index > 0 ? rows[index - 1].price : null;
+      const delta = previous === null ? null : Number((row.price - previous).toFixed(2));
+      const item = document.createElement('article'); item.className = 'activity-row';
+      const icon = document.createElement('span'); icon.className = 'activity-icon'; icon.textContent = delta === null ? '✓' : delta > 0 ? '↑' : delta < 0 ? '↓' : '·';
+      const copy = document.createElement('div'); copy.className = 'activity-copy';
+      const title = document.createElement('strong'); title.textContent = delta === null ? 'تم حفظ سعر الأساس' : delta > 0 ? 'رُصد ارتفاع بين فحصين' : delta < 0 ? 'رُصد انخفاض بين فحصين' : 'السعر دون تغير بين فحصين';
+      const sub = document.createElement('small'); sub.textContent = `${dateTime(row.time)} · ${number(row.price)} دج`;
+      copy.append(title, sub);
+      const value = document.createElement('span'); value.className = `activity-value ${delta > 0 ? 'up' : delta < 0 ? 'down' : ''}`;
+      value.textContent = delta === null ? 'أساس' : delta > 0 ? `+${number(delta)} دج` : delta < 0 ? `−${number(Math.abs(delta))} دج` : 'ثابت';
+      item.append(icon, copy, value); ui.activity.appendChild(item);
+    });
+  }
+
   function showMovement(previous, current, knownChange) {
     const change = Number.isFinite(knownChange) ? knownChange : previous === null ? null : Number((current - previous).toFixed(2));
     if (change === null) { ui.movement.hidden = true; return; }
@@ -68,6 +94,7 @@
       if (!old || !Number.isFinite(old.price)) return null;
       showQuote(old, true);
       renderChart(readHistory());
+      renderActivity(readHistory());
       return old;
     } catch (_) { return null; }
   }
@@ -88,7 +115,7 @@
       const history = readHistory();
       history.push({ price: data.price, time: data.fetchedAt });
       localStorage.setItem(HISTORY_KEY, JSON.stringify(history.slice(-60)));
-      showQuote(data); showMovement(previous, data.price); renderChart(history.slice(-60));
+      showQuote(data); showMovement(previous, data.price); renderChart(history.slice(-60)); renderActivity(history.slice(-60));
       ui.status.textContent = 'تم الفحص بنجاح · البيانات من SGBV';
     } catch (error) {
       ui.error.textContent = `${error.message || 'تعذّر الاتصال.'} ${saved ? 'نعرض آخر سعر محفوظ وقد لا يكون حديثاً.' : 'لا يوجد سعر محفوظ لعرضه.'}`;
