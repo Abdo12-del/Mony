@@ -2,17 +2,22 @@ package com.nabd.ayrad
 
 import android.Manifest
 import android.app.Activity
+import android.app.AlertDialog
 import android.content.res.ColorStateList
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.net.Uri
+import android.graphics.BitmapFactory
 import android.graphics.Color
 import android.graphics.Typeface
 import android.graphics.drawable.GradientDrawable
 import android.os.Build
 import android.os.Bundle
 import android.view.Gravity
+import android.text.InputType
 import android.view.View
+import android.widget.EditText
+import android.widget.FrameLayout
 import android.widget.ImageView
 import android.widget.LinearLayout
 import android.widget.ScrollView
@@ -23,6 +28,7 @@ import androidx.core.view.WindowCompat
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
+import java.net.URL
 import java.util.concurrent.Executors
 
 class MainActivity : Activity() {
@@ -37,6 +43,12 @@ class MainActivity : Activity() {
     private lateinit var openingText: TextView
     private lateinit var closingText: TextView
     private lateinit var observationsCount: TextView
+    private lateinit var portfolioTotalText: TextView
+    private lateinit var portfolioSharesText: TextView
+    private lateinit var portfolioPriceText: TextView
+    private lateinit var portfolioHoldingValueText: TextView
+    private lateinit var companyLogoImage: ImageView
+    private lateinit var companyLogoFallback: TextView
     private lateinit var sparkline: SparklineView
     private lateinit var alertSwitch: Switch
     private var pendingAlertPermission = false
@@ -61,6 +73,7 @@ class MainActivity : Activity() {
         loadSavedData()
         if (QuoteStorage.alertsEnabled(this)) AlertScheduler.enable(this)
         refreshQuote()
+        loadCompanyLogo()
     }
 
     private fun buildScreen() {
@@ -188,6 +201,79 @@ class MainActivity : Activity() {
             alertCardRef?.let { screenScroll.smoothScrollTo(0, (it.top - dp(8)).coerceAtLeast(0)) }
         }, LinearLayout.LayoutParams(0, dp(72), 1f))
         page.addView(quoteCard, marginParams(bottom = 11))
+
+        val portfolioCard = vertical().apply {
+            setPadding(dp(15), dp(14), dp(15), dp(13))
+            background = rounded(white, 15)
+            elevation = dp(1).toFloat()
+        }
+        val portfolioHeader = horizontal().apply { gravity = Gravity.CENTER_VERTICAL }
+        val portfolioCopy = vertical().apply {
+            addView(text("محفظتي", 15, darkInk, true))
+            addView(text("متابعة حصة AYRADE التي تملكها", 9, 0xFF766E7F.toInt()))
+        }
+        portfolioHeader.addView(portfolioCopy, LinearLayout.LayoutParams(0, -2, 1f))
+        portfolioTotalText = text("—", 15, 0xFF6441A8.toInt(), true).apply { gravity = Gravity.LEFT or Gravity.CENTER_VERTICAL }
+        portfolioHeader.addView(portfolioTotalText)
+        portfolioCard.addView(portfolioHeader)
+        portfolioCard.addView(text("القيمة التقديرية · دج", 8, 0xFF766E7F.toInt()).apply { gravity = Gravity.LEFT }, marginParams(bottom = 10))
+
+        val holdingRow = horizontal().apply { gravity = Gravity.CENTER_VERTICAL }
+        val logoFrame = FrameLayout(this).apply {
+            background = rounded(white, 12)
+            contentDescription = "شعار شركة AYRADE من موقعها الرسمي"
+        }
+        companyLogoFallback = text("AY", 12, 0xFF176B75.toInt(), true).apply { gravity = Gravity.CENTER }
+        logoFrame.addView(companyLogoFallback, FrameLayout.LayoutParams(-1, -1, Gravity.CENTER))
+        companyLogoImage = ImageView(this).apply {
+            contentDescription = "شعار شركة AYRADE"
+            scaleType = ImageView.ScaleType.FIT_CENTER
+            setPadding(dp(2), dp(2), dp(2), dp(2))
+        }
+        logoFrame.addView(companyLogoImage, FrameLayout.LayoutParams(-1, -1, Gravity.CENTER))
+        holdingRow.addView(logoFrame, LinearLayout.LayoutParams(dp(48), dp(48)))
+        val holdingCopy = vertical().apply {
+            addView(text("AYRADE SPA", 12, darkInk, true))
+            addView(text("AYRD · بورصة الجزائر", 8, 0xFF766E7F.toInt()))
+        }
+        holdingRow.addView(holdingCopy, LinearLayout.LayoutParams(0, -2, 1f).apply { marginStart = dp(9) })
+        val editQuantity = text("تعديل الكمية", 9, white, true).apply {
+            gravity = Gravity.CENTER
+            background = rounded(0xFF7548D3.toInt(), 9)
+            setPadding(dp(10), dp(8), dp(10), dp(8))
+            isClickable = true
+            isFocusable = true
+            setOnClickListener { showOwnedSharesDialog() }
+        }
+        holdingRow.addView(editQuantity)
+        portfolioCard.addView(holdingRow, marginParams(bottom = 12))
+
+        val portfolioDivider = View(this).apply { setBackgroundColor(0xFFEAE7EF.toInt()) }
+        portfolioCard.addView(portfolioDivider, LinearLayout.LayoutParams(-1, dp(1)).apply { bottomMargin = dp(10) })
+        val portfolioMetrics = horizontal()
+        val sharesFact = vertical().apply {
+            addView(text("الكمية المملوكة", 8, 0xFF766E7F.toInt()))
+            portfolioSharesText = text("لم تُدخل بعد", 10, darkInk, true)
+            addView(portfolioSharesText)
+        }
+        portfolioMetrics.addView(sharesFact, LinearLayout.LayoutParams(0, -2, 1f))
+        val portfolioPriceFact = vertical().apply {
+            addView(text("آخر سعر", 8, 0xFF766E7F.toInt()))
+            portfolioPriceText = text("—", 10, darkInk, true)
+            addView(portfolioPriceText)
+        }
+        portfolioMetrics.addView(portfolioPriceFact, LinearLayout.LayoutParams(0, -2, 1f).apply { marginStart = dp(6) })
+        val holdingValueFact = vertical().apply {
+            addView(text("قيمة الحصة", 8, 0xFF766E7F.toInt()))
+            portfolioHoldingValueText = text("—", 10, darkInk, true)
+            addView(portfolioHoldingValueText)
+        }
+        portfolioMetrics.addView(holdingValueFact, LinearLayout.LayoutParams(0, -2, 1f).apply { marginStart = dp(6) })
+        portfolioCard.addView(portfolioMetrics)
+        portfolioCard.addView(text("الكمية تحفظ محلياً على هذا الجهاز؛ القيمة تقديرية حسب آخر قراءة ناجحة وقد لا تكون حديثة.", 8, 0xFF766E7F.toInt()).apply {
+            setPadding(0, dp(9), 0, 0)
+        })
+        page.addView(portfolioCard, marginParams(bottom = 11))
         page.addView(quickActions, marginParams(bottom = 11))
         page.addView(chartCard, marginParams(bottom = 12))
 
@@ -263,13 +349,66 @@ class MainActivity : Activity() {
             background = rounded(0xFF17171C.toInt(), 22)
             elevation = dp(8).toFloat()
         }
-        navBar.addView(navItem("⌂", "الرئيسية", page, true), LinearLayout.LayoutParams(0, dp(52), 1f))
+        navBar.addView(navItem("◈", "المحفظة", portfolioCard, true), LinearLayout.LayoutParams(0, dp(52), 1f))
         navBar.addView(navItem("⌁", "الرسم", chartCard), LinearLayout.LayoutParams(0, dp(52), 1f))
         navBar.addView(navItem("◉", "التنبيهات", alertCard), LinearLayout.LayoutParams(0, dp(52), 1f))
         navBar.addView(navItem("≡", "السجل", historyCard), LinearLayout.LayoutParams(0, dp(52), 1f))
         root.addView(screenScroll, LinearLayout.LayoutParams(-1, 0, 1f))
         root.addView(navBar, marginParams(top = 4, bottom = 5).apply { marginStart = dp(14); marginEnd = dp(14) })
         setContentView(root)
+    }
+
+    private fun showOwnedSharesDialog() {
+        val input = EditText(this).apply {
+            inputType = InputType.TYPE_CLASS_NUMBER
+            hint = "مثال: 25"
+            setText(QuoteStorage.ownedShares(this@MainActivity)?.toString().orEmpty())
+            contentDescription = "عدد أسهم AYRADE التي أملكها"
+        }
+        val inputBox = vertical().apply {
+            setPadding(dp(22), dp(4), dp(22), dp(2))
+            addView(input, LinearLayout.LayoutParams(-1, dp(52)))
+        }
+        val dialog = AlertDialog.Builder(this)
+            .setTitle("كمية أسهم AYRADE")
+            .setMessage("أدخل العدد الصحيح من الأسهم التي تملكها. ستُحفظ الكمية على هذا الجهاز فقط.")
+            .setView(inputBox)
+            .setNegativeButton("إلغاء", null)
+            .setPositiveButton("حفظ", null)
+            .create()
+        dialog.setOnShowListener {
+            dialog.getButton(AlertDialog.BUTTON_POSITIVE).setOnClickListener {
+                val quantity = input.text.toString().trim().toLongOrNull()
+                if (quantity == null || quantity < 0) {
+                    input.error = "أدخل عدداً صحيحاً غير سالب"
+                } else {
+                    QuoteStorage.setOwnedShares(this, quantity)
+                    loadSavedData()
+                    Toast.makeText(this, "تم حفظ الكمية على هذا الجهاز.", Toast.LENGTH_SHORT).show()
+                    dialog.dismiss()
+                }
+            }
+        }
+        dialog.show()
+    }
+
+    private fun loadCompanyLogo() {
+        executor.execute {
+            val bitmap = try {
+                val connection = URL(AYRADE_LOGO_URL).openConnection().apply {
+                    connectTimeout = 5000
+                    readTimeout = 7000
+                    setRequestProperty("User-Agent", "NabdAyrad/1.0")
+                }
+                connection.getInputStream().use { BitmapFactory.decodeStream(it) }
+            } catch (_: Exception) { null }
+            if (bitmap != null) runOnUiThread {
+                if (!isFinishing && !isDestroyed) {
+                    companyLogoImage.setImageBitmap(bitmap)
+                    companyLogoFallback.visibility = View.GONE
+                }
+            }
+        }
     }
 
     private fun onAlertToggle(enabled: Boolean) {
@@ -336,6 +475,13 @@ class MainActivity : Activity() {
         checkedText.text = if (checked > 0) SimpleDateFormat("yyyy-MM-dd HH:mm", Locale.getDefault()).format(Date(checked)) else "لم ينجح فحص بعد"
         openingText.text = QuoteStorage.openingPrice(this)?.let { String.format(Locale.ROOT, "%,.2f دج", it) } ?: "غير منشور"
         closingText.text = QuoteStorage.closingPrice(this)?.let { String.format(Locale.ROOT, "%,.2f دج", it) } ?: "غير منشور"
+        val ownedShares = QuoteStorage.ownedShares(this)
+        portfolioSharesText.text = ownedShares?.let { "${String.format(Locale.ROOT, "%,d", it)} سهم" } ?: "لم تُدخل بعد"
+        portfolioPriceText.text = price?.let { String.format(Locale.ROOT, "%,.2f دج", it) } ?: "لا توجد قراءة ناجحة"
+        val holdingValue = if (price != null && ownedShares != null) price * ownedShares.toDouble() else null
+        val holdingValueLabel = holdingValue?.let { String.format(Locale.ROOT, "%,.2f دج", it) } ?: "—"
+        portfolioTotalText.text = holdingValueLabel
+        portfolioHoldingValueText.text = holdingValueLabel
         val samples = QuoteStorage.observations(this)
         sparkline.setPrices(samples.map { it.price })
         observationsCount.text = "${samples.size} فحص"
@@ -427,5 +573,8 @@ class MainActivity : Activity() {
 
     override fun onDestroy() { super.onDestroy(); executor.shutdown() }
 
-    companion object { private const val REQUEST_NOTIFICATIONS = 91 }
+    companion object {
+        private const val REQUEST_NOTIFICATIONS = 91
+        private const val AYRADE_LOGO_URL = "https://www.ayrade.com/wp-content/uploads/2026/04/logo-ayrade-lion.png"
+    }
 }

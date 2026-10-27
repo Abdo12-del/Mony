@@ -357,3 +357,88 @@ footer a { color: #b4a3d5; text-decoration: none; }
 }
 
 :focus-visible { outline: 2px solid #c2a6ff; outline-offset: 3px; }
+
+/* Personal holdings: quantities stay in this browser; values use only verified quotes. */
+.portfolio-section {
+  min-width: 0;
+  padding: 17px;
+  border: 1px solid #302a3b;
+  border-radius: 18px;
+  background: linear-gradient(145deg, #17151d, #111115);
+  box-shadow: 0 10px 28px #0003;
+}
+.portfolio-heading {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 20px;
+  margin-bottom: 14px;
+}
+.portfolio-heading h2 { margin: 2px 0 3px; font-size: 17px; }
+.portfolio-heading p { margin: 0; color: #9b94a2; font-size: 10px; }
+.portfolio-total { min-width: 160px; text-align: left; }
+.portfolio-total span, .portfolio-total small { display: block; color: #a7a0ae; font-size: 9px; }
+.portfolio-total strong { display: block; color: #fff; font-size: 22px; line-height: 1.35; font-variant-numeric: tabular-nums; }
+.holding-card {
+  display: grid;
+  grid-template-columns: minmax(190px, 1.25fr) minmax(100px, .7fr) minmax(165px, 1fr) minmax(120px, .8fr) auto;
+  align-items: center;
+  gap: 12px;
+  padding: 13px;
+  border: 1px solid #2e2b34;
+  border-radius: 14px;
+  background: #1b1a20;
+}
+.holding-company { min-width: 0; display: flex; align-items: center; gap: 11px; }
+.company-logo-wrap {
+  width: 48px; height: 48px; flex: 0 0 48px;
+  display: grid; place-items: center; overflow: hidden;
+  border: 1px solid #ffffff35; border-radius: 13px; background: #fff;
+}
+.company-logo-wrap img { display: block; width: 100%; height: 100%; object-fit: contain; padding: 2px; }
+.company-logo-wrap [hidden] { display: none !important; }
+#ayrade-logo-fallback { color: #176b75; font: 700 13px Arial, sans-serif; }
+.holding-company-copy { min-width: 0; display: grid; gap: 2px; }
+.holding-company-copy strong { color: #f5f1fa; font-size: 12px; }
+.holding-company-copy small { color: #9d96a5; font-size: 9px; }
+.holding-metric { min-width: 0; display: grid; gap: 3px; }
+.holding-metric > span, .holding-quantity > span { color: #9d96a5; font-size: 9px; }
+.holding-metric strong { color: #f5f1fa; font-size: 12px; font-variant-numeric: tabular-nums; }
+.holding-quantity { min-width: 0; display: grid; gap: 4px; }
+.holding-quantity input {
+  width: 100%; min-width: 0; height: 39px;
+  padding: 7px 10px; border: 1px solid #4b405b; border-radius: 9px;
+  color: #fff; background: #111015; font-family: inherit; font-size: 12px; font-weight: 500;
+}
+.holding-quantity input:focus { border-color: #aa8aff; outline: 2px solid #aa8aff38; }
+.holding-quantity input::placeholder { color: #77717e; font-size: 10px; }
+.save-shares-button {
+  min-height: 39px; padding: 8px 12px; border: 0; border-radius: 9px;
+  color: #fff; background: #7548d3; font-family: inherit; font-size: 10px; font-weight: 600;
+  cursor: pointer; white-space: nowrap; transition: background .16s, transform .16s;
+}
+.save-shares-button:hover { background: #865be4; transform: translateY(-1px); }
+.portfolio-status, .portfolio-feedback { margin: 9px 2px 0; color: #928b9a; font-size: 9px; }
+.portfolio-feedback:not([hidden]) { color: #bfe8cc; }
+@media (min-width: 651px) and (max-width: 900px) {
+  .holding-card { grid-template-columns: repeat(6, minmax(0, 1fr)); }
+  .holding-company { grid-column: span 3; }
+  .holding-metric:first-of-type { grid-column: span 1; }
+  .holding-quantity { grid-column: span 2; }
+  .holding-value { grid-column: span 3; }
+  .save-shares-button { grid-column: span 3; }
+}
+@media (max-width: 650px) {
+  .portfolio-section { padding: 13px; }
+  .portfolio-heading { align-items: flex-start; flex-direction: column; gap: 10px; }
+  .portfolio-total { min-width: 0; text-align: right; }
+  .portfolio-total strong { font-size: 20px; }
+  .holding-card { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 11px 10px; padding: 10px; }
+  .holding-company, .save-shares-button { grid-column: 1 / -1; }
+}
+@media (max-width: 380px) {
+  .portfolio-heading h2 { font-size: 15px; }
+  .holding-card { gap: 9px 7px; }
+  .holding-metric strong { font-size: 10px; }
+  .holding-quantity input { padding-inline: 7px; }
+}

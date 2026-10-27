@@ -5,10 +5,16 @@
     error: $('error'), button: $('refresh'), status: $('refresh-status'), movement: $('movement'),
     movementCaption: $('movement-caption'), opening: $('opening-price'), closing: $('closing-price'),
     chartLine: $('chart-line'), chartArea: $('chart-area'), chartPoint: $('chart-point'), chartEmpty: $('chart-empty'),
-    chartCount: $('observation-count'), chartFirst: $('chart-first'), chartLast: $('chart-last'), activity: $('activity-list')
+    chartCount: $('observation-count'), chartFirst: $('chart-first'), chartLast: $('chart-last'), activity: $('activity-list'),
+    portfolioForm: $('portfolio-form'), sharesInput: $('shares-input'), portfolioTotal: $('portfolio-total'),
+    portfolioPrice: $('portfolio-price'), holdingValue: $('holding-value'), portfolioFeedback: $('portfolio-feedback'),
+    companyLogo: $('ayrade-logo'), companyLogoFallback: $('ayrade-logo-fallback')
   };
   const CACHE_KEY = 'nabd-ayrad-last-success-v1';
   const HISTORY_KEY = 'nabd-ayrad-observations-v1';
+  const PORTFOLIO_KEY = 'nabd-ayrad-portfolio-v1';
+  let latestPrice = null;
+  let ownedShares = null;
   const number = value => new Intl.NumberFormat('ar-DZ', { minimumFractionDigits: 2, maximumFractionDigits: 2 }).format(value);
   const dateTime = value => value ? new Intl.DateTimeFormat('ar-DZ', { dateStyle: 'medium', timeStyle: 'short' }).format(new Date(value)) : '—';
 
@@ -65,6 +71,49 @@
     });
   }
 
+  function readOwnedShares() {
+    try {
+      const raw = localStorage.getItem(PORTFOLIO_KEY);
+      if (raw === null || raw.trim() === '') return null;
+      const quantity = Number(raw);
+      return Number.isSafeInteger(quantity) && quantity >= 0 ? quantity : null;
+    } catch (_) { return null; }
+  }
+
+  function renderPortfolio(syncInput = false) {
+    if (!ui.portfolioForm) return;
+    if (syncInput && document.activeElement !== ui.sharesInput) {
+      ui.sharesInput.value = ownedShares === null ? '' : String(ownedShares);
+    }
+    ui.portfolioPrice.textContent = Number.isFinite(latestPrice) ? `${number(latestPrice)} دج` : 'لا توجد قراءة ناجحة';
+    const value = ownedShares !== null && Number.isFinite(latestPrice) ? ownedShares * latestPrice : null;
+    const formatted = Number.isFinite(value) ? `${number(value)} دج` : '—';
+    ui.portfolioTotal.textContent = formatted;
+    ui.holdingValue.textContent = formatted;
+  }
+
+  function saveOwnedShares(event) {
+    event.preventDefault();
+    const raw = ui.sharesInput.value.trim();
+    const quantity = Number(raw);
+    if (!raw || !Number.isSafeInteger(quantity) || quantity < 0) {
+      ui.sharesInput.setCustomValidity('أدخل عدداً صحيحاً غير سالب.');
+      ui.sharesInput.reportValidity();
+      return;
+    }
+    ui.sharesInput.setCustomValidity('');
+    try {
+      localStorage.setItem(PORTFOLIO_KEY, String(quantity));
+      ownedShares = quantity;
+      renderPortfolio();
+      ui.portfolioFeedback.textContent = `تم حفظ ${new Intl.NumberFormat('ar-DZ').format(quantity)} سهم AYRD على هذا الجهاز.`;
+      ui.portfolioFeedback.hidden = false;
+    } catch (_) {
+      ui.portfolioFeedback.textContent = 'تعذّر حفظ الكمية في هذا المتصفح.';
+      ui.portfolioFeedback.hidden = false;
+    }
+  }
+
   function showMovement(previous, current, knownChange) {
     const change = Number.isFinite(knownChange) ? knownChange : previous === null ? null : Number((current - previous).toFixed(2));
     if (change === null) { ui.movement.hidden = true; return; }
@@ -74,6 +123,7 @@
   }
 
   function showQuote(data, cached = false) {
+    latestPrice = Number.isFinite(data.price) && data.price > 0 ? data.price : null;
     ui.price.textContent = number(data.price);
     ui.type.textContent = data.priceLabel || 'السعر المنشور';
     ui.note.textContent = cached
@@ -86,6 +136,7 @@
     ui.opening.textContent = Number.isFinite(data.openingPrice) ? `${number(data.openingPrice)} دج` : 'غير منشور';
     ui.closing.textContent = Number.isFinite(data.closingPrice) ? `${number(data.closingPrice)} دج` : 'غير منشور';
     if (cached) showMovement(null, data.price, Number.isFinite(data.observedDelta) ? data.observedDelta : null);
+    renderPortfolio();
   }
 
   function showCached() {
@@ -124,7 +175,15 @@
       ui.button.disabled = false; ui.button.classList.remove('loading');
     }
   }
-  showCached(); renderChart(readHistory());
+  ownedShares = readOwnedShares();
+  if (ui.companyLogo) {
+    const showLogoFallback = () => { ui.companyLogo.hidden = true; ui.companyLogoFallback.hidden = false; };
+    ui.companyLogo.addEventListener('error', showLogoFallback, { once: true });
+    if (ui.companyLogo.complete && ui.companyLogo.naturalWidth === 0) showLogoFallback();
+  }
+  showCached(); renderChart(readHistory()); renderActivity(readHistory()); renderPortfolio(true);
+  ui.portfolioForm?.addEventListener('submit', saveOwnedShares);
+  ui.sharesInput?.addEventListener('input', () => ui.sharesInput.setCustomValidity(''));
   ui.button.addEventListener('click', refresh);
   document.querySelectorAll('.bottom-nav a').forEach(link => link.addEventListener('click', () => {
     document.querySelectorAll('.bottom-nav a').forEach(item => item.classList.remove('active'));

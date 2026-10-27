@@ -26,6 +26,8 @@ internal object QuoteStorage {
     }
     fun alertsEnabled(context: Context) = prefs(context).getBoolean("alerts", false)
     fun setAlerts(context: Context, enabled: Boolean) { prefs(context).edit().putBoolean("alerts", enabled).apply() }
+    fun ownedShares(context: Context): Long? = if (prefs(context).contains("ownedSharesAYRD")) prefs(context).getLong("ownedSharesAYRD", 0L) else null
+    fun setOwnedShares(context: Context, quantity: Long) { prefs(context).edit().putLong("ownedSharesAYRD", quantity).apply() }
 
     fun saveSuccess(context: Context, quote: Quote, change: Double?) {
         val p = prefs(context)

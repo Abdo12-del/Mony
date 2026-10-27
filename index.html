@@ -4,8 +4,8 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="theme-color" content="#0b0b0e">
-  <meta name="description" content="نبض أيراد — متابعة السعر المنشور لسهم AYRADE (AYRD) من بورصة الجزائر.">
-  <title>نبض أيراد | متابعة AYRD</title>
+  <meta name="description" content="نبض أيراد — متابعة السعر المنشور لسهم AYRADE (AYRD) وتسجيل كمية الأسهم التي تملكها ضمن محفظة محلية.">
+  <title>نبض أيراد | محفظة AYRD</title>
   <link rel="icon" href="/favicon.svg" type="image/svg+xml">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -52,6 +52,28 @@
       <a class="quick-action" href="#details"><span class="action-icon">▤</span><strong>بيانات السعر</strong><small>فتح وإغلاق</small></a>
       <a class="quick-action" href="#android"><span class="action-icon">◉</span><strong>التنبيهات</strong><small>تطبيق أندرويد</small></a>
     </nav>
+
+    <section class="portfolio-section" id="portfolio" aria-labelledby="portfolio-title">
+      <div class="portfolio-heading">
+        <div><span class="section-kicker">محفظتي</span><h2 id="portfolio-title">متابعة حصتك في AYRADE</h2><p>سجّل عدد الأسهم التي تملكها؛ تُحفظ الكمية على هذا الجهاز فقط.</p></div>
+        <div class="portfolio-total"><span>القيمة التقديرية</span><strong id="portfolio-total">—</strong><small>دج · حسب آخر سعر منشور</small></div>
+      </div>
+      <form id="portfolio-form" class="holding-card">
+        <div class="holding-company">
+          <span class="company-logo-wrap">
+            <img id="ayrade-logo" src="https://www.ayrade.com/wp-content/uploads/2026/04/logo-ayrade-lion.png" alt="شعار شركة AYRADE" loading="lazy" decoding="async">
+            <span id="ayrade-logo-fallback" hidden>AY</span>
+          </span>
+          <span class="holding-company-copy"><strong>AYRADE SPA</strong><small>AYRD · بورصة الجزائر</small></span>
+        </div>
+        <div class="holding-metric"><span>آخر سعر متاح</span><strong id="portfolio-price">—</strong></div>
+        <label class="holding-quantity" for="shares-input"><span>عدد الأسهم التي تملكها</span><input id="shares-input" name="shares" type="number" min="0" step="1" inputmode="numeric" placeholder="أدخل الكمية" autocomplete="off"></label>
+        <div class="holding-metric holding-value"><span>قيمة حصتك</span><strong id="holding-value">—</strong></div>
+        <button class="save-shares-button" type="submit">حفظ الكمية</button>
+      </form>
+      <p class="portfolio-status">القيمة تقديرية حسب آخر سعر منشور من SGBV، وقد تكون غير حديثة؛ ليست قيمة لحظية أو نصيحة استثمارية.</p>
+      <p id="portfolio-feedback" class="portfolio-feedback" role="status" hidden></p>
+    </section>
 
     <section class="summary-section" id="details">
       <div class="section-heading-inline"><div><span class="section-kicker">ملخص الجلسة</span><h2>بيانات السهم</h2></div><span class="section-meta">AYRD · DZD</span></div>
@@ -101,7 +123,7 @@
   </main>
 
   <nav class="bottom-nav" aria-label="التنقل السريع">
-    <a class="active" href="#top"><span>⌂</span><small>الرئيسية</small></a>
+    <a class="active" href="#portfolio"><span>◈</span><small>محفظتي</small></a>
     <a href="#chart-section"><span>⌁</span><small>الرسم</small></a>
     <a href="#activity"><span>▤</span><small>السجل</small></a>
     <a href="#android"><span>◉</span><small>التنبيهات</small></a>
