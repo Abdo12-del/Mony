@@ -209,7 +209,22 @@
   });
   window.addEventListener('appinstalled', () => { if (ui.installButton) ui.installButton.hidden = true; });
   if ('serviceWorker' in navigator && window.isSecureContext) {
-    window.addEventListener('load', () => navigator.serviceWorker.register('/sw.js').catch(() => {}), { once: true });
+    if (navigator.serviceWorker.controller) {
+      let reloadingForWorkerUpdate = false;
+      navigator.serviceWorker.addEventListener('controllerchange', () => {
+        if (reloadingForWorkerUpdate) return;
+        reloadingForWorkerUpdate = true;
+        window.location.reload();
+      });
+    }
+    window.addEventListener('load', async () => {
+      try {
+        const registration = await navigator.serviceWorker.register('/sw.js', { updateViaCache: 'none' });
+        await registration.update();
+      } catch (_) {
+        // The site still works online if service-worker installation is unavailable.
+      }
+    }, { once: true });
   }
   refresh();
 })();

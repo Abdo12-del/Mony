@@ -41,6 +41,9 @@ test('web app links its manifest, install metadata and service worker registrati
   assert.match(html, /rel="manifest" href="\/manifest\.webmanifest"/);
   assert.match(html, /id="install-app"/);
   assert.match(html, /apple-mobile-web-app-title" content="محفظتي"/);
-  assert.match(read('app.js'), /navigator\.serviceWorker\.register\('\/sw\.js'\)/);
+  assert.ok(read('app.js').includes("navigator.serviceWorker.register('/sw.js', { updateViaCache: 'none' })"));
+  assert.match(read('app.js'), /controllerchange/);
   assert.match(read('app.js'), /beforeinstallprompt/);
+  const vercel = JSON.parse(read('vercel.json'));
+  assert.ok(vercel.headers.some(rule => rule.source === '/sw.js' && rule.headers.some(header => header.key === 'Cache-Control' && header.value.includes('no-store'))));
 });
