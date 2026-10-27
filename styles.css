@@ -305,6 +305,8 @@ footer a { color: #b4a3d5; text-decoration: none; }
   .dashboard > .activity-section { grid-column: span 3; }
   .dashboard > .detail-grid { margin-top: 0; }
   .dashboard > .app-section { padding-top: 15px; }
+  .app-grid { grid-template-columns: 1fr; }
+  .app-feature { min-height: 0; }
   .dashboard > .notice,
   .dashboard > .disclaimer { margin-top: 0; }
 }
