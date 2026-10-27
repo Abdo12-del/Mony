@@ -1,0 +1,8 @@
+{
+  "name": "nabd-ayrad",
+  "version": "1.0.0",
+  "private": true,
+  "description": "متابعة السعر المنشور لسهم AYRADE (AYRD) من بورصة الجزائر",
+  "scripts": {"test": "node --test", "dev": "node dev-server.js", "build": "node scripts/build.js"},
+  "engines": {"node": ">=18"}
+}

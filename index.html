@@ -1,0 +1,91 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#102c25">
+  <meta name="description" content="نبض أيراد — متابعة السعر المنشور لسهم AYRADE (AYRD) من بورصة الجزائر.">
+  <title>نبض أيراد | متابعة AYRD</title>
+  <link rel="icon" href="/favicon.svg" type="image/svg+xml">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Arabic:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/styles.css">
+</head>
+<body>
+  <header class="topbar">
+    <a class="brand" href="/" aria-label="نبض أيراد الصفحة الرئيسية">
+      <img class="brand-mark" src="/logo.svg" alt="">
+      <span class="brand-name">نبض <b>أيراد</b></span>
+    </a>
+    <div class="topbar-end">
+      <span class="market-pill"><i class="market-dot"></i> بورصة الجزائر</span>
+      <span class="top-symbol">AYRD</span>
+    </div>
+  </header>
+
+  <main class="shell">
+    <section class="intro-row">
+      <div><span class="eyebrow">قائمة المتابعة <b>·</b> أسهم الجزائر</span><h1>تفاصيل السهم</h1></div>
+      <a class="source-link" href="https://www.sgbv.dz/" target="_blank" rel="noopener"><span class="external-icon">↗</span> المصدر الرسمي</a>
+    </section>
+
+    <section class="instrument-card" aria-live="polite" aria-atomic="true">
+      <div class="instrument-top">
+        <div class="company-info"><div class="company-avatar">أ</div><div><div class="company-title">أيراد <span class="ticker">AYRD</span></div><div class="company-subtitle">AYRADE SPA <span class="bullet">•</span> بورصة الجزائر</div></div></div>
+        <span class="quote-state"><i></i> سعر منشور</span>
+      </div>
+      <div class="quote-main">
+        <div><span class="quote-caption">آخر سعر متاح</span><div class="price-line"><strong id="price" class="price">—</strong><span class="currency">دج</span></div>
+          <div class="change-line"><span id="movement" class="movement" hidden></span><span id="movement-caption" class="movement-caption">مقارنة بين آخر فحصين ناجحين</span></div>
+        </div>
+        <div class="quote-unit"><span class="unit-icon">د.ج</span><span>دينار جزائري</span></div>
+      </div>
+      <div class="chart-panel">
+        <div class="chart-heading"><div><strong>سجل الفحوصات</strong><span>القيم التي رُصدت في هذا المتصفح</span></div><span class="chart-count" id="observation-count">٠ فحص</span></div>
+        <div class="chart-wrap"><svg id="price-chart" viewBox="0 0 720 150" preserveAspectRatio="none" role="img" aria-label="رسم يوضح الأسعار التي رُصدت في الفحوصات السابقة"><defs><linearGradient id="chart-fill" x1="0" x2="0" y1="0" y2="1"><stop offset="0%" stop-color="#87d6a7" stop-opacity=".34"/><stop offset="100%" stop-color="#87d6a7" stop-opacity="0"/></linearGradient></defs><path id="chart-area" d=""/><path id="chart-line" d=""/><circle id="chart-point" cx="0" cy="0" r="4"/></svg><div class="chart-empty" id="chart-empty"><span class="empty-bars">▁ ▃ ▂ ▅ ▄</span><span>يظهر المسار بعد تسجيل فحصين ناجحين على الأقل</span></div></div>
+        <div class="chart-foot"><span id="chart-first">—</span><span class="chart-disclaimer">ليس رسماً تاريخياً رسمياً</span><span id="chart-last">—</span></div>
+      </div>
+      <div class="instrument-bottom">
+        <div class="quote-fact"><span class="fact-icon">◷</span><div><span>تاريخ الجلسة</span><strong id="session-date">غير متاح من المصدر</strong></div></div>
+        <div class="quote-fact"><span class="fact-icon">↻</span><div><span>آخر فحص ناجح</span><strong id="checked-at">—</strong></div></div>
+        <button id="refresh" class="refresh-button"><span class="refresh-icon" aria-hidden="true">↻</span><span>تحديث السعر</span></button>
+      </div>
+      <p id="price-note" class="price-note">السعر سيظهر بعد قراءة المصدر الرسمي.</p>
+      <div id="error" class="error" role="status" hidden></div>
+      <div id="refresh-status" class="refresh-status" aria-live="polite">يتم التحقق من بيانات المصدر</div>
+    </section>
+
+    <section class="detail-grid">
+      <article class="detail-card quote-details">
+        <div class="section-title"><div><span class="section-kicker">بيانات التداول</span><h2>تفاصيل السعر</h2></div><span class="section-icon">▤</span></div>
+        <div class="detail-row"><span>سعر الافتتاح المنشور</span><strong id="opening-price">—</strong></div>
+        <div class="detail-row"><span>سعر الإغلاق المنشور</span><strong id="closing-price">—</strong></div>
+        <div class="detail-row"><span>حالة السعر المعروض</span><strong id="price-kind" class="detail-badge">بانتظار التحديث</strong></div>
+        <div class="source-note"><span>✓</span><p>إذا كان الإغلاق غير منشور، لا نعرض سعر الافتتاح على أنه إغلاق.</p></div>
+      </article>
+      <article class="detail-card background-card">
+        <div class="section-title"><div><span class="section-kicker">التنبيه</span><h2>تابع حتى عند إغلاق التطبيق</h2></div><span class="section-icon">♧</span></div>
+        <p>للفحص الدوري والتنبيهات، ثبّت تطبيق أندرويد وفعّل الإشعارات. صفحة الويب وحدها لا تعمل في الخلفية.</p>
+        <a class="app-link" href="#android">طريقة التثبيت <span>←</span></a>
+      </article>
+    </section>
+
+    <section class="notice"><span class="notice-icon">i</span><p><strong>ملاحظة عن المقارنة:</strong> التغير الملون يصف الفرق بين قراءتين ناجحتين لهذا المتصفح فقط، وليس بالضرورة تغير جلسة البورصة أو تغيراً لحظياً.</p></section>
+
+    <section class="app-section" id="android">
+      <div class="section-heading"><span class="section-kicker">متابعة مستمرة</span><h2>تطبيق نبض أيراد لأندرويد</h2><p>احفظ السعر محلياً واستقبل إشعاراً عند رصد اختلاف بين فحصين ناجحين.</p></div>
+      <div class="app-grid">
+        <article class="app-feature"><span class="feature-num">01</span><div><strong>نزّل التطبيق</strong><p>يتطلب Android 8 أو أحدث. لا يتوفر ملف APK موقّع في هذا الإصدار.</p><button class="download-button" id="download-apk" type="button" disabled>APK غير متاح حالياً</button></div></article>
+        <article class="app-feature"><span class="feature-num">02</span><div><strong>اسمح بالإشعارات</strong><p>بعد التثبيت، فعّل التنبيهات من التطبيق واسمح بإذن الإشعارات عند طلبه.</p></div></article>
+        <article class="app-feature"><span class="feature-num">03</span><div><strong>اعرف حدود الفحص</strong><p>يُجدول كل ١٥ دقيقة تقريباً عند توفر الإنترنت؛ قد يؤخر أندرويد الفحص أو يفوّت تغيراً بين فحصين. الإيقاف الإجباري يوقفه حتى إعادة فتح التطبيق.</p></div></article>
+      </div>
+    </section>
+
+    <section class="disclaimer"><span class="disclaimer-mark">!</span><p><strong>إخلاء مسؤولية</strong><br>«نبض أيراد» مشروع مستقل غير تابع لبورصة الجزائر أو شركة AYRADE، والبيانات للمتابعة فقط وليست نصيحة استثمارية.</p></section>
+  </main>
+
+  <footer><span>نبض أيراد <span class="footer-dot">·</span> AYRD</span><a href="https://www.sgbv.dz/" target="_blank" rel="noopener">بورصة الجزائر ↗</a></footer>
+  <script src="/app.js" defer></script>
+</body>
+</html>
