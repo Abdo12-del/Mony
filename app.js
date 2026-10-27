@@ -1,5 +1,6 @@
 (() => {
   const $ = id => document.getElementById(id);
+  const portfolio = window.NabdPortfolio;
   const ui = {
     price: $('price'), type: $('price-kind'), note: $('price-note'), date: $('session-date'), checked: $('checked-at'),
     error: $('error'), button: $('refresh'), status: $('refresh-status'), movement: $('movement'),
@@ -74,9 +75,7 @@
   function readOwnedShares() {
     try {
       const raw = localStorage.getItem(PORTFOLIO_KEY);
-      if (raw === null || raw.trim() === '') return null;
-      const quantity = Number(raw);
-      return Number.isSafeInteger(quantity) && quantity >= 0 ? quantity : null;
+      return raw === null ? null : portfolio.parseQuantity(raw);
     } catch (_) { return null; }
   }
 
@@ -86,17 +85,16 @@
       ui.sharesInput.value = ownedShares === null ? '' : String(ownedShares);
     }
     ui.portfolioPrice.textContent = Number.isFinite(latestPrice) ? `${number(latestPrice)} دج` : 'لا توجد قراءة ناجحة';
-    const value = ownedShares !== null && Number.isFinite(latestPrice) ? ownedShares * latestPrice : null;
-    const formatted = Number.isFinite(value) ? `${number(value)} دج` : '—';
+    const value = ownedShares === null ? null : portfolio.estimateValue(ownedShares, latestPrice);
+    const formatted = value === null ? '—' : `${number(value)} دج`;
     ui.portfolioTotal.textContent = formatted;
     ui.holdingValue.textContent = formatted;
   }
 
   function saveOwnedShares(event) {
     event.preventDefault();
-    const raw = ui.sharesInput.value.trim();
-    const quantity = Number(raw);
-    if (!raw || !Number.isSafeInteger(quantity) || quantity < 0) {
+    const quantity = portfolio.parseQuantity(ui.sharesInput.value.trim());
+    if (quantity === null) {
       ui.sharesInput.setCustomValidity('أدخل عدداً صحيحاً غير سالب.');
       ui.sharesInput.reportValidity();
       return;
