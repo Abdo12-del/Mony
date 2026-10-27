@@ -488,11 +488,9 @@ footer a { color: #b4a3d5; text-decoration: none; }
   grid-template-columns: minmax(160px, 1.3fr) minmax(130px, .85fr) minmax(145px, .9fr) minmax(140px, .9fr) auto;
   gap: 10px;
 }
-.holding-company-avatar {
-  width: 42px; height: 42px; flex: 0 0 42px;
-  display: grid; place-items: center; border: 1px solid #6546a1;
-  border-radius: 12px; color: #d9c7ff; background: #302244;
-  font-size: 11px; font-weight: 700; direction: ltr;
+.company-logo-fallback {
+  display: grid; place-items: center; width: 100%; height: 100%;
+  color: #7049ad; background: #f6f3fb; font: 700 11px Arial, sans-serif; direction: ltr;
 }
 .holding-actions { display: flex; align-items: center; gap: 7px; }
 .remove-holding-button {
@@ -528,7 +526,7 @@ footer a { color: #b4a3d5; text-decoration: none; }
   .company-list .save-shares-button { grid-column: auto; padding-inline: 8px; }
 }
 @media (max-width: 380px) {
-  .company-list .holding-company-avatar { width: 36px; height: 36px; flex-basis: 36px; }
+  .company-list .company-logo-wrap { width: 42px; height: 42px; flex-basis: 42px; }
   .company-list .holding-actions { align-items: stretch; flex-direction: column; }
   .company-list .remove-holding-button, .company-list .save-shares-button { width: 100%; }
 }

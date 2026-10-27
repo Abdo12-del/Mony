@@ -140,11 +140,20 @@
         ? portfolio.estimateValue(quantity, price) : null;
       const card = document.createElement('article'); card.className = 'holding-card'; card.dataset.symbol = symbol;
       const identity = document.createElement('div'); identity.className = 'holding-company';
-      const avatar = document.createElement('span'); avatar.className = 'holding-company-avatar'; avatar.textContent = company.symbol.slice(0, 2);
+      const logoWrap = document.createElement('span'); logoWrap.className = 'company-logo-wrap';
+      const logoFallback = document.createElement('span'); logoFallback.className = 'company-logo-fallback';
+      logoFallback.textContent = company.symbol.slice(0, 2); logoFallback.hidden = Boolean(company.logoUrl);
+      if (company.logoUrl) {
+        const logo = document.createElement('img'); logo.src = company.logoUrl;
+        logo.alt = `شعار شركة ${company.arabicName}`; logo.loading = 'lazy'; logo.decoding = 'async';
+        logo.addEventListener('error', () => { logo.hidden = true; logoFallback.hidden = false; }, { once: true });
+        logoWrap.appendChild(logo);
+      }
+      logoWrap.appendChild(logoFallback);
       const copy = document.createElement('span'); copy.className = 'holding-company-copy';
       const name = document.createElement('strong'); name.textContent = company.arabicName;
       const sub = document.createElement('small'); sub.textContent = `${company.name} · ${company.symbol} · ${company.sector}`;
-      copy.append(name, sub); identity.append(avatar, copy);
+      copy.append(name, sub); identity.append(logoWrap, copy);
 
       const priceMetric = document.createElement('div'); priceMetric.className = 'holding-metric';
       const priceLabel = document.createElement('span'); priceLabel.textContent = 'آخر سعر متاح من SGBV';
