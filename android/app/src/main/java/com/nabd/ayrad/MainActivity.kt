@@ -87,12 +87,12 @@ class MainActivity : Activity() {
         val header = horizontal().apply { gravity = Gravity.CENTER_VERTICAL }
         val brandMark = ImageView(this).apply {
             setImageResource(R.drawable.nabd_logo)
-            contentDescription = "شعار نبض أيراد"
+            contentDescription = "شعار محفظتي"
             scaleType = ImageView.ScaleType.FIT_CENTER
         }
         header.addView(brandMark, LinearLayout.LayoutParams(dp(42), dp(42)))
         val headerCopy = vertical().apply {
-            addView(text("نبض أيراد", 18, ink, true))
+            addView(text("محفظتي", 18, ink, true))
             addView(text("متابعة سهم AYRADE · AYRD", 10, muted))
         }
         header.addView(headerCopy, LinearLayout.LayoutParams(0, -2, 1f).apply { marginStart = dp(10) })
@@ -398,7 +398,7 @@ class MainActivity : Activity() {
                 val connection = URL(AYRADE_LOGO_URL).openConnection().apply {
                     connectTimeout = 5000
                     readTimeout = 7000
-                    setRequestProperty("User-Agent", "NabdAyrad/1.0")
+                    setRequestProperty("User-Agent", "Mahfazati/1.0")
                 }
                 connection.getInputStream().use { BitmapFactory.decodeStream(it) }
             } catch (_: Exception) { null }

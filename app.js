@@ -9,7 +9,7 @@
     chartCount: $('observation-count'), chartFirst: $('chart-first'), chartLast: $('chart-last'), activity: $('activity-list'),
     portfolioForm: $('portfolio-form'), sharesInput: $('shares-input'), portfolioTotal: $('portfolio-total'),
     portfolioPrice: $('portfolio-price'), holdingValue: $('holding-value'), portfolioFeedback: $('portfolio-feedback'),
-    companyLogo: $('ayrade-logo'), companyLogoFallback: $('ayrade-logo-fallback')
+    companyLogo: $('ayrade-logo'), companyLogoFallback: $('ayrade-logo-fallback'), installButton: $('install-app')
   };
   const CACHE_KEY = 'nabd-ayrad-last-success-v1';
   const HISTORY_KEY = 'nabd-ayrad-observations-v1';
@@ -187,5 +187,29 @@
     document.querySelectorAll('.bottom-nav a').forEach(item => item.classList.remove('active'));
     link.classList.add('active');
   }));
+
+  let deferredInstallPrompt = null;
+  window.addEventListener('beforeinstallprompt', event => {
+    event.preventDefault();
+    deferredInstallPrompt = event;
+    if (ui.installButton) ui.installButton.hidden = false;
+  });
+  ui.installButton?.addEventListener('click', async () => {
+    if (!deferredInstallPrompt) return;
+    const promptEvent = deferredInstallPrompt;
+    deferredInstallPrompt = null;
+    try {
+      promptEvent.prompt();
+      await promptEvent.userChoice;
+    } catch (_) {
+      // The browser's built-in menu remains available if its install prompt is unavailable.
+    } finally {
+      ui.installButton.hidden = true;
+    }
+  });
+  window.addEventListener('appinstalled', () => { if (ui.installButton) ui.installButton.hidden = true; });
+  if ('serviceWorker' in navigator && window.isSecureContext) {
+    window.addEventListener('load', () => navigator.serviceWorker.register('/sw.js').catch(() => {}), { once: true });
+  }
   refresh();
 })();

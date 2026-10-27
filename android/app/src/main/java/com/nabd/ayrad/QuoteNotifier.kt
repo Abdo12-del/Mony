@@ -26,7 +26,7 @@ internal object QuoteNotifier {
         val text = "$direction بمقدار $delta دج؛ من ${String.format(Locale.ROOT, "%.2f", previous)} إلى ${String.format(Locale.ROOT, "%.2f", current)} دج"
         val notification = NotificationCompat.Builder(context, CHANNEL_ID)
             .setSmallIcon(android.R.drawable.ic_dialog_info)
-            .setContentTitle("نبض أيراد · رُصد $direction في AYRD")
+            .setContentTitle("محفظتي · رُصد $direction في AYRD")
             .setContentText(text)
             .setStyle(NotificationCompat.BigTextStyle().bigText("$text. هذا تغير مرصود بين فحصين، وليس بالضرورة تغير جلسة التداول."))
             .setPriority(NotificationCompat.PRIORITY_DEFAULT)

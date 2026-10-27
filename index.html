@@ -4,9 +4,15 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="theme-color" content="#0b0b0e">
-  <meta name="description" content="نبض أيراد — متابعة السعر المنشور لسهم AYRADE (AYRD) وتسجيل كمية الأسهم التي تملكها ضمن محفظة محلية.">
-  <title>نبض أيراد | محفظة AYRD</title>
+  <meta name="application-name" content="محفظتي">
+  <meta name="description" content="محفظتي — متابعة سهم AYRADE (AYRD) وتسجيل كمية الأسهم في محفظة شخصية تعمل كتطبيق ويب قابل للتثبيت.">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="محفظتي">
+  <title>محفظتي | AYRD</title>
+  <link rel="manifest" href="/manifest.webmanifest">
   <link rel="icon" href="/favicon.svg" type="image/svg+xml">
+  <link rel="apple-touch-icon" href="/icons/icon-180.png">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Arabic:wght@400;500;600;700&display=swap" rel="stylesheet">
@@ -14,11 +20,12 @@
 </head>
 <body>
   <header class="topbar" id="top">
-    <a class="brand" href="#top" aria-label="نبض أيراد، الرئيسية">
-      <img class="brand-mark" src="/logo.svg" alt="">
-      <span class="brand-name">نبض <b>أيراد</b></span>
+    <a class="brand" href="#top" aria-label="محفظتي، الرئيسية">
+      <img class="brand-mark" src="/icons/app-icon.svg" alt="">
+      <span class="brand-name">محفظتي</span>
     </a>
     <div class="topbar-end">
+      <button id="install-app" class="install-app" type="button" hidden><span aria-hidden="true">⇩</span> تثبيت</button>
       <span class="market-pill"><i class="market-dot"></i> بورصة الجزائر</span>
       <span class="top-symbol">AYRD</span>
     </div>
@@ -26,7 +33,7 @@
 
   <main class="shell dashboard">
     <section class="welcome-row">
-      <div><span class="eyebrow">لوحة المتابعة</span><h1>أهلاً بك في نبض أيراد</h1><p>ملخص سهم AYRADE من المصدر الرسمي</p></div>
+      <div><span class="eyebrow">لوحة المتابعة</span><h1>أهلاً بك في محفظتي</h1><p>ملخص سهم AYRADE من المصدر الرسمي</p></div>
       <span class="welcome-mark" aria-hidden="true">◌</span>
     </section>
 
@@ -50,7 +57,7 @@
       <button id="refresh" class="quick-action refresh-action"><span class="action-icon">↻</span><strong>تحديث</strong><small>قراءة جديدة</small></button>
       <a class="quick-action" href="https://www.sgbv.dz/" target="_blank" rel="noopener"><span class="action-icon">↗</span><strong>المصدر</strong><small>بورصة الجزائر</small></a>
       <a class="quick-action" href="#details"><span class="action-icon">▤</span><strong>بيانات السعر</strong><small>فتح وإغلاق</small></a>
-      <a class="quick-action" href="#android"><span class="action-icon">◉</span><strong>التنبيهات</strong><small>تطبيق أندرويد</small></a>
+      <a class="quick-action" href="#pwa-info"><span class="action-icon">⇩</span><strong>تثبيت التطبيق</strong><small>محفظتي PWA</small></a>
     </nav>
 
     <section class="portfolio-section" id="portfolio" aria-labelledby="portfolio-title">
@@ -96,24 +103,24 @@
       <div id="activity-list" class="activity-list"></div>
     </section>
 
-    <details class="extra-info" id="android">
-      <summary><span><small>تفاصيل اختيارية</small><strong>عن السعر والتنبيهات</strong></span><span class="disclosure-icon" aria-hidden="true">⌄</span></summary>
+    <details class="extra-info" id="pwa-info">
+      <summary><span><small>تفاصيل اختيارية</small><strong>عن التثبيت والسعر</strong></span><span class="disclosure-icon" aria-hidden="true">⌄</span></summary>
       <div class="extra-info-content">
+        <section><strong>التثبيت والعمل دون اتصال</strong><p>ثبّت محفظتي من زر التثبيت عند ظهوره أو من قائمة المتصفح. تعمل واجهة المحفظة والبيانات المحفوظة دون اتصال؛ أما تحديث السعر فيتطلب الإنترنت.</p></section>
         <section><strong>مصدر السعر</strong><p>المصدر هو <a href="https://www.sgbv.dz/" target="_blank" rel="noopener">بورصة الجزائر (SGBV)</a>. إذا لم يُنشر سعر إغلاق، نعرض السعر المتاح بوصفه افتتاحاً أو سعراً مرجعياً، ولا نسميه إغلاقاً.</p></section>
-        <section><strong>حدود التنبيهات</strong><p>صفحة الويب لا ترسل تنبيهات في الخلفية. تطبيق Android غير متاح للتنزيل حالياً؛ وعند توفره، قد يؤخر النظام الفحص الدوري أو يفوّت تغيراً، كما يوقفه الإيقاف الإجباري حتى فتح التطبيق مجدداً.</p></section>
-        <section><strong>مقارنة الأسعار</strong><p>التغير المعروض يقارن آخر فحصين ناجحين فقط، ولا يعني تغيراً لحظياً أو تغير جلسة البورصة.</p></section>
+        <section><strong>حدود المتابعة</strong><p>نسخة PWA لا تفحص الأسعار في الخلفية ولا ترسل تنبيهات؛ التغير المعروض يقارن آخر فحصين ناجحين فقط. لا تتوفر حالياً نسخة Android للتنزيل.</p></section>
       </div>
     </details>
-    <p class="trust-line">«نبض أيراد» مشروع مستقل غير تابع لبورصة الجزائر أو AYRADE، ولا يقدم نصيحة استثمارية.</p>
+    <p class="trust-line">«محفظتي» مشروع مستقل غير تابع لبورصة الجزائر أو AYRADE، ولا يقدم نصيحة استثمارية.</p>
   </main>
 
   <nav class="bottom-nav" aria-label="التنقل السريع">
     <a class="active" href="#portfolio"><span>◈</span><small>محفظتي</small></a>
     <a href="#chart-section"><span>⌁</span><small>الرسم</small></a>
     <a href="#activity"><span>▤</span><small>السجل</small></a>
-    <a href="#android"><span>◉</span><small>التنبيهات</small></a>
+    <a href="#pwa-info"><span>⇩</span><small>التثبيت</small></a>
   </nav>
-  <footer><span>نبض أيراد <span class="footer-dot">·</span> AYRD</span><a href="https://www.sgbv.dz/" target="_blank" rel="noopener">بورصة الجزائر ↗</a></footer>
+  <footer><span>محفظتي <span class="footer-dot">·</span> AYRD</span><a href="https://www.sgbv.dz/" target="_blank" rel="noopener">بورصة الجزائر ↗</a></footer>
   <script src="/portfolio.js" defer></script>
   <script src="/app.js" defer></script>
 </body>

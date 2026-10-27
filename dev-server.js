@@ -3,7 +3,7 @@ const fs = require('node:fs');
 const path = require('node:path');
 const apiHandler = require('./api/ayrd');
 const root = __dirname;
-const types = { '.html': 'text/html; charset=utf-8', '.css': 'text/css; charset=utf-8', '.js': 'text/javascript; charset=utf-8', '.json': 'application/json; charset=utf-8', '.png': 'image/png', '.jpg': 'image/jpeg', '.svg': 'image/svg+xml' };
+const types = { '.html': 'text/html; charset=utf-8', '.css': 'text/css; charset=utf-8', '.js': 'text/javascript; charset=utf-8', '.json': 'application/json; charset=utf-8', '.webmanifest': 'application/manifest+json; charset=utf-8', '.png': 'image/png', '.jpg': 'image/jpeg', '.svg': 'image/svg+xml' };
 
 http.createServer(async (req, res) => {
   const pathname = new URL(req.url, 'http://localhost').pathname;
@@ -26,5 +26,5 @@ http.createServer(async (req, res) => {
     res.end(data);
   });
 }).listen(Number(process.env.PORT || 4173), '0.0.0.0', () => {
-  console.log(`نبض أيراد dev server listening on 0.0.0.0:${process.env.PORT || 4173}`);
+  console.log(`محفظتي dev server listening on 0.0.0.0:${process.env.PORT || 4173}`);
 });
