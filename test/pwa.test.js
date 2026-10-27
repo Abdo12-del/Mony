@@ -28,7 +28,7 @@ test('PWA manifest names محفظتي and declares installable app icons', () =>
 
 test('PWA shell supports offline launch without caching the stock API', () => {
   const worker = read('sw.js');
-  for (const asset of ['/', '/index.html', '/styles.css', '/app.js', '/portfolio.js', '/manifest.webmanifest', '/icons/icon-192.png', '/icons/icon-512.png']) {
+  for (const asset of ['/', '/index.html', '/styles.css', '/app.js', '/portfolio.js', '/companies.js', '/manifest.webmanifest', '/icons/icon-192.png', '/icons/icon-512.png']) {
     assert.ok(worker.includes(`'${asset}'`), `offline shell missing ${asset}`);
   }
   assert.match(worker, /url\.pathname\.startsWith\('\/api\/'\)/);
@@ -44,8 +44,15 @@ test('web app links its manifest, install metadata and service worker registrati
   assert.match(html, /<span class="quote-caption">إجمالي محفظتي<\/span>/);
   assert.match(html, /id="share-price"/);
   const app = read('app.js');
-  assert.ok(app.includes('portfolio.totalValue([{ quantity: ownedShares, price: latestPrice }])'));
-  assert.ok(app.includes("ui.price.textContent = totalValue === null ? '—' : number(totalValue);"));
+  assert.ok(app.includes('portfolio.totalValue(values)'));
+  assert.ok(app.includes("if (ui.price) ui.price.textContent = total === null ? '—' : number(total);"));
+  assert.match(html, /id="company-select"/);
+  assert.match(html, /id="company-list"/);
+  assert.match(html, /id="quote-refresh-feedback"/);
+  assert.ok(app.includes("fetch('/api/quotes'"));
+  assert.ok(app.includes("localStorage.setItem(PORTFOLIO_KEY, JSON.stringify(positions))"));
+  assert.match(read('dev-server.js'), /pathname === '\/api\/quotes'/);
+  assert.ok(read('scripts/build.js').includes("'companies.js'"));
   assert.ok(app.includes("navigator.serviceWorker.register('/sw.js', { updateViaCache: 'none' })"));
   assert.match(read('app.js'), /controllerchange/);
   assert.match(read('app.js'), /beforeinstallprompt/);

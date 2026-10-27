@@ -464,3 +464,75 @@ footer a { color: #b4a3d5; text-decoration: none; }
   .holding-metric strong { font-size: 10px; }
   .holding-quantity input { padding-inline: 7px; }
 }
+
+/* Multi-company holdings picker and editable position cards. */
+.company-picker {
+  display: grid;
+  grid-template-columns: auto minmax(180px, 1fr) auto;
+  align-items: center;
+  gap: 10px;
+  margin: 0 0 12px;
+  padding: 11px;
+  border: 1px solid #302a3b;
+  border-radius: 12px;
+  background: #141318;
+}
+.company-picker > label { color: #c7bfce; font-size: 10px; }
+.company-picker select {
+  width: 100%; min-width: 0; min-height: 39px; padding: 7px 10px;
+  border: 1px solid #4b405b; border-radius: 9px; color: #f5f1fa;
+  background: #111015; font-family: inherit; font-size: 11px;
+}
+.company-list { display: grid; gap: 9px; }
+.company-list .holding-card {
+  grid-template-columns: minmax(160px, 1.3fr) minmax(130px, .85fr) minmax(145px, .9fr) minmax(140px, .9fr) auto;
+  gap: 10px;
+}
+.holding-company-avatar {
+  width: 42px; height: 42px; flex: 0 0 42px;
+  display: grid; place-items: center; border: 1px solid #6546a1;
+  border-radius: 12px; color: #d9c7ff; background: #302244;
+  font-size: 11px; font-weight: 700; direction: ltr;
+}
+.holding-actions { display: flex; align-items: center; gap: 7px; }
+.remove-holding-button {
+  min-height: 39px; padding: 7px 10px; border: 1px solid #49414e;
+  border-radius: 9px; color: #c7bdcd; background: transparent;
+  font-family: inherit; font-size: 10px; cursor: pointer;
+}
+.remove-holding-button:hover { border-color: #a36f78; color: #ffc3c9; }
+.screening-note { grid-column: 1 / -1; color: #aa9caf; font-size: 9px; line-height: 1.6; }
+.company-list-empty {
+  padding: 18px 12px; border: 1px dashed #44394f; border-radius: 12px;
+  color: #aaa2b0; text-align: center; font-size: 10px;
+}
+.quote-refresh-feedback:not([hidden]) { color: #efc688; }
+@media (max-width: 900px) {
+  .company-list .holding-card { grid-template-columns: repeat(6, minmax(0, 1fr)); }
+  .company-list .holding-company { grid-column: span 3; }
+  .company-list .holding-metric { grid-column: span 2; }
+  .company-list .holding-quantity { grid-column: span 2; }
+  .company-list .holding-value { grid-column: span 2; }
+  .company-list .holding-actions { grid-column: span 2; }
+  .company-list .screening-note { grid-column: 1 / -1; }
+}
+@media (max-width: 650px) {
+  .company-picker { grid-template-columns: 1fr auto; gap: 8px; }
+  .company-picker > label { grid-column: 1 / -1; }
+  .company-picker select { font-size: 10px; }
+  .company-picker .save-shares-button { grid-column: auto; padding-inline: 8px; }
+  .company-list .holding-card { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px 8px; }
+  .company-list .holding-company, .company-list .screening-note { grid-column: 1 / -1; }
+  .company-list .holding-metric, .company-list .holding-quantity, .company-list .holding-value, .company-list .holding-actions { grid-column: span 1; }
+  .company-list .holding-actions { align-self: end; }
+  .company-list .save-shares-button { grid-column: auto; padding-inline: 8px; }
+}
+@media (max-width: 380px) {
+  .company-list .holding-company-avatar { width: 36px; height: 36px; flex-basis: 36px; }
+  .company-list .holding-actions { align-items: stretch; flex-direction: column; }
+  .company-list .remove-holding-button, .company-list .save-shares-button { width: 100%; }
+}
+.company-picker select { font-family: inherit; font-size: 11px; }
+.remove-holding-button { font-family: inherit; font-size: 10px; }
+.holding-metric > small { color: #918998; font-size: 8px; line-height: 1.45; }
+#quote-refresh-feedback:not([hidden]) { color: #efc688; }

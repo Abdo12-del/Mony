@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="theme-color" content="#0b0b0e">
   <meta name="application-name" content="محفظتي">
-  <meta name="description" content="محفظتي — متابعة سهم AYRADE (AYRD) وتسجيل كمية الأسهم في محفظة شخصية تعمل كتطبيق ويب قابل للتثبيت.">
+  <meta name="description" content="محفظتي — متابعة أسهم بورصة الجزائر وتسجيل حيازاتك الشخصية من المصدر الرسمي.">
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   <meta name="apple-mobile-web-app-title" content="محفظتي">
@@ -40,7 +40,7 @@
     <section class="instrument-card" aria-live="polite" aria-atomic="true">
       <div class="instrument-top">
         <div class="company-info"><div class="company-avatar">أ</div><div><div class="company-title">أيراد <span class="ticker">AYRD</span></div><div class="company-subtitle">AYRADE SPA <span class="bullet">•</span> بورصة الجزائر</div></div></div>
-        <span class="quote-state"><i></i> سعر AYRD المنشور</span>
+        <span class="quote-state"><i></i> مجموع الحيازات المسجّلة</span>
       </div>
       <div class="quote-main">
         <div><span class="quote-caption">إجمالي محفظتي</span><div class="price-line"><strong id="price" class="price">—</strong><span class="currency">دج</span></div>
@@ -62,24 +62,18 @@
 
     <section class="portfolio-section" id="portfolio" aria-labelledby="portfolio-title">
       <div class="portfolio-heading">
-        <div><span class="section-kicker">محفظتي</span><h2 id="portfolio-title">متابعة حصتك في AYRADE</h2><p>سجّل عدد الأسهم التي تملكها؛ تُحفظ الكمية على هذا الجهاز فقط.</p></div>
-        <div class="portfolio-total"><span>إجمالي قيمة المحفظة</span><strong id="portfolio-total">—</strong><small>مجموع قيم الحيازات المسجلة · دج</small></div>
+        <div><span class="section-kicker">محفظتي</span><h2 id="portfolio-title">أسهمي</h2><p>اختر شركة مرشحة مبدئياً، ثم سجّل عدد الأسهم التي تملكها؛ تحفظ الحيازات على هذا الجهاز فقط.</p></div>
+        <div class="portfolio-total"><span>إجمالي قيمة المحفظة</span><strong id="portfolio-total">—</strong><small>لا يظهر الإجمالي إذا تعذّر تسعير إحدى الحيازات · دج</small></div>
       </div>
-      <form id="portfolio-form" class="holding-card">
-        <div class="holding-company">
-          <span class="company-logo-wrap">
-            <img id="ayrade-logo" src="https://www.ayrade.com/wp-content/uploads/2026/04/logo-ayrade-lion.png" alt="شعار شركة AYRADE" loading="lazy" decoding="async">
-            <span id="ayrade-logo-fallback" hidden>AY</span>
-          </span>
-          <span class="holding-company-copy"><strong>AYRADE SPA</strong><small>AYRD · بورصة الجزائر</small></span>
-        </div>
-        <div class="holding-metric"><span>آخر سعر متاح</span><strong id="portfolio-price">—</strong></div>
-        <label class="holding-quantity" for="shares-input"><span>عدد الأسهم التي تملكها</span><input id="shares-input" name="shares" type="number" min="0" step="1" inputmode="numeric" placeholder="أدخل الكمية" autocomplete="off"></label>
-        <div class="holding-metric holding-value"><span>قيمة حصتك</span><strong id="holding-value">—</strong></div>
-        <button class="save-shares-button" type="submit">حفظ الكمية</button>
-      </form>
-      <p class="portfolio-status">القيمة تقديرية حسب آخر سعر منشور من SGBV، وقد تكون غير حديثة؛ ليست قيمة لحظية أو نصيحة استثمارية.</p>
+      <div class="company-picker">
+        <label for="company-select">إضافة شركة إلى المحفظة</label>
+        <select id="company-select" aria-label="اختر شركة مدرجة لإضافتها للمحفظة"></select>
+        <button id="add-company" class="save-shares-button" type="button">إضافة شركة</button>
+      </div>
+      <div id="company-list" class="company-list" aria-live="polite"></div>
+      <p class="portfolio-status">خيارات الإضافة مرشحة مبدئياً من طبيعة النشاط الظاهر فقط، وليست فتوى أو شهادة توافق شرعي؛ لا تتوفر مراجعة للقوائم المالية أو تطهير الدخل. لم ندرج الأسهم الأخرى كخيارات حتى تُراجع أنشطتها وبياناتها. تحقّق شرعياً قبل الاستثمار. الأسعار من SGBV وقد تتأخر أو لا تكون حديثة، والقيمة ليست نصيحة استثمارية.</p>
       <p id="portfolio-feedback" class="portfolio-feedback" role="status" hidden></p>
+      <p id="quote-refresh-feedback" class="portfolio-feedback" role="status" hidden></p>
     </section>
 
     <section class="summary-section" id="details">
@@ -122,6 +116,7 @@
   </nav>
   <footer><span>محفظتي <span class="footer-dot">·</span> AYRD</span><a href="https://www.sgbv.dz/" target="_blank" rel="noopener">بورصة الجزائر ↗</a></footer>
   <script src="/portfolio.js" defer></script>
+  <script src="/companies.js" defer></script>
   <script src="/app.js" defer></script>
 </body>
 </html>

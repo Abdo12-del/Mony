@@ -2,12 +2,14 @@ const http = require('node:http');
 const fs = require('node:fs');
 const path = require('node:path');
 const apiHandler = require('./api/ayrd');
+const quotesHandler = require('./api/quotes');
 const root = __dirname;
 const types = { '.html': 'text/html; charset=utf-8', '.css': 'text/css; charset=utf-8', '.js': 'text/javascript; charset=utf-8', '.json': 'application/json; charset=utf-8', '.webmanifest': 'application/manifest+json; charset=utf-8', '.png': 'image/png', '.jpg': 'image/jpeg', '.svg': 'image/svg+xml' };
 
 http.createServer(async (req, res) => {
   const pathname = new URL(req.url, 'http://localhost').pathname;
-  if (pathname === '/api/ayrd') {
+  if (pathname === '/api/ayrd' || pathname === '/api/quotes') {
+    const apiHandler = pathname === '/api/quotes' ? quotesHandler : require('./api/ayrd');
     const adapter = {
       setHeader: (key, value) => res.setHeader(key, value),
       status(code) { res.statusCode = code; return this; },

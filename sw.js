@@ -1,12 +1,13 @@
 'use strict';
 
-const CACHE_NAME = 'mahfazati-shell-v5';
+const CACHE_NAME = 'mahfazati-shell-v6';
 const APP_SHELL = [
   '/',
   '/index.html',
   '/styles.css',
   '/app.js',
   '/portfolio.js',
+  '/companies.js',
   '/manifest.webmanifest',
   '/logo.svg',
   '/favicon.svg',

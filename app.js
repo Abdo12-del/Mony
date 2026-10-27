@@ -1,21 +1,26 @@
 (() => {
   const $ = id => document.getElementById(id);
   const portfolio = window.NabdPortfolio;
+  const companies = window.NabdCompanies;
   const ui = {
     price: $('price'), sharePrice: $('share-price'), type: $('price-kind'), note: $('price-note'), date: $('session-date'), checked: $('checked-at'),
     error: $('error'), button: $('refresh'), status: $('refresh-status'), movement: $('movement'),
     movementCaption: $('movement-caption'), opening: $('opening-price'), closing: $('closing-price'),
     chartLine: $('chart-line'), chartArea: $('chart-area'), chartPoint: $('chart-point'), chartEmpty: $('chart-empty'),
     chartCount: $('observation-count'), chartFirst: $('chart-first'), chartLast: $('chart-last'), activity: $('activity-list'),
-    portfolioForm: $('portfolio-form'), sharesInput: $('shares-input'), portfolioTotal: $('portfolio-total'),
-    portfolioPrice: $('portfolio-price'), holdingValue: $('holding-value'), portfolioFeedback: $('portfolio-feedback'),
-    companyLogo: $('ayrade-logo'), companyLogoFallback: $('ayrade-logo-fallback'), installButton: $('install-app')
+    portfolioTotal: $('portfolio-total'), portfolioFeedback: $('portfolio-feedback'), quoteFeedback: $('quote-refresh-feedback'),
+    companySelect: $('company-select'), addCompany: $('add-company'), companyList: $('company-list'),
+    installButton: $('install-app')
   };
   const CACHE_KEY = 'nabd-ayrad-last-success-v1';
   const HISTORY_KEY = 'nabd-ayrad-observations-v1';
-  const PORTFOLIO_KEY = 'nabd-ayrad-portfolio-v1';
+  const PORTFOLIO_KEY = 'mahfazati-portfolio-v2';
+  const LEGACY_PORTFOLIO_KEY = 'nabd-ayrad-portfolio-v1';
+  const QUOTES_KEY = 'mahfazati-last-quotes-v1';
   let latestPrice = null;
-  let ownedShares = null;
+  let positions = readPositions();
+  let draftSymbols = [];
+  let quoteCache = readQuoteCache();
   const number = value => new Intl.NumberFormat('ar-DZ', { minimumFractionDigits: 2, maximumFractionDigits: 2 }).format(value);
   const dateTime = value => value ? new Intl.DateTimeFormat('ar-DZ', { dateStyle: 'medium', timeStyle: 'short' }).format(new Date(value)) : '—';
 
@@ -72,48 +77,180 @@
     });
   }
 
-  function readOwnedShares() {
+  function readPositions() {
     try {
-      const raw = localStorage.getItem(PORTFOLIO_KEY);
-      return raw === null ? null : portfolio.parseQuantity(raw);
-    } catch (_) { return null; }
+      const saved = JSON.parse(localStorage.getItem(PORTFOLIO_KEY) || 'null');
+      if (saved && typeof saved === 'object' && !Array.isArray(saved)) {
+        return Object.fromEntries(Object.entries(saved).filter(([symbol, quantity]) =>
+          companies.get(symbol) && Number.isSafeInteger(quantity) && quantity > 0));
+      }
+      const legacy = localStorage.getItem(LEGACY_PORTFOLIO_KEY);
+      const legacyQuantity = legacy === null ? null : portfolio.parseQuantity(legacy);
+      return legacyQuantity > 0 ? { AYRD: legacyQuantity } : {};
+    } catch (_) { return {}; }
   }
 
-  function renderPortfolio(syncInput = false) {
-    if (!ui.portfolioForm) return;
-    if (syncInput && document.activeElement !== ui.sharesInput) {
-      ui.sharesInput.value = ownedShares === null ? '' : String(ownedShares);
+  function readQuoteCache() {
+    try {
+      const data = JSON.parse(localStorage.getItem(QUOTES_KEY) || '{}');
+      return data && typeof data === 'object' && !Array.isArray(data) ? data : {};
+    } catch (_) { return {}; }
+  }
+
+  function savePositions() {
+    localStorage.setItem(PORTFOLIO_KEY, JSON.stringify(positions));
+  }
+
+  function companyDisplayName(company) {
+    return `${company.arabicName} · ${company.symbol}`;
+  }
+
+  function renderCompanyPicker() {
+    if (!ui.companySelect) return;
+    ui.companySelect.replaceChildren();
+    const group = document.createElement('optgroup');
+    group.label = 'مرشحة مبدئياً حسب طبيعة النشاط — لا تُعد شهادة توافق شرعي';
+    for (const company of companies.candidates()) {
+      const option = document.createElement('option'); option.value = company.symbol;
+      option.textContent = `${companyDisplayName(company)} — ${company.sector}`;
+      group.appendChild(option);
     }
-    const formattedSharePrice = Number.isFinite(latestPrice) ? `${number(latestPrice)} دج` : 'لا توجد قراءة ناجحة';
-    ui.portfolioPrice.textContent = formattedSharePrice;
-    ui.sharePrice.textContent = formattedSharePrice;
-    const holdingValue = ownedShares === null ? null : portfolio.estimateValue(ownedShares, latestPrice);
-    const totalValue = ownedShares === null ? null : portfolio.totalValue([{ quantity: ownedShares, price: latestPrice }]);
-    const formattedTotal = totalValue === null ? '—' : `${number(totalValue)} دج`;
-    ui.price.textContent = totalValue === null ? '—' : number(totalValue);
-    ui.portfolioTotal.textContent = formattedTotal;
-    ui.holdingValue.textContent = holdingValue === null ? '—' : `${number(holdingValue)} دج`;
+    ui.companySelect.appendChild(group);
   }
 
-  function saveOwnedShares(event) {
-    event.preventDefault();
-    const quantity = portfolio.parseQuantity(ui.sharesInput.value.trim());
-    if (quantity === null) {
-      ui.sharesInput.setCustomValidity('أدخل عدداً صحيحاً غير سالب.');
-      ui.sharesInput.reportValidity();
+  function renderCompanyList() {
+    if (!ui.companyList) return;
+    const pendingValues = new Map([...ui.companyList.querySelectorAll('.holding-card[data-symbol]')]
+      .map(card => [card.dataset.symbol, card.querySelector('input')?.value]));
+    ui.companyList.replaceChildren();
+    const symbols = [...new Set([...Object.keys(positions), ...draftSymbols])];
+    if (!symbols.length) {
+      const empty = document.createElement('div'); empty.className = 'company-list-empty';
+      empty.textContent = 'لم تضف شركات بعد. اختر سهماً من القائمة وسجّل الكمية التي تملكها.';
+      ui.companyList.appendChild(empty);
       return;
     }
-    ui.sharesInput.setCustomValidity('');
-    try {
-      localStorage.setItem(PORTFOLIO_KEY, String(quantity));
-      ownedShares = quantity;
-      renderPortfolio();
-      ui.portfolioFeedback.textContent = `تم حفظ ${new Intl.NumberFormat('ar-DZ').format(quantity)} سهم AYRD على هذا الجهاز.`;
-      ui.portfolioFeedback.hidden = false;
-    } catch (_) {
-      ui.portfolioFeedback.textContent = 'تعذّر حفظ الكمية في هذا المتصفح.';
-      ui.portfolioFeedback.hidden = false;
+    for (const symbol of symbols) {
+      const company = companies.get(symbol);
+      if (!company) continue;
+      const quote = quoteCache[symbol];
+      const quantity = positions[symbol];
+      const price = quote && Number.isFinite(quote.price) && quote.price > 0 ? quote.price : null;
+      const value = Number.isSafeInteger(quantity) && quantity > 0 && price !== null
+        ? portfolio.estimateValue(quantity, price) : null;
+      const card = document.createElement('article'); card.className = 'holding-card'; card.dataset.symbol = symbol;
+      const identity = document.createElement('div'); identity.className = 'holding-company';
+      const avatar = document.createElement('span'); avatar.className = 'holding-company-avatar'; avatar.textContent = company.symbol.slice(0, 2);
+      const copy = document.createElement('span'); copy.className = 'holding-company-copy';
+      const name = document.createElement('strong'); name.textContent = company.arabicName;
+      const sub = document.createElement('small'); sub.textContent = `${company.name} · ${company.symbol} · ${company.sector}`;
+      copy.append(name, sub); identity.append(avatar, copy);
+
+      const priceMetric = document.createElement('div'); priceMetric.className = 'holding-metric';
+      const priceLabel = document.createElement('span'); priceLabel.textContent = 'آخر سعر متاح من SGBV';
+      const priceText = document.createElement('strong'); priceText.textContent = price === null ? 'لا توجد قراءة ناجحة' : `${number(price)} دج`;
+      const quoteNote = document.createElement('small');
+      quoteNote.textContent = price === null ? 'بانتظار قراءة رسمية' : `${quote.priceLabel || 'السعر المنشور'}${quote._retrievedAt && Date.now() - quote._retrievedAt > 60000 ? ' · آخر قراءة محفوظة وقد لا تكون حديثة' : ''}`;
+      priceMetric.append(priceLabel, priceText, quoteNote);
+
+      const quantityLabel = document.createElement('label'); quantityLabel.className = 'holding-quantity';
+      const quantityCaption = document.createElement('span'); quantityCaption.textContent = 'عدد الأسهم التي تملكها';
+      const input = document.createElement('input'); input.type = 'number'; input.min = '1'; input.step = '1'; input.inputMode = 'numeric';
+      input.placeholder = 'أدخل الكمية'; input.autocomplete = 'off'; input.setAttribute('aria-label', `عدد أسهم ${company.arabicName}`);
+      input.value = pendingValues.has(symbol) ? pendingValues.get(symbol) : quantity ? String(quantity) : '';
+      quantityLabel.append(quantityCaption, input);
+
+      const valueMetric = document.createElement('div'); valueMetric.className = 'holding-metric holding-value';
+      const valueLabel = document.createElement('span'); valueLabel.textContent = 'قيمة الحيازة التقديرية';
+      const valueText = document.createElement('strong'); valueText.textContent = value === null ? '—' : `${number(value)} دج`;
+      valueMetric.append(valueLabel, valueText);
+
+      const actions = document.createElement('div'); actions.className = 'holding-actions';
+      const saveButton = document.createElement('button'); saveButton.className = 'save-shares-button'; saveButton.type = 'button'; saveButton.textContent = 'حفظ الكمية';
+      saveButton.addEventListener('click', () => {
+        const parsed = portfolio.parseQuantity(input.value.trim());
+        if (parsed === null || parsed < 1) {
+          input.setCustomValidity('أدخل عدداً صحيحاً من الأسهم، لا يقل عن سهم واحد.'); input.reportValidity(); return;
+        }
+        input.setCustomValidity('');
+        positions[symbol] = parsed;
+        draftSymbols = draftSymbols.filter(item => item !== symbol);
+        try { savePositions(); renderPortfolio(); showPortfolioFeedback(`تم حفظ ${new Intl.NumberFormat('ar-DZ').format(parsed)} سهم من ${company.arabicName} على هذا الجهاز.`); }
+        catch (_) { showPortfolioFeedback('تعذّر حفظ الحيازة في هذا المتصفح.'); }
+      });
+      const removeButton = document.createElement('button'); removeButton.className = 'remove-holding-button'; removeButton.type = 'button';
+      removeButton.textContent = 'إزالة'; removeButton.setAttribute('aria-label', `إزالة ${company.arabicName} من المحفظة`);
+      removeButton.addEventListener('click', () => {
+        delete positions[symbol]; draftSymbols = draftSymbols.filter(item => item !== symbol);
+        try { savePositions(); renderPortfolio(); showPortfolioFeedback(`تمت إزالة ${company.arabicName} من المحفظة.`); }
+        catch (_) { showPortfolioFeedback('تعذّر تحديث المحفظة في هذا المتصفح.'); }
+      });
+      actions.append(saveButton, removeButton);
+      const screening = document.createElement('small'); screening.className = 'screening-note'; screening.textContent = company.screening;
+      card.append(identity, priceMetric, quantityLabel, valueMetric, actions, screening);
+      ui.companyList.appendChild(card);
     }
+  }
+
+  function showPortfolioFeedback(message) {
+    ui.portfolioFeedback.textContent = message;
+    ui.portfolioFeedback.hidden = false;
+  }
+
+  function renderPortfolio() {
+    const held = Object.entries(positions).filter(([, quantity]) => Number.isSafeInteger(quantity) && quantity > 0);
+    const values = held.map(([symbol, quantity]) => ({ quantity, price: quoteCache[symbol]?.price }));
+    const total = portfolio.totalValue(values);
+    const formattedTotal = total === null ? '—' : `${number(total)} دج`;
+    if (ui.price) ui.price.textContent = total === null ? '—' : number(total);
+    if (ui.portfolioTotal) ui.portfolioTotal.textContent = formattedTotal;
+    if (ui.sharePrice) {
+      const ayPrice = Number.isFinite(latestPrice) ? latestPrice : quoteCache.AYRD?.price;
+      ui.sharePrice.textContent = Number.isFinite(ayPrice) ? `${number(ayPrice)} دج` : 'لا توجد قراءة ناجحة';
+    }
+    renderCompanyList();
+  }
+
+  async function refreshPortfolioQuotes() {
+    try {
+      const response = await fetch('/api/quotes', { headers: { Accept: 'application/json' }, cache: 'no-store' });
+      const data = await response.json();
+      if (!response.ok || !data.quotes || typeof data.quotes !== 'object') throw new Error(data.error || 'تعذّر قراءة أسعار الشركات.');
+      const returnedSymbols = new Set();
+      for (const [symbol, quote] of Object.entries(data.quotes)) {
+        if (companies.get(symbol) && Number.isFinite(quote.price) && quote.price > 0) {
+          quoteCache[symbol] = { ...quote, _retrievedAt: Date.now() };
+          returnedSymbols.add(symbol);
+        }
+      }
+      localStorage.setItem(QUOTES_KEY, JSON.stringify(quoteCache));
+      renderPortfolio();
+      const unavailableHeld = Object.keys(positions).filter(symbol => !returnedSymbols.has(symbol));
+      if (ui.quoteFeedback) {
+        ui.quoteFeedback.textContent = unavailableHeld.length
+          ? 'لم تصل قراءة حديثة لكل الأسهم في المحفظة؛ نعرض آخر قراءة محفوظة إن توفرت، ولا يظهر الإجمالي عند غياب سعر صالح.'
+          : '';
+        ui.quoteFeedback.hidden = unavailableHeld.length === 0;
+      }
+    } catch (error) {
+      renderPortfolio();
+      if (ui.quoteFeedback) {
+        ui.quoteFeedback.textContent = `${error.message || 'تعذّر تحديث الأسعار.'} ${Object.keys(quoteCache).length ? 'نعرض آخر الأسعار المحفوظة وقد لا تكون حديثة.' : 'لا توجد أسعار محفوظة لعرضها.'}`;
+        ui.quoteFeedback.hidden = false;
+      }
+    }
+  }
+
+  function addSelectedCompany() {
+    const symbol = ui.companySelect?.value;
+    const company = companies.get(symbol);
+    if (!company) return;
+    if (positions[symbol] || draftSymbols.includes(symbol)) {
+      showPortfolioFeedback(`${company.arabicName} موجودة بالفعل في المحفظة.`); return;
+    }
+    draftSymbols.push(symbol);
+    renderPortfolio();
+    ui.companyList?.lastElementChild?.scrollIntoView?.({ behavior: 'smooth', block: 'nearest' });
   }
 
   function showMovement(previous, current, knownChange) {
@@ -138,6 +275,7 @@
     ui.opening.textContent = Number.isFinite(data.openingPrice) ? `${number(data.openingPrice)} دج` : 'غير منشور';
     ui.closing.textContent = Number.isFinite(data.closingPrice) ? `${number(data.closingPrice)} دج` : 'غير منشور';
     if (cached) showMovement(null, data.price, Number.isFinite(data.observedDelta) ? data.observedDelta : null);
+    if (Number.isFinite(data.price) && data.price > 0) quoteCache.AYRD = { ...(quoteCache.AYRD || {}), ...data };
     renderPortfolio();
   }
 
@@ -154,6 +292,7 @@
 
   async function refresh() {
     if (ui.button.disabled) return;
+    refreshPortfolioQuotes();
     const saved = (() => { try { return JSON.parse(localStorage.getItem(CACHE_KEY)); } catch (_) { return null; } })();
     ui.button.disabled = true; ui.button.classList.add('loading');
     ui.status.textContent = 'جارٍ التحقق من المصدر الرسمي…'; ui.error.hidden = true;
@@ -177,15 +316,9 @@
       ui.button.disabled = false; ui.button.classList.remove('loading');
     }
   }
-  ownedShares = readOwnedShares();
-  if (ui.companyLogo) {
-    const showLogoFallback = () => { ui.companyLogo.hidden = true; ui.companyLogoFallback.hidden = false; };
-    ui.companyLogo.addEventListener('error', showLogoFallback, { once: true });
-    if (ui.companyLogo.complete && ui.companyLogo.naturalWidth === 0) showLogoFallback();
-  }
-  showCached(); renderChart(readHistory()); renderActivity(readHistory()); renderPortfolio(true);
-  ui.portfolioForm?.addEventListener('submit', saveOwnedShares);
-  ui.sharesInput?.addEventListener('input', () => ui.sharesInput.setCustomValidity(''));
+  renderCompanyPicker();
+  showCached(); renderChart(readHistory()); renderActivity(readHistory()); renderPortfolio();
+  ui.addCompany?.addEventListener('click', addSelectedCompany);
   ui.button.addEventListener('click', refresh);
   document.querySelectorAll('.bottom-nav a').forEach(link => link.addEventListener('click', () => {
     document.querySelectorAll('.bottom-nav a').forEach(item => item.classList.remove('active'));
