@@ -41,7 +41,7 @@ test('web app links its manifest, install metadata and service worker registrati
   assert.match(html, /rel="manifest" href="\/manifest\.webmanifest"/);
   assert.match(html, /id="install-app"/);
   assert.match(html, /apple-mobile-web-app-title" content="محفظتي"/);
-  assert.match(html, /<span class="quote-caption">إجمالي قيمة المحفظة<\/span>/);
+  assert.match(html, /<span class="quote-caption">إجمالي محفظتي<\/span>/);
   assert.match(html, /id="share-price"/);
   const app = read('app.js');
   assert.ok(app.includes('portfolio.totalValue([{ quantity: ownedShares, price: latestPrice }])'));
