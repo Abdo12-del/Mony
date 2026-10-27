@@ -6,6 +6,7 @@ const { parseOfficialHtml, numberFrom } = require('../api/quotes');
 
 test('SGBV quote parser extracts only listed equity symbols and respects missing closes', () => {
   const html = `
+    <p>Informations de marché 27 octobre 2026</p>
     <table>
       <tr><th>Société</th><th>Code</th><th>Ouverture</th><th>Clôture</th></tr>
       <tr><td>AYRADE</td><td>AYRD</td><td>830,00</td><td>NC</td><td>0,00</td></tr>
@@ -17,6 +18,7 @@ test('SGBV quote parser extracts only listed equity symbols and respects missing
   assert.equal(result.AYRD.price, 830);
   assert.equal(result.AYRD.priceType, 'reference');
   assert.equal(result.AYRD.closingPrice, null);
+  assert.equal(result.AYRD.sessionDate, '27 octobre 2026');
   assert.equal(result.BIO.price, 2357);
   assert.equal(result.BIO.priceType, 'close');
   assert.equal(result.BDL.price, 1391);

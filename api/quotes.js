@@ -58,6 +58,18 @@ function numberFrom(value) {
   return Number.isFinite(result) ? result : null;
 }
 
+function findSessionDate(html, symbol) {
+  const text = visibleText(html);
+  const ticker = new RegExp(`\\b${symbol}\\b`, 'i').exec(text);
+  if (!ticker) return null;
+  const context = text.slice(Math.max(0, ticker.index - 260), ticker.index + 450);
+  const months = '(?:janvier|février|fevrier|mars|avril|mai|juin|juillet|août|aout|septembre|octobre|novembre|décembre|decembre|january|february|march|april|june|july|august|september|october|november|december)';
+  const named = context.match(new RegExp(`\\b(\\d{1,2})\\s+(${months})\\s+(\\d{4})`, 'i'));
+  if (named) return `${named[1]} ${named[2]} ${named[3]}`;
+  const numeric = context.match(/\b(\d{1,2}[\/.-]\d{1,2}[\/.-]\d{4})\b/);
+  return numeric ? numeric[1] : null;
+}
+
 function parseOfficialHtml(html) {
   if (typeof html !== 'string' || !html.trim()) throw new Error('صفحة المصدر فارغة');
   const rows = [...html.matchAll(/<tr\b[^>]*>([\s\S]*?)<\/tr>/gi)].map(match =>
@@ -79,8 +91,8 @@ function parseOfficialHtml(html) {
       symbol, company: companyCell, currency: 'DZD', price,
       priceType: closingPrice !== null && closingPrice > 0 ? 'close' : 'reference',
       priceLabel: closingPrice !== null && closingPrice > 0 ? 'سعر الإغلاق المنشور' : 'سعر افتتاح/مرجع منشور',
-      openingPrice, closingPrice, source: SOURCE_NAME, sourceUrl: SOURCE_URL,
-      fetchedAt: new Date().toISOString()
+      openingPrice, closingPrice, sessionDate: findSessionDate(html, symbol),
+      source: SOURCE_NAME, sourceUrl: SOURCE_URL, fetchedAt: new Date().toISOString()
     };
   }
   if (!Object.keys(quotes).length) throw new Error('لم يُعثر على أسعار أسهم قابلة للقراءة في جدول SGBV');

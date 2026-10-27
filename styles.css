@@ -536,3 +536,16 @@ footer a { color: #b4a3d5; text-decoration: none; }
 .remove-holding-button { font-family: inherit; font-size: 10px; }
 .holding-metric > small { color: #918998; font-size: 8px; line-height: 1.45; }
 #quote-refresh-feedback:not([hidden]) { color: #efc688; }
+
+.focus-stock-picker { display: grid; gap: 3px; min-width: 104px; max-width: 142px; }
+.focus-stock-picker > small { color: #e1d5ff; font-size: 8px; }
+.focus-stock-picker select {
+  width: 100%; min-width: 0; height: 31px; padding: 3px 7px;
+  border: 1px solid #ffffff45; border-radius: 8px; color: #fff;
+  background: #5633a766; font-family: inherit; font-size: 10px;
+}
+.focus-stock-picker option { color: #211a2b; background: #fff; }
+@media (max-width: 650px) {
+  .focus-stock-picker { min-width: 92px; max-width: 116px; }
+  .focus-stock-picker select { font-size: 9px; padding-inline: 4px; }
+}

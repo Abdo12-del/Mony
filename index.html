@@ -9,7 +9,7 @@
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   <meta name="apple-mobile-web-app-title" content="محفظتي">
-  <title>محفظتي | AYRD</title>
+  <title>محفظتي | بورصة الجزائر</title>
   <link rel="manifest" href="/manifest.webmanifest">
   <link rel="icon" href="/favicon.svg" type="image/svg+xml">
   <link rel="apple-touch-icon" href="/icons/icon-180.png">
@@ -27,33 +27,33 @@
     <div class="topbar-end">
       <button id="install-app" class="install-app" type="button" hidden><span aria-hidden="true">⇩</span> تثبيت</button>
       <span class="market-pill"><i class="market-dot"></i> بورصة الجزائر</span>
-      <span class="top-symbol">AYRD</span>
+      <span class="top-symbol">DZD</span>
     </div>
   </header>
 
   <main class="shell dashboard">
     <section class="welcome-row">
-      <div><span class="eyebrow">لوحة المتابعة</span><h1>أهلاً بك في محفظتي</h1><p>ملخص سهم AYRADE من المصدر الرسمي</p></div>
+      <div><span class="eyebrow">لوحة المتابعة</span><h1>أهلاً بك في محفظتي</h1><p>ملخص حيازاتك وأسعار الأسهم في بورصة الجزائر</p></div>
       <span class="welcome-mark" aria-hidden="true">◌</span>
     </section>
 
     <section class="instrument-card" aria-live="polite" aria-atomic="true">
       <div class="instrument-top">
-        <div class="company-info"><div class="company-avatar"><img id="ayrade-header-logo" src="https://www.ayrade.com/wp-content/uploads/2026/04/logo-ayrade-lion.png" alt="شعار شركة AYRADE" decoding="async"><span id="ayrade-header-fallback" hidden>أ</span></div><div><div class="company-title">أيراد <span class="ticker">AYRD</span></div><div class="company-subtitle">AYRADE SPA <span class="bullet">•</span> بورصة الجزائر</div></div></div>
+        <div class="company-info"><div class="company-avatar"><img id="focus-company-logo" alt="" decoding="async" hidden><span id="focus-company-fallback">أ</span></div><div><div class="company-title"><span id="focus-company-name">أيراد</span> <span id="focus-company-symbol" class="ticker">AYRD</span></div><div class="company-subtitle"><span id="focus-company-full-name">AYRADE SPA</span> <span class="bullet">•</span> بورصة الجزائر</div></div></div>
         <span class="quote-state"><i></i> مجموع الحيازات المسجّلة</span>
       </div>
       <div class="quote-main">
         <div><span class="quote-caption">إجمالي محفظتي</span><div class="price-line"><strong id="price" class="price">—</strong><span class="currency">دج</span></div>
-          <div class="change-line"><span id="movement" class="movement" hidden></span><span id="movement-caption" class="movement-caption">تغير سعر AYRD بين آخر فحصين ناجحين</span></div>
+          <div class="change-line"><span id="movement" class="movement" hidden></span><span id="movement-caption" class="movement-caption">تغير السهم المحدد بين آخر فحصين ناجحين</span></div>
         </div>
-        <div class="quote-unit"><span class="unit-icon">AYRD</span><span class="quote-unit-label"><small>سعر السهم</small><strong id="share-price">—</strong></span></div>
+        <div class="quote-unit"><label class="focus-stock-picker" for="focus-company-select"><small>السهم المحدد</small><select id="focus-company-select" aria-label="اختر السهم لعرض سعره وبياناته"></select></label><span class="quote-unit-label"><small>سعر السهم المحدد</small><strong id="share-price">—</strong></span></div>
       </div>
       <div class="quote-bottom"><span class="quote-kind-label">حالة سعر السهم</span><strong id="price-kind" class="quote-kind">بانتظار التحديث</strong><p id="price-note">السعر سيظهر بعد قراءة المصدر الرسمي.</p></div>
       <div id="error" class="error" role="status" hidden></div>
       <div id="refresh-status" class="refresh-status" aria-live="polite">يتم التحقق من بيانات المصدر</div>
     </section>
 
-    <nav class="quick-actions" aria-label="إجراءات السهم">
+    <nav class="quick-actions" aria-label="إجراءات السوق">
       <button id="refresh" class="quick-action refresh-action"><span class="action-icon">↻</span><strong>تحديث</strong><small>قراءة جديدة</small></button>
       <a class="quick-action" href="https://www.sgbv.dz/" target="_blank" rel="noopener"><span class="action-icon">↗</span><strong>المصدر</strong><small>بورصة الجزائر</small></a>
       <a class="quick-action" href="#details"><span class="action-icon">▤</span><strong>بيانات السعر</strong><small>فتح وإغلاق</small></a>
@@ -77,7 +77,7 @@
     </section>
 
     <section class="summary-section" id="details">
-      <div class="section-heading-inline"><div><span class="section-kicker">ملخص الجلسة</span><h2>بيانات السهم</h2></div><span class="section-meta">AYRD · DZD</span></div>
+      <div class="section-heading-inline"><div><span class="section-kicker">ملخص السعر</span><h2>بيانات السهم المحدد</h2></div><span class="section-meta"><span id="details-symbol">AYRD</span> · DZD</span></div>
       <div class="summary-grid">
         <article class="summary-card summary-date"><span class="summary-icon">◷</span><span class="summary-label">تاريخ الجلسة</span><strong id="session-date">غير متاح من المصدر</strong></article>
         <article class="summary-card"><span class="summary-icon">↻</span><span class="summary-label">آخر فحص ناجح</span><strong id="checked-at">—</strong></article>
@@ -105,7 +105,7 @@
         <section><strong>حدود المتابعة</strong><p>نسخة PWA لا تفحص الأسعار في الخلفية ولا ترسل تنبيهات؛ التغير المعروض يقارن آخر فحصين ناجحين فقط. لا تتوفر حالياً نسخة Android للتنزيل.</p></section>
       </div>
     </details>
-    <p class="trust-line">«محفظتي» مشروع مستقل غير تابع لبورصة الجزائر أو AYRADE، ولا يقدم نصيحة استثمارية.</p>
+    <p class="trust-line">«محفظتي» مشروع مستقل غير تابع لبورصة الجزائر أو أي شركة مدرجة، ولا يقدم نصيحة استثمارية.</p>
   </main>
 
   <nav class="bottom-nav" aria-label="التنقل السريع">
@@ -114,7 +114,7 @@
     <a href="#activity"><span>▤</span><small>السجل</small></a>
     <a href="#pwa-info"><span>⇩</span><small>التثبيت</small></a>
   </nav>
-  <footer><span>محفظتي <span class="footer-dot">·</span> AYRD</span><a href="https://www.sgbv.dz/" target="_blank" rel="noopener">بورصة الجزائر ↗</a></footer>
+  <footer><span>محفظتي <span class="footer-dot">·</span> أسهم الجزائر</span><a href="https://www.sgbv.dz/" target="_blank" rel="noopener">بورصة الجزائر ↗</a></footer>
   <script src="/portfolio.js" defer></script>
   <script src="/companies.js" defer></script>
   <script src="/app.js" defer></script>

@@ -10,24 +10,37 @@
     chartCount: $('observation-count'), chartFirst: $('chart-first'), chartLast: $('chart-last'), activity: $('activity-list'),
     portfolioTotal: $('portfolio-total'), portfolioFeedback: $('portfolio-feedback'), quoteFeedback: $('quote-refresh-feedback'),
     companySelect: $('company-select'), addCompany: $('add-company'), companyList: $('company-list'),
-    ayradeHeaderLogo: $('ayrade-header-logo'), ayradeHeaderFallback: $('ayrade-header-fallback'),
-    installButton: $('install-app')
+    focusSelect: $('focus-company-select'), focusName: $('focus-company-name'), focusSymbol: $('focus-company-symbol'),
+    focusFullName: $('focus-company-full-name'), focusLogo: $('focus-company-logo'), focusFallback: $('focus-company-fallback'),
+    detailsSymbol: $('details-symbol'), installButton: $('install-app')
   };
-  const CACHE_KEY = 'nabd-ayrad-last-success-v1';
-  const HISTORY_KEY = 'nabd-ayrad-observations-v1';
+  const LEGACY_CACHE_KEY = 'nabd-ayrad-last-success-v1';
+  const LEGACY_HISTORY_KEY = 'nabd-ayrad-observations-v1';
+  const SELECTED_SYMBOL_KEY = 'mahfazati-selected-symbol-v1';
   const PORTFOLIO_KEY = 'mahfazati-portfolio-v2';
   const LEGACY_PORTFOLIO_KEY = 'nabd-ayrad-portfolio-v1';
   const QUOTES_KEY = 'mahfazati-last-quotes-v1';
-  let latestPrice = null;
+  let selectedSymbol = readSelectedSymbol();
   let positions = readPositions();
   let draftSymbols = [];
   let quoteCache = readQuoteCache();
   const number = value => new Intl.NumberFormat('ar-DZ', { minimumFractionDigits: 2, maximumFractionDigits: 2 }).format(value);
   const dateTime = value => value ? new Intl.DateTimeFormat('ar-DZ', { dateStyle: 'medium', timeStyle: 'short' }).format(new Date(value)) : '—';
 
-  function readHistory() {
+  function readSelectedSymbol() {
     try {
-      const rows = JSON.parse(localStorage.getItem(HISTORY_KEY) || '[]');
+      const symbol = localStorage.getItem(SELECTED_SYMBOL_KEY);
+      return companies.get(symbol) ? symbol : 'AYRD';
+    } catch (_) { return 'AYRD'; }
+  }
+
+  function historyKey(symbol) { return `mahfazati-${symbol.toLowerCase()}-observations-v1`; }
+
+  function readHistory(symbol = selectedSymbol) {
+    try {
+      const saved = localStorage.getItem(historyKey(symbol));
+      const legacy = symbol === 'AYRD' && saved === null ? localStorage.getItem(LEGACY_HISTORY_KEY) : null;
+      const rows = JSON.parse(saved || legacy || '[]');
       return Array.isArray(rows) ? rows.filter(x => x && Number.isFinite(x.price)).slice(-60) : [];
     } catch (_) { return []; }
   }
@@ -94,8 +107,74 @@
   function readQuoteCache() {
     try {
       const data = JSON.parse(localStorage.getItem(QUOTES_KEY) || '{}');
-      return data && typeof data === 'object' && !Array.isArray(data) ? data : {};
+      const quotes = data && typeof data === 'object' && !Array.isArray(data) ? data : {};
+      if (!quotes.AYRD) {
+        const legacy = JSON.parse(localStorage.getItem(LEGACY_CACHE_KEY) || 'null');
+        if (legacy && Number.isFinite(legacy.price) && legacy.price > 0) {
+          quotes.AYRD = { ...legacy, _retrievedAt: Date.parse(legacy.fetchedAt) || 0 };
+        }
+      }
+      return quotes;
     } catch (_) { return {}; }
+  }
+
+  function renderFocusPicker() {
+    if (!ui.focusSelect) return;
+    ui.focusSelect.replaceChildren();
+    for (const company of companies.all()) {
+      const option = document.createElement('option'); option.value = company.symbol;
+      option.textContent = companyDisplayName(company);
+      ui.focusSelect.appendChild(option);
+    }
+    ui.focusSelect.value = selectedSymbol;
+  }
+
+  function renderSelectedQuote() {
+    const company = companies.get(selectedSymbol);
+    if (!company) return;
+    const quote = quoteCache[selectedSymbol];
+    if (ui.focusSelect) ui.focusSelect.value = selectedSymbol;
+    if (ui.focusName) ui.focusName.textContent = company.arabicName;
+    if (ui.focusSymbol) ui.focusSymbol.textContent = company.symbol;
+    if (ui.focusFullName) ui.focusFullName.textContent = company.name;
+    if (ui.detailsSymbol) ui.detailsSymbol.textContent = company.symbol;
+    if (ui.movementCaption) ui.movementCaption.textContent = `تغير سعر ${company.symbol} بين آخر فحصين ناجحين`;
+
+    if (ui.focusLogo && ui.focusFallback) {
+      ui.focusLogo.hidden = true;
+      ui.focusFallback.hidden = Boolean(company.logoUrl);
+      ui.focusFallback.textContent = company.symbol.slice(0, 1);
+      ui.focusLogo.removeAttribute('src');
+      ui.focusLogo.alt = company.logoUrl ? `شعار شركة ${company.arabicName}` : '';
+      if (company.logoUrl) {
+        ui.focusLogo.addEventListener('error', () => {
+          ui.focusLogo.hidden = true; ui.focusFallback.hidden = false;
+        }, { once: true });
+        ui.focusLogo.src = company.logoUrl;
+        ui.focusLogo.hidden = false;
+      }
+    }
+
+    const hasPrice = quote && Number.isFinite(quote.price) && quote.price > 0;
+    if (ui.sharePrice) ui.sharePrice.textContent = hasPrice ? `${number(quote.price)} دج` : 'لا توجد قراءة ناجحة';
+    if (ui.type) ui.type.textContent = hasPrice ? quote.priceLabel || 'السعر المنشور' : 'بانتظار التحديث';
+    if (ui.note) {
+      ui.note.textContent = !hasPrice
+        ? 'السعر سيظهر بعد نجاح قراءة المصدر الرسمي.'
+        : quote._retrievedAt && Date.now() - quote._retrievedAt > 60000
+          ? 'نعرض آخر قراءة محفوظة؛ قد لا تكون حديثة.'
+          : quote.priceType === 'close'
+            ? 'هذا سعر إغلاق منشور من المصدر الرسمي.'
+            : 'السعر المتاح افتتاحي/مرجعي؛ لم يُنشر إغلاق لهذا السهم.';
+    }
+    if (ui.date) ui.date.textContent = quote?.sessionDate || 'غير متاح من المصدر';
+    if (ui.checked) ui.checked.textContent = hasPrice ? dateTime(quote.fetchedAt) : '—';
+    if (ui.opening) ui.opening.textContent = Number.isFinite(quote?.openingPrice) ? `${number(quote.openingPrice)} دج` : 'غير منشور';
+    if (ui.closing) ui.closing.textContent = Number.isFinite(quote?.closingPrice) ? `${number(quote.closingPrice)} دج` : 'غير منشور';
+    if (!quote || !Number.isFinite(quote._observedDelta)) showMovement(null, null);
+    else showMovement(null, quote.price, quote._observedDelta);
+    const history = readHistory(selectedSymbol);
+    renderChart(history); renderActivity(history);
   }
 
   function savePositions() {
@@ -214,40 +293,51 @@
     const formattedTotal = total === null ? '—' : `${number(total)} دج`;
     if (ui.price) ui.price.textContent = total === null ? '—' : number(total);
     if (ui.portfolioTotal) ui.portfolioTotal.textContent = formattedTotal;
-    if (ui.sharePrice) {
-      const ayPrice = Number.isFinite(latestPrice) ? latestPrice : quoteCache.AYRD?.price;
-      ui.sharePrice.textContent = Number.isFinite(ayPrice) ? `${number(ayPrice)} دج` : 'لا توجد قراءة ناجحة';
-    }
     renderCompanyList();
   }
 
-  async function refreshPortfolioQuotes() {
+  async function refresh() {
+    if (ui.button.disabled) return;
+    ui.button.disabled = true; ui.button.classList.add('loading');
+    ui.status.textContent = 'جارٍ التحقق من أسعار الأسهم من المصدر الرسمي…';
+    ui.error.hidden = true;
     try {
       const response = await fetch('/api/quotes', { headers: { Accept: 'application/json' }, cache: 'no-store' });
       const data = await response.json();
       if (!response.ok || !data.quotes || typeof data.quotes !== 'object') throw new Error(data.error || 'تعذّر قراءة أسعار الشركات.');
       const returnedSymbols = new Set();
       for (const [symbol, quote] of Object.entries(data.quotes)) {
-        if (companies.get(symbol) && Number.isFinite(quote.price) && quote.price > 0) {
-          quoteCache[symbol] = { ...quote, _retrievedAt: Date.now() };
-          returnedSymbols.add(symbol);
-        }
+        if (!companies.get(symbol) || !Number.isFinite(quote.price) || quote.price <= 0) continue;
+        const previous = quoteCache[symbol];
+        const change = previous && Number.isFinite(previous.price)
+          ? Number((quote.price - previous.price).toFixed(2)) : null;
+        quoteCache[symbol] = { ...quote, _retrievedAt: Date.now(), _observedDelta: change };
+        const history = readHistory(symbol);
+        history.push({ price: quote.price, time: quote.fetchedAt });
+        localStorage.setItem(historyKey(symbol), JSON.stringify(history.slice(-60)));
+        returnedSymbols.add(symbol);
       }
       localStorage.setItem(QUOTES_KEY, JSON.stringify(quoteCache));
-      renderPortfolio();
+      renderPortfolio(); renderSelectedQuote();
       const unavailableHeld = Object.keys(positions).filter(symbol => !returnedSymbols.has(symbol));
+      const selectedUnavailable = !returnedSymbols.has(selectedSymbol);
+      const warning = [];
+      if (selectedUnavailable) warning.push(`لم تصل قراءة حديثة لسهم ${selectedSymbol}`);
+      if (unavailableHeld.length) warning.push('لم تصل قراءة حديثة لكل حيازات المحفظة');
       if (ui.quoteFeedback) {
-        ui.quoteFeedback.textContent = unavailableHeld.length
-          ? 'لم تصل قراءة حديثة لكل الأسهم في المحفظة؛ نعرض آخر قراءة محفوظة إن توفرت، ولا يظهر الإجمالي عند غياب سعر صالح.'
+        ui.quoteFeedback.textContent = warning.length
+          ? `${warning.join('، ')}؛ نعرض آخر قراءة محفوظة إن توفرت، ولا يظهر الإجمالي إذا غاب سعر صالح.`
           : '';
-        ui.quoteFeedback.hidden = unavailableHeld.length === 0;
+        ui.quoteFeedback.hidden = warning.length === 0;
       }
+      ui.status.textContent = 'تم فحص الأسعار المتاحة من SGBV';
     } catch (error) {
-      renderPortfolio();
-      if (ui.quoteFeedback) {
-        ui.quoteFeedback.textContent = `${error.message || 'تعذّر تحديث الأسعار.'} ${Object.keys(quoteCache).length ? 'نعرض آخر الأسعار المحفوظة وقد لا تكون حديثة.' : 'لا توجد أسعار محفوظة لعرضها.'}`;
-        ui.quoteFeedback.hidden = false;
-      }
+      renderPortfolio(); renderSelectedQuote();
+      ui.error.textContent = `${error.message || 'تعذّر الاتصال بالمصدر الرسمي.'} ${Object.keys(quoteCache).length ? 'نعرض آخر الأسعار المحفوظة وقد لا تكون حديثة.' : 'لا توجد أسعار محفوظة.'}`;
+      ui.error.hidden = false;
+      ui.status.textContent = 'لم ينجح هذا الفحص';
+    } finally {
+      ui.button.disabled = false; ui.button.classList.remove('loading');
     }
   }
 
@@ -271,69 +361,14 @@
     ui.movement.textContent = change > 0 ? `↑ +${number(change)} دج` : change < 0 ? `↓ −${number(Math.abs(change))} دج` : '— دون تغيّر';
   }
 
-  function showQuote(data, cached = false) {
-    latestPrice = Number.isFinite(data.price) && data.price > 0 ? data.price : null;
-    ui.sharePrice.textContent = `${number(data.price)} دج`;
-    ui.type.textContent = data.priceLabel || 'السعر المنشور';
-    ui.note.textContent = cached
-      ? 'آخر سعر محفوظ في هذا المتصفح؛ قد لا يكون حديثاً.'
-      : data.priceType === 'close'
-        ? 'هذا سعر إغلاق منشور من المصدر الرسمي.'
-        : 'السعر المتاح افتتاحي/مرجعي؛ لم يُنشر إغلاق في صف التداول الرسمي.';
-    ui.date.textContent = data.sessionDate || 'غير متاح من المصدر';
-    ui.checked.textContent = dateTime(data.fetchedAt);
-    ui.opening.textContent = Number.isFinite(data.openingPrice) ? `${number(data.openingPrice)} دج` : 'غير منشور';
-    ui.closing.textContent = Number.isFinite(data.closingPrice) ? `${number(data.closingPrice)} دج` : 'غير منشور';
-    if (cached) showMovement(null, data.price, Number.isFinite(data.observedDelta) ? data.observedDelta : null);
-    if (Number.isFinite(data.price) && data.price > 0) quoteCache.AYRD = { ...(quoteCache.AYRD || {}), ...data };
-    renderPortfolio();
-  }
-
-  function showCached() {
-    try {
-      const old = JSON.parse(localStorage.getItem(CACHE_KEY));
-      if (!old || !Number.isFinite(old.price)) return null;
-      showQuote(old, true);
-      renderChart(readHistory());
-      renderActivity(readHistory());
-      return old;
-    } catch (_) { return null; }
-  }
-
-  async function refresh() {
-    if (ui.button.disabled) return;
-    refreshPortfolioQuotes();
-    const saved = (() => { try { return JSON.parse(localStorage.getItem(CACHE_KEY)); } catch (_) { return null; } })();
-    ui.button.disabled = true; ui.button.classList.add('loading');
-    ui.status.textContent = 'جارٍ التحقق من المصدر الرسمي…'; ui.error.hidden = true;
-    try {
-      const response = await fetch('/api/ayrd', { headers: { Accept: 'application/json' }, cache: 'no-store' });
-      const data = await response.json();
-      if (!response.ok || !Number.isFinite(data.price) || data.price <= 0) throw new Error(data.error || 'لم تصل بيانات سعر صالحة.');
-      const previous = saved && Number.isFinite(saved.price) ? saved.price : null;
-      const observedDelta = previous === null ? null : Number((data.price - previous).toFixed(2));
-      data.observedDelta = observedDelta;
-      localStorage.setItem(CACHE_KEY, JSON.stringify(data));
-      const history = readHistory();
-      history.push({ price: data.price, time: data.fetchedAt });
-      localStorage.setItem(HISTORY_KEY, JSON.stringify(history.slice(-60)));
-      showQuote(data); showMovement(previous, data.price); renderChart(history.slice(-60)); renderActivity(history.slice(-60));
-      ui.status.textContent = 'تم الفحص بنجاح · البيانات من SGBV';
-    } catch (error) {
-      ui.error.textContent = `${error.message || 'تعذّر الاتصال.'} ${saved ? 'نعرض آخر سعر محفوظ وقد لا يكون حديثاً.' : 'لا يوجد سعر محفوظ لعرضه.'}`;
-      ui.error.hidden = false; ui.status.textContent = 'لم ينجح هذا الفحص';
-    } finally {
-      ui.button.disabled = false; ui.button.classList.remove('loading');
-    }
-  }
-  if (ui.ayradeHeaderLogo && ui.ayradeHeaderFallback) {
-    const showAyradeFallback = () => { ui.ayradeHeaderLogo.hidden = true; ui.ayradeHeaderFallback.hidden = false; };
-    ui.ayradeHeaderLogo.addEventListener('error', showAyradeFallback, { once: true });
-    if (ui.ayradeHeaderLogo.complete && ui.ayradeHeaderLogo.naturalWidth === 0) showAyradeFallback();
-  }
-  renderCompanyPicker();
-  showCached(); renderChart(readHistory()); renderActivity(readHistory()); renderPortfolio();
+  renderCompanyPicker(); renderFocusPicker();
+  renderPortfolio(); renderSelectedQuote();
   ui.addCompany?.addEventListener('click', addSelectedCompany);
+  ui.focusSelect?.addEventListener('change', () => {
+    selectedSymbol = companies.get(ui.focusSelect.value)?.symbol || 'AYRD';
+    try { localStorage.setItem(SELECTED_SYMBOL_KEY, selectedSymbol); } catch (_) {}
+    renderSelectedQuote();
+  });
   ui.button.addEventListener('click', refresh);
   document.querySelectorAll('.bottom-nav a').forEach(link => link.addEventListener('click', () => {
     document.querySelectorAll('.bottom-nav a').forEach(item => item.classList.remove('active'));
