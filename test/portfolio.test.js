@@ -2,7 +2,7 @@
 
 const test = require('node:test');
 const assert = require('node:assert/strict');
-const { estimateValue, parseQuantity } = require('../portfolio');
+const { estimateValue, parseQuantity, totalValue } = require('../portfolio');
 
 test('portfolio quantity accepts only non-negative whole share counts', () => {
   assert.equal(parseQuantity('0'), 0);
@@ -13,7 +13,7 @@ test('portfolio quantity accepts only non-negative whole share counts', () => {
   }
 });
 
-test('portfolio valuation uses a valid available quote and handles zero shares', () => {
+test('single holding value uses its share quantity and available quote', () => {
   assert.equal(estimateValue(3, 830), 2490);
   assert.equal(estimateValue(3, 830.125), 2490.38);
   assert.equal(estimateValue(0, 830), 0);
@@ -22,4 +22,14 @@ test('portfolio valuation uses a valid available quote and handles zero shares',
   assert.equal(estimateValue(3, 0), null);
   assert.equal(estimateValue(3, -1), null);
   assert.equal(estimateValue(3, NaN), null);
+});
+
+test('overall portfolio value sums each holding and avoids partial totals', () => {
+  assert.equal(totalValue([
+    { quantity: 3, price: 830 },
+    { quantity: 2, price: 415 }
+  ]), 3320);
+  assert.equal(totalValue([{ quantity: 1, price: 830.25 }, { quantity: 3, price: 10.1 }]), 860.55);
+  assert.equal(totalValue([]), null);
+  assert.equal(totalValue([{ quantity: 1, price: 830 }, { quantity: 2, price: null }]), null);
 });

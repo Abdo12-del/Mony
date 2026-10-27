@@ -85,10 +85,10 @@
       ui.sharesInput.value = ownedShares === null ? '' : String(ownedShares);
     }
     ui.portfolioPrice.textContent = Number.isFinite(latestPrice) ? `${number(latestPrice)} دج` : 'لا توجد قراءة ناجحة';
-    const value = ownedShares === null ? null : portfolio.estimateValue(ownedShares, latestPrice);
-    const formatted = value === null ? '—' : `${number(value)} دج`;
-    ui.portfolioTotal.textContent = formatted;
-    ui.holdingValue.textContent = formatted;
+    const holdingValue = ownedShares === null ? null : portfolio.estimateValue(ownedShares, latestPrice);
+    const totalValue = ownedShares === null ? null : portfolio.totalValue([{ quantity: ownedShares, price: latestPrice }]);
+    ui.portfolioTotal.textContent = totalValue === null ? '—' : `${number(totalValue)} دج`;
+    ui.holdingValue.textContent = holdingValue === null ? '—' : `${number(holdingValue)} دج`;
   }
 
   function saveOwnedShares(event) {

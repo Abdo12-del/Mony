@@ -17,7 +17,20 @@
     return Number.isFinite(value) ? Number(value.toFixed(2)) : null;
   }
 
-  const api = Object.freeze({ parseQuantity, estimateValue });
+  function totalValue(positions) {
+    if (!Array.isArray(positions) || positions.length === 0) return null;
+    let total = 0;
+    for (const position of positions) {
+      if (!position) return null;
+      const value = estimateValue(position.quantity, position.price);
+      if (value === null) return null;
+      total += value;
+      if (!Number.isFinite(total)) return null;
+    }
+    return Number(total.toFixed(2));
+  }
+
+  const api = Object.freeze({ parseQuantity, estimateValue, totalValue });
   if (typeof module === 'object' && module.exports) module.exports = api;
   else root.NabdPortfolio = api;
 })(globalThis);
