@@ -85,7 +85,10 @@ body {
 .movement.stable { color: #eee8f7; background: #ffffff24; }
 .movement-caption { font-size: 9px; color: #e3d8f7; }
 .quote-unit { display: flex; align-items: center; gap: 9px; color: #e5d8fb; font-size: 10px; padding-bottom: 6px; }
-.unit-icon { height: 29px; width: 29px; border-radius: 9px; display: grid; place-items: center; color: #fff; background: #ffffff24; font-size: 10px; font-weight: 600; }
+.quote-unit-label { display: grid; gap: 1px; }
+.quote-unit-label small { color: #e1d5ff; font-size: 8px; }
+.quote-unit-label strong { color: #fff; font-size: 10px; font-weight: 600; direction: ltr; }
+.unit-icon { height: 32px; width: 45px; border-radius: 9px; display: grid; place-items: center; color: #fff; background: #ffffff24; font: 700 9px Arial, sans-serif; }
 .chart-panel { border: 1px solid #ffffff20; background: #141319e8; border-radius: 14px; padding: 12px 14px 8px; }
 .chart-heading { display: flex; justify-content: space-between; align-items: center; }
 .chart-heading strong { display: block; color: #f2edf9; font-size: 11px; font-weight: 500; }

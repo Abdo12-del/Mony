@@ -2,7 +2,7 @@
   const $ = id => document.getElementById(id);
   const portfolio = window.NabdPortfolio;
   const ui = {
-    price: $('price'), type: $('price-kind'), note: $('price-note'), date: $('session-date'), checked: $('checked-at'),
+    price: $('price'), sharePrice: $('share-price'), type: $('price-kind'), note: $('price-note'), date: $('session-date'), checked: $('checked-at'),
     error: $('error'), button: $('refresh'), status: $('refresh-status'), movement: $('movement'),
     movementCaption: $('movement-caption'), opening: $('opening-price'), closing: $('closing-price'),
     chartLine: $('chart-line'), chartArea: $('chart-area'), chartPoint: $('chart-point'), chartEmpty: $('chart-empty'),
@@ -84,10 +84,14 @@
     if (syncInput && document.activeElement !== ui.sharesInput) {
       ui.sharesInput.value = ownedShares === null ? '' : String(ownedShares);
     }
-    ui.portfolioPrice.textContent = Number.isFinite(latestPrice) ? `${number(latestPrice)} دج` : 'لا توجد قراءة ناجحة';
+    const formattedSharePrice = Number.isFinite(latestPrice) ? `${number(latestPrice)} دج` : 'لا توجد قراءة ناجحة';
+    ui.portfolioPrice.textContent = formattedSharePrice;
+    ui.sharePrice.textContent = formattedSharePrice;
     const holdingValue = ownedShares === null ? null : portfolio.estimateValue(ownedShares, latestPrice);
     const totalValue = ownedShares === null ? null : portfolio.totalValue([{ quantity: ownedShares, price: latestPrice }]);
-    ui.portfolioTotal.textContent = totalValue === null ? '—' : `${number(totalValue)} دج`;
+    const formattedTotal = totalValue === null ? '—' : `${number(totalValue)} دج`;
+    ui.price.textContent = totalValue === null ? '—' : number(totalValue);
+    ui.portfolioTotal.textContent = formattedTotal;
     ui.holdingValue.textContent = holdingValue === null ? '—' : `${number(holdingValue)} دج`;
   }
 
@@ -122,7 +126,7 @@
 
   function showQuote(data, cached = false) {
     latestPrice = Number.isFinite(data.price) && data.price > 0 ? data.price : null;
-    ui.price.textContent = number(data.price);
+    ui.sharePrice.textContent = `${number(data.price)} دج`;
     ui.type.textContent = data.priceLabel || 'السعر المنشور';
     ui.note.textContent = cached
       ? 'آخر سعر محفوظ في هذا المتصفح؛ قد لا يكون حديثاً.'
