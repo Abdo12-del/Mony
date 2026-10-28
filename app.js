@@ -12,7 +12,7 @@
     companySelect: $('company-select'), addCompany: $('add-company'), companyList: $('company-list'),
     focusSelect: $('focus-company-select'), focusName: $('focus-company-name'), focusSymbol: $('focus-company-symbol'),
     focusFullName: $('focus-company-full-name'), focusLogo: $('focus-company-logo'), focusFallback: $('focus-company-fallback'),
-    detailsSymbol: $('details-symbol'), installButton: $('install-app')
+    quoteUpdated: $('focus-quote-updated'), detailsSymbol: $('details-symbol'), installButton: $('install-app')
   };
   const LEGACY_CACHE_KEY = 'nabd-ayrad-last-success-v1';
   const LEGACY_HISTORY_KEY = 'nabd-ayrad-observations-v1';
@@ -24,7 +24,7 @@
   let positions = readPositions();
   let draftSymbols = [];
   let quoteCache = readQuoteCache();
-  const number = value => new Intl.NumberFormat('ar-DZ', { minimumFractionDigits: 2, maximumFractionDigits: 2 }).format(value);
+  const number = value => new Intl.NumberFormat('de-DE', { minimumFractionDigits: 2, maximumFractionDigits: 2 }).format(value);
   const dateTime = value => value ? new Intl.DateTimeFormat('ar-DZ', { dateStyle: 'medium', timeStyle: 'short' }).format(new Date(value)) : '—';
 
   function readSelectedSymbol() {
@@ -138,7 +138,6 @@
     if (ui.focusSymbol) ui.focusSymbol.textContent = company.symbol;
     if (ui.focusFullName) ui.focusFullName.textContent = company.name;
     if (ui.detailsSymbol) ui.detailsSymbol.textContent = company.symbol;
-    if (ui.movementCaption) ui.movementCaption.textContent = `تغير سعر ${company.symbol} بين آخر فحصين ناجحين`;
 
     if (ui.focusLogo && ui.focusFallback) {
       ui.focusLogo.hidden = true;
@@ -158,20 +157,34 @@
     const hasPrice = quote && Number.isFinite(quote.price) && quote.price > 0;
     if (ui.sharePrice) ui.sharePrice.textContent = hasPrice ? `${number(quote.price)} دج` : 'لا توجد قراءة ناجحة';
     if (ui.type) ui.type.textContent = hasPrice ? quote.priceLabel || 'السعر المنشور' : 'بانتظار التحديث';
+    const quoteIsStale = Boolean(quote?._retrievedAt && Date.now() - quote._retrievedAt > 60000);
     if (ui.note) {
       ui.note.textContent = !hasPrice
-        ? 'السعر سيظهر بعد نجاح قراءة المصدر الرسمي.'
-        : quote._retrievedAt && Date.now() - quote._retrievedAt > 60000
-          ? 'نعرض آخر قراءة محفوظة؛ قد لا تكون حديثة.'
+        ? 'لا توجد قراءة ناجحة لهذا السهم بعد.'
+        : quoteIsStale
+          ? 'آخر قراءة محفوظة وقد لا تكون حديثة.'
           : quote.priceType === 'close'
-            ? 'هذا سعر إغلاق منشور من المصدر الرسمي.'
-            : 'السعر المتاح افتتاحي/مرجعي؛ لم يُنشر إغلاق لهذا السهم.';
+            ? 'إغلاق منشور من SGBV، وليس سعراً مباشراً.'
+            : 'السعر المتاح افتتاحي/مرجعي من SGBV، وليس إغلاقاً.';
     }
     if (ui.date) ui.date.textContent = quote?.sessionDate || 'غير متاح من المصدر';
     if (ui.checked) ui.checked.textContent = hasPrice ? dateTime(quote.fetchedAt) : '—';
+    if (ui.quoteUpdated) ui.quoteUpdated.textContent = hasPrice ? dateTime(quote.fetchedAt) : '—';
     if (ui.opening) ui.opening.textContent = Number.isFinite(quote?.openingPrice) ? `${number(quote.openingPrice)} دج` : 'غير منشور';
     if (ui.closing) ui.closing.textContent = Number.isFinite(quote?.closingPrice) ? `${number(quote.closingPrice)} دج` : 'غير منشور';
-    if (!quote || !Number.isFinite(quote._observedDelta)) showMovement(null, null);
+    const hasPreviousReading = Number.isFinite(quote?._observedDelta);
+    if (ui.movementCaption) {
+      ui.movementCaption.textContent = !hasPrice
+        ? 'لا توجد قراءة لهذا السهم'
+        : !hasPreviousReading
+          ? 'لا توجد قراءة سابقة للمقارنة'
+          : quote._observedDelta === 0
+            ? 'لم يتغير السعر منذ آخر فحص ناجح'
+            : quote._observedDelta > 0
+              ? 'ارتفع السعر منذ آخر فحص ناجح'
+              : 'انخفض السعر منذ آخر فحص ناجح';
+    }
+    if (!hasPreviousReading) showMovement(null, null);
     else showMovement(null, quote.price, quote._observedDelta);
     const history = readHistory(selectedSymbol);
     renderChart(history); renderActivity(history);
@@ -237,7 +250,7 @@
 
       const priceMetric = document.createElement('div'); priceMetric.className = 'holding-metric';
       const priceLabel = document.createElement('span'); priceLabel.textContent = 'آخر سعر متاح من SGBV';
-      const priceText = document.createElement('strong'); priceText.textContent = price === null ? 'لا توجد قراءة ناجحة' : `${number(price)} دج`;
+      const priceText = document.createElement('strong'); priceText.dir = 'auto'; priceText.textContent = price === null ? 'لا توجد قراءة ناجحة' : `${number(price)} دج`;
       const quoteNote = document.createElement('small');
       quoteNote.textContent = price === null ? 'بانتظار قراءة رسمية' : `${quote.priceLabel || 'السعر المنشور'}${quote._retrievedAt && Date.now() - quote._retrievedAt > 60000 ? ' · آخر قراءة محفوظة وقد لا تكون حديثة' : ''}`;
       priceMetric.append(priceLabel, priceText, quoteNote);
@@ -251,7 +264,7 @@
 
       const valueMetric = document.createElement('div'); valueMetric.className = 'holding-metric holding-value';
       const valueLabel = document.createElement('span'); valueLabel.textContent = 'قيمة الحيازة التقديرية';
-      const valueText = document.createElement('strong'); valueText.textContent = value === null ? '—' : `${number(value)} دج`;
+      const valueText = document.createElement('strong'); valueText.dir = 'auto'; valueText.textContent = value === null ? '—' : `${number(value)} دج`;
       valueMetric.append(valueLabel, valueText);
 
       const actions = document.createElement('div'); actions.className = 'holding-actions';
@@ -290,8 +303,13 @@
     const held = Object.entries(positions).filter(([, quantity]) => Number.isSafeInteger(quantity) && quantity > 0);
     const values = held.map(([symbol, quantity]) => ({ quantity, price: quoteCache[symbol]?.price }));
     const total = portfolio.totalValue(values);
-    const formattedTotal = total === null ? '—' : `${number(total)} دج`;
-    if (ui.price) ui.price.textContent = total === null ? '—' : number(total);
+    const formattedAmount = total === null ? '—' : number(total);
+    const formattedTotal = total === null ? '—' : `${formattedAmount} دج`;
+    if (ui.price) {
+      ui.price.textContent = formattedAmount;
+      const compactSize = Math.max(15.5, Math.min(32, 285 / (formattedAmount.length + 2)));
+      ui.price.style.setProperty('--total-mobile-size', `${compactSize.toFixed(1)}px`);
+    }
     if (ui.portfolioTotal) ui.portfolioTotal.textContent = formattedTotal;
     renderCompanyList();
   }

@@ -27,38 +27,39 @@
     <div class="topbar-end">
       <button id="install-app" class="install-app" type="button" hidden><span aria-hidden="true">⇩</span> تثبيت</button>
       <span class="market-pill"><i class="market-dot"></i> بورصة الجزائر</span>
-      <span class="top-symbol">DZD</span>
+      <span class="top-symbol">دج</span>
     </div>
   </header>
 
   <main class="shell dashboard">
     <section class="welcome-row" id="home" data-mobile-screen="home">
       <div><span class="eyebrow">لوحة المتابعة</span><h1>أهلاً بك في محفظتي</h1><p>ملخص حيازاتك وأسعار الأسهم في بورصة الجزائر</p></div>
-      <span class="welcome-mark" aria-hidden="true">◌</span>
     </section>
 
     <section class="instrument-card" data-mobile-screen="home" aria-live="polite" aria-atomic="true">
       <div class="instrument-top">
         <div class="company-info"><div class="company-avatar"><img id="focus-company-logo" alt="" decoding="async" hidden><span id="focus-company-fallback">أ</span></div><div><div class="company-title"><span id="focus-company-name">أيراد</span> <span id="focus-company-symbol" class="ticker">AYRD</span></div><div class="company-subtitle"><span id="focus-company-full-name">AYRADE SPA</span> <span class="bullet">•</span> بورصة الجزائر</div></div></div>
-        <span class="quote-state">أسعار SGBV</span>
+        <span class="quote-state">بيانات SGBV</span>
       </div>
-      <div class="quote-main">
-        <div><span class="quote-caption">إجمالي محفظتي</span><div class="price-line"><strong id="price" class="price">—</strong><span class="currency">دج</span></div>
-        </div>
-        <div class="quote-unit">
-          <label class="focus-stock-picker" for="focus-company-select"><small>السهم المحدد</small><select id="focus-company-select" aria-label="اختر السهم لعرض سعره وبياناته"></select></label>
-          <span class="quote-unit-label"><small>سعر السهم المحدد</small><strong id="share-price">—</strong></span>
-          <div class="change-line"><span id="movement" class="movement" hidden></span><span id="movement-caption" class="movement-caption">تغير السهم المحدد بين آخر فحصين ناجحين</span></div>
-        </div>
+      <div class="portfolio-total-block">
+        <div class="portfolio-total-label"><span class="quote-caption">إجمالي محفظتي</span><small>مجموع قيمة جميع الحيازات</small></div>
+        <div class="price-line"><strong id="price" class="price" dir="ltr">—</strong><span class="currency">دج</span></div>
       </div>
-      <div class="quote-bottom"><span class="quote-kind-label">حالة سعر السهم</span><strong id="price-kind" class="quote-kind">بانتظار التحديث</strong><p id="price-note">السعر سيظهر بعد قراءة المصدر الرسمي.</p></div>
+      <div class="quote-unit" role="group" aria-label="بيانات السهم المحدد">
+        <label class="focus-stock-picker" for="focus-company-select"><small>السهم المحدد</small><select id="focus-company-select" aria-label="اختر السهم لعرض سعره وبياناته"></select></label>
+        <span class="quote-unit-label"><small>سعر السهم المحدد</small><strong id="share-price" dir="ltr">—</strong></span>
+        <div class="focus-quote-status"><small>حالة السعر من SGBV</small><strong id="price-kind" class="quote-kind">بانتظار التحديث</strong></div>
+        <div class="focus-quote-updated"><small>آخر تحديث ناجح</small><time id="focus-quote-updated" dir="auto">—</time></div>
+        <div class="change-line"><span id="movement" class="movement" hidden></span><span id="movement-caption" class="movement-caption">لا توجد قراءة سابقة للمقارنة</span></div>
+        <p id="price-note" class="price-note">السعر سيظهر بعد نجاح قراءة المصدر الرسمي.</p>
+      </div>
       <div id="error" class="error" role="status" hidden></div>
-      <div id="refresh-status" class="refresh-status" aria-live="polite">يتم التحقق من بيانات المصدر</div>
+      <div id="refresh-status" class="refresh-status" aria-live="polite">بانتظار تحديث الأسعار</div>
     </section>
 
     <nav class="quick-actions" data-mobile-screen="home" aria-label="إجراءات سريعة">
       <button id="refresh" class="quick-action refresh-action" type="button"><span class="action-icon" aria-hidden="true">↻</span><strong>تحديث الأسعار</strong><small>قراءة من SGBV</small></button>
-      <a class="quick-action" href="https://www.sgbv.dz/" target="_blank" rel="noopener"><span class="action-icon" aria-hidden="true">↗</span><strong>المصدر الرسمي</strong><small>بورصة الجزائر</small></a>
+      <a class="quick-action source-action" href="https://www.sgbv.dz/" target="_blank" rel="noopener"><span class="action-icon" aria-hidden="true">↗</span><strong>المصدر الرسمي</strong><small>بورصة الجزائر</small></a>
     </nav>
 
     <section class="portfolio-section" id="portfolio" data-mobile-screen="portfolio" aria-labelledby="portfolio-title">
@@ -78,12 +79,12 @@
     </section>
 
     <section class="summary-section" id="details" data-mobile-screen="home">
-      <div class="section-heading-inline"><div><span class="section-kicker">ملخص السعر</span><h2>بيانات السهم المحدد</h2></div><span class="section-meta"><span id="details-symbol">AYRD</span> · DZD</span></div>
+      <div class="section-heading-inline"><div><span class="section-kicker">ملخص السعر</span><h2>بيانات السهم المحدد</h2></div><span class="section-meta"><span id="details-symbol">AYRD</span> · دج</span></div>
       <div class="summary-grid">
         <article class="summary-card summary-date"><span class="summary-icon">◷</span><span class="summary-label">تاريخ الجلسة</span><strong id="session-date">غير متاح من المصدر</strong></article>
         <article class="summary-card"><span class="summary-icon">↻</span><span class="summary-label">آخر فحص ناجح</span><strong id="checked-at">—</strong></article>
-        <article class="summary-card"><span class="summary-icon">↗</span><span class="summary-label">سعر الافتتاح المنشور</span><strong id="opening-price">غير منشور</strong></article>
-        <article class="summary-card"><span class="summary-icon">↘</span><span class="summary-label">سعر الإغلاق المنشور</span><strong id="closing-price">غير منشور</strong></article>
+        <article class="summary-card"><span class="summary-icon">↗</span><span class="summary-label">سعر الافتتاح المنشور</span><strong id="opening-price" dir="auto">غير منشور</strong></article>
+        <article class="summary-card"><span class="summary-icon">↘</span><span class="summary-label">سعر الإغلاق المنشور</span><strong id="closing-price" dir="auto">غير منشور</strong></article>
       </div>
     </section>
 

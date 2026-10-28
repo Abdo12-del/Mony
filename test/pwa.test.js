@@ -36,6 +36,19 @@ test('PWA shell supports offline launch without caching the stock API', () => {
   assert.match(worker, /self\.clients\.claim\(\)/);
 });
 
+test('portfolio hero keeps total holdings distinct from the selected-share quote', () => {
+  const html = read('index.html');
+  assert.match(html, /class="portfolio-total-block"[\s\S]*?إجمالي محفظتي[\s\S]*?مجموع قيمة جميع الحيازات[\s\S]*?id="price"/);
+  assert.match(html, /id="focus-company-select"[\s\S]*?id="share-price"/);
+  assert.match(html, /id="price-kind"/);
+  assert.match(html, /id="focus-quote-updated"/);
+  assert.doesNotMatch(html, /welcome-mark/);
+  const app = read('app.js');
+  assert.ok(app.includes("new Intl.NumberFormat('de-DE'"));
+  assert.ok(app.includes('لم يتغير السعر منذ آخر فحص ناجح'));
+  assert.ok(app.includes('إغلاق منشور من SGBV، وليس سعراً مباشراً.'));
+});
+
 test('mobile experience uses four real app tabs with a persistent touch-friendly bottom bar', () => {
   const html = read('index.html');
   for (const screen of ['home', 'portfolio', 'chart', 'history']) {
@@ -45,7 +58,7 @@ test('mobile experience uses four real app tabs with a persistent touch-friendly
   assert.match(html, /viewport-fit=cover/);
   assert.match(html, /<nav class="bottom-nav" aria-label="التنقل الرئيسي">/);
   const css = read('styles.css');
-  assert.match(css, /\.bottom-nav a \{[\s\S]*?min-height: 56px/);
+  assert.match(css, /\.bottom-nav a \{ min-height: 48px; gap: 1px/);
   assert.match(css, /padding: 7px 9px calc\(8px \+ env\(safe-area-inset-bottom/);
   const app = read('app.js');
   assert.match(app, /applyMobileScreen\(link\.dataset\.screenTarget, \{ updateHash: true, scroll: true \}\)/);
@@ -65,7 +78,7 @@ test('web app links its manifest, install metadata and service worker registrati
   const app = read('app.js');
   const vercel = JSON.parse(read('vercel.json'));
   assert.ok(app.includes('portfolio.totalValue(values)'));
-  assert.ok(app.includes("if (ui.price) ui.price.textContent = total === null ? '—' : number(total);"));
+  assert.ok(app.includes('ui.price.textContent = formattedAmount;'));
   assert.match(html, /id="company-select"/);
   assert.match(html, /id="company-list"/);
   assert.match(html, /id="quote-refresh-feedback"/);
