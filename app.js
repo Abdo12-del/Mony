@@ -9,6 +9,8 @@
     chartLine: $('chart-line'), chartArea: $('chart-area'), chartPoint: $('chart-point'), chartEmpty: $('chart-empty'),
     chartCount: $('observation-count'), chartFirst: $('chart-first'), chartLast: $('chart-last'), activity: $('activity-list'),
     portfolioTotal: $('portfolio-total'), portfolioFeedback: $('portfolio-feedback'), quoteFeedback: $('quote-refresh-feedback'),
+    portfolioChart: $('portfolio-total-chart'), portfolioChartLine: $('portfolio-total-line'),
+    portfolioChartArea: $('portfolio-total-area'), portfolioChartPoint: $('portfolio-total-point'), portfolioChartHint: $('portfolio-total-chart-hint'),
     companySelect: $('company-select'), addCompany: $('add-company'), companyList: $('company-list'),
     focusSelect: $('focus-company-select'), focusName: $('focus-company-name'), focusSymbol: $('focus-company-symbol'),
     focusFullName: $('focus-company-full-name'), focusLogo: $('focus-company-logo'), focusFallback: $('focus-company-fallback'),
@@ -18,6 +20,7 @@
   const LEGACY_HISTORY_KEY = 'nabd-ayrad-observations-v1';
   const SELECTED_SYMBOL_KEY = 'mahfazati-selected-symbol-v1';
   const PORTFOLIO_KEY = 'mahfazati-portfolio-v2';
+  const PORTFOLIO_HISTORY_KEY = 'mahfazati-portfolio-observations-v1';
   const LEGACY_PORTFOLIO_KEY = 'nabd-ayrad-portfolio-v1';
   const QUOTES_KEY = 'mahfazati-last-quotes-v1';
   let selectedSymbol = readSelectedSymbol();
@@ -43,6 +46,61 @@
       const rows = JSON.parse(saved || legacy || '[]');
       return Array.isArray(rows) ? rows.filter(x => x && Number.isFinite(x.price)).slice(-60) : [];
     } catch (_) { return []; }
+  }
+
+  function readPortfolioHistory() {
+    try {
+      const rows = JSON.parse(localStorage.getItem(PORTFOLIO_HISTORY_KEY) || '[]');
+      return Array.isArray(rows)
+        ? rows.filter(row => row && Number.isFinite(row.total) && row.total > 0 && Number.isFinite(row.time)).slice(-60)
+        : [];
+    } catch (_) { return []; }
+  }
+
+  function renderPortfolioChart(rows = readPortfolioHistory()) {
+    if (!ui.portfolioChart || !ui.portfolioChartLine || !ui.portfolioChartArea || !ui.portfolioChartPoint || !ui.portfolioChartHint) return;
+    const visible = rows.slice(-36);
+    if (visible.length < 2) {
+      ui.portfolioChart.hidden = true;
+      ui.portfolioChartLine.setAttribute('d', '');
+      ui.portfolioChartArea.setAttribute('d', '');
+      ui.portfolioChartPoint.setAttribute('r', '0');
+      ui.portfolioChartHint.hidden = false;
+      ui.portfolioChartHint.textContent = Object.keys(positions).length === 0
+        ? 'أضف حيازة لبدء التتبّع'
+        : visible.length === 0 ? 'يبدأ التتبّع بعد تحديثين ناجحين' : 'يحتاج المسار إلى قراءة ناجحة أخرى';
+      return;
+    }
+
+    const values = visible.map(row => row.total);
+    const min = Math.min(...values), max = Math.max(...values);
+    const spread = max - min || Math.max(max * .05, 1);
+    const points = values.map((value, index) => ({
+      x: 4 + index * (252 / (values.length - 1)),
+      y: max === min ? 20 : 32 - ((value - min) / spread) * 23
+    }));
+    const line = points.map((point, index) => `${index ? 'L' : 'M'}${point.x.toFixed(1)},${point.y.toFixed(1)}`).join(' ');
+    const first = points[0], last = points[points.length - 1];
+    ui.portfolioChart.hidden = false;
+    ui.portfolioChartHint.hidden = false;
+    ui.portfolioChartHint.textContent = 'قيمة مرصودة · ليست عائداً استثمارياً';
+    ui.portfolioChart.setAttribute('aria-label', `مسار القيمة الإجمالية المرصودة للمحفظة عبر ${new Intl.NumberFormat('ar-DZ').format(visible.length)} قراءة ناجحة؛ لا يمثل عائداً استثمارياً.`);
+    ui.portfolioChartLine.setAttribute('d', line);
+    ui.portfolioChartArea.setAttribute('d', `${line} L${last.x.toFixed(1)},40 L${first.x.toFixed(1)},40 Z`);
+    ui.portfolioChartPoint.setAttribute('cx', last.x.toFixed(1));
+    ui.portfolioChartPoint.setAttribute('cy', last.y.toFixed(1));
+    ui.portfolioChartPoint.setAttribute('r', '2.8');
+  }
+
+  function savePortfolioObservation(refreshedSymbols) {
+    try {
+      const holdings = Object.entries(positions).map(([symbol, quantity]) => ({ symbol, quantity }));
+      const snapshot = portfolio.createSnapshot(holdings, quoteCache, refreshedSymbols, Date.now());
+      if (!snapshot) return;
+      const history = readPortfolioHistory();
+      history.push(snapshot);
+      localStorage.setItem(PORTFOLIO_HISTORY_KEY, JSON.stringify(history.slice(-60)));
+    } catch (_) { /* Snapshot storage is optional; never block a successful quote refresh. */ }
   }
 
   function renderChart(rows) {
@@ -312,6 +370,7 @@
     }
     if (ui.portfolioTotal) ui.portfolioTotal.textContent = formattedTotal;
     renderCompanyList();
+    renderPortfolioChart();
   }
 
   async function refresh() {
@@ -335,6 +394,7 @@
         localStorage.setItem(historyKey(symbol), JSON.stringify(history.slice(-60)));
         returnedSymbols.add(symbol);
       }
+      savePortfolioObservation(returnedSymbols);
       localStorage.setItem(QUOTES_KEY, JSON.stringify(quoteCache));
       renderPortfolio(); renderSelectedQuote();
       const unavailableHeld = Object.keys(positions).filter(symbol => !returnedSymbols.has(symbol));

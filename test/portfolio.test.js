@@ -2,7 +2,7 @@
 
 const test = require('node:test');
 const assert = require('node:assert/strict');
-const { estimateValue, parseQuantity, totalValue } = require('../portfolio');
+const { createSnapshot, estimateValue, parseQuantity, totalValue } = require('../portfolio');
 
 test('portfolio quantity accepts only non-negative whole share counts', () => {
   assert.equal(parseQuantity('0'), 0);
@@ -32,4 +32,13 @@ test('overall portfolio value sums each holding and avoids partial totals', () =
   assert.equal(totalValue([{ quantity: 1, price: 830.25 }, { quantity: 3, price: 10.1 }]), 860.55);
   assert.equal(totalValue([]), null);
   assert.equal(totalValue([{ quantity: 1, price: 830 }, { quantity: 2, price: null }]), null);
+});
+
+test('portfolio trend snapshots require fresh official readings for every current holding', () => {
+  const holdings = [{ symbol: 'AYRD', quantity: 3 }, { symbol: 'BIO', quantity: 2 }];
+  const quotes = { AYRD: { price: 830 }, BIO: { price: 415 } };
+  assert.deepEqual(createSnapshot(holdings, quotes, new Set(['AYRD', 'BIO']), 1234), { time: 1234, total: 3320 });
+  assert.equal(createSnapshot(holdings, quotes, new Set(['AYRD']), 1234), null);
+  assert.equal(createSnapshot(holdings, { AYRD: quotes.AYRD }, new Set(['AYRD', 'BIO']), 1234), null);
+  assert.equal(createSnapshot([], quotes, new Set(['AYRD', 'BIO']), 1234), null);
 });

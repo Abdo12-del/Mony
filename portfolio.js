@@ -30,7 +30,15 @@
     return Number(total.toFixed(2));
   }
 
-  const api = Object.freeze({ parseQuantity, estimateValue, totalValue });
+  function createSnapshot(holdings, quotes, refreshedSymbols, time) {
+    if (!Array.isArray(holdings) || holdings.length === 0 || !quotes || !(refreshedSymbols instanceof Set) || !Number.isFinite(time)) return null;
+    if (holdings.some(position => !position || typeof position.symbol !== 'string' ||
+      !Number.isSafeInteger(position.quantity) || position.quantity <= 0 || !refreshedSymbols.has(position.symbol))) return null;
+    const total = totalValue(holdings.map(({ symbol, quantity }) => ({ quantity, price: quotes[symbol]?.price })));
+    return total === null ? null : { time, total };
+  }
+
+  const api = Object.freeze({ parseQuantity, estimateValue, totalValue, createSnapshot });
   if (typeof module === 'object' && module.exports) module.exports = api;
   else root.NabdPortfolio = api;
 })(globalThis);

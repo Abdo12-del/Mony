@@ -54,6 +54,20 @@ test('portfolio hero shows only the independent total; selected-share details st
   assert.ok(app.includes('إغلاق منشور من SGBV، وليس سعراً مباشراً.'));
 });
 
+test('portfolio total card contains an accessible history sparkline and never invents a trend', () => {
+  const html = read('index.html');
+  const hero = html.match(/<section class="instrument-card portfolio-total-card"[\s\S]*?<\/section>/)?.[0];
+  assert.ok(hero);
+  assert.match(hero, /id="portfolio-total-chart"[^>]*role="img"/);
+  assert.match(hero, /id="portfolio-total-chart-hint"/);
+  const app = read('app.js');
+  assert.match(app, /portfolio\.createSnapshot\(holdings, quoteCache, refreshedSymbols, Date\.now\(\)\)/);
+  assert.match(app, /history\.push\(snapshot\)/);
+  assert.match(app, /visible\.length < 2/);
+  assert.match(app, /لا يمثل عائداً استثمارياً/);
+  assert.match(read('sw.js'), /mahfazati-shell-v13/);
+});
+
 test('finance UI uses clear rectangular cards with a single prominent portfolio total', () => {
   const css = read('styles.css');
   const designSystem = css.slice(css.lastIndexOf('/* Unified finance-app card system'));
@@ -62,7 +76,7 @@ test('finance UI uses clear rectangular cards with a single prominent portfolio 
   assert.match(designSystem, /\.portfolio-total-card\s*\{[\s\S]*?min-height:\s*144px[\s\S]*?border-radius:\s*var\(--card-radius\)/);
   assert.match(designSystem, /\.summary-card\.summary-date\s*\{[^}]*background:\s*var\(--card-surface\)/);
   const worker = read('sw.js');
-  assert.match(worker, /mahfazati-shell-v12/);
+  assert.match(worker, /mahfazati-shell-v13/);
 });
 
 test('mobile experience uses four real app tabs with a persistent touch-friendly bottom bar', () => {
