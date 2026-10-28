@@ -307,7 +307,7 @@
     const formattedTotal = total === null ? '—' : `${formattedAmount} دج`;
     if (ui.price) {
       ui.price.textContent = formattedAmount;
-      const compactSize = Math.max(15.5, Math.min(32, 285 / (formattedAmount.length + 2)));
+      const compactSize = Math.max(21, Math.min(40, 350 / (formattedAmount.length + 1)));
       ui.price.style.setProperty('--total-mobile-size', `${compactSize.toFixed(1)}px`);
     }
     if (ui.portfolioTotal) ui.portfolioTotal.textContent = formattedTotal;
