@@ -73,7 +73,7 @@ test('portfolio total card contains an accessible history sparkline and never in
   assert.match(app, /trend-\$\{trend\}/);
   assert.match(read('styles.css'), /trend-positive \.portfolio-total-line/);
   assert.match(read('styles.css'), /trend-negative \.portfolio-total-line/);
-  assert.match(read('sw.js'), /mahfazati-shell-v17/);
+  assert.match(read('sw.js'), /mahfazati-shell-v16/);
 });
 
 test('finance UI uses clear rectangular cards with a single prominent portfolio total', () => {
@@ -84,7 +84,7 @@ test('finance UI uses clear rectangular cards with a single prominent portfolio 
   assert.match(designSystem, /\.portfolio-total-card\s*\{[\s\S]*?min-height:\s*144px[\s\S]*?border-radius:\s*var\(--card-radius\)/);
   assert.match(designSystem, /\.summary-card\.summary-date\s*\{[^}]*background:\s*var\(--card-surface\)/);
   const worker = read('sw.js');
-  assert.match(worker, /mahfazati-shell-v17/);
+  assert.match(worker, /mahfazati-shell-v16/);
 });
 
 test('mobile experience uses four real app tabs with a persistent touch-friendly bottom bar', () => {
@@ -98,9 +98,7 @@ test('mobile experience uses four real app tabs with a persistent touch-friendly
   const css = read('styles.css');
   assert.match(css, /\.bottom-nav a \{ min-height: 48px; gap: 1px/);
   assert.match(css, /padding: 7px 9px calc\(8px \+ env\(safe-area-inset-bottom/);
-  assert.match(css, /width: min\(440px, calc\(100% - 28px\)\)/);
-  assert.match(css, /border-radius: 24px/);
-  assert.match(css, /backdrop-filter: blur\(20px\) saturate\(145%\)/);
+  assert.match(css, /border-radius: 12px 12px 0 0/);
   const app = read('app.js');
   assert.match(app, /applyMobileScreen\(link\.dataset\.screenTarget, \{ updateHash: true, scroll: true \}\)/);
   assert.match(app, /mobileScrollPositions\[previousScreen\] = window\.scrollY/);
