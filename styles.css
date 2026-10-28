@@ -286,6 +286,7 @@ footer a { color: #b4a3d5; text-decoration: none; }
   .dashboard > * { min-width: 0; grid-column: 1 / -1; }
   .dashboard > .welcome-row { padding: 8px 3px 1px; }
   .dashboard > .instrument-card { grid-column: span 7; }
+  .dashboard > .stock-quote-card { grid-column: span 7; margin-top: 0; }
   .dashboard > .quick-actions {
     grid-column: span 5;
     grid-template-columns: repeat(2, minmax(0, 1fr));
@@ -316,6 +317,7 @@ footer a { color: #b4a3d5; text-decoration: none; }
   .dashboard > * { min-width: 0; grid-column: 1 / -1; }
   .dashboard > .welcome-row { padding: 8px 3px 1px; }
   .dashboard > .instrument-card,
+  .dashboard > .stock-quote-card,
   .dashboard > .quick-actions,
   .dashboard > .summary-section,
   .dashboard > .detail-grid,
@@ -937,4 +939,115 @@ footer a { color: #b4a3d5; text-decoration: none; }
   .quick-actions .quick-action { padding-inline: 6px; gap: 5px; }
   .quick-actions .quick-action strong { font-size: 10px; }
   .bottom-nav a small { font-size: 9px; }
+}
+
+/* The violet hero is exclusively the all-holdings total; quote controls live separately. */
+.portfolio-total-card {
+  min-width: 0;
+  padding: 12px 22px;
+  border-radius: 18px;
+  box-shadow: 0 10px 28px #6237c326;
+}
+.portfolio-total-card::after { display: none; }
+.portfolio-total-card .portfolio-total-block {
+  min-width: 0;
+  min-height: 60px;
+  padding: 0;
+  gap: 14px;
+}
+.portfolio-total-card .quote-caption {
+  color: #fff;
+  font-size: 17px;
+  font-weight: 600;
+  white-space: nowrap;
+}
+.portfolio-total-card .price-line {
+  min-width: 0;
+  margin: 0;
+  gap: 6px;
+  white-space: nowrap;
+}
+.portfolio-total-card .price {
+  font-size: var(--total-mobile-size, clamp(28px, 3.5vw, 38px));
+  line-height: 1.15;
+}
+.portfolio-total-card .currency { font-size: 13px; white-space: nowrap; }
+.stock-quote-card {
+  min-width: 0;
+  padding: 14px 16px;
+  border: 1px solid #302a3b;
+  border-radius: 17px;
+  background: linear-gradient(145deg, #17151d, #121116);
+}
+.stock-quote-header {
+  min-width: 0;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+}
+.stock-quote-header .company-info { min-width: 0; }
+.stock-quote-header .company-title { color: #f5f1fa; }
+.stock-quote-header .ticker { background: #292331; border-color: #51455f; color: #e9dfff; }
+.stock-quote-header .company-subtitle { color: #aaa2b2; }
+.stock-quote-header .quote-state {
+  flex: 0 0 auto;
+  padding: 5px 8px;
+  border: 1px solid #3c3545;
+  border-radius: 9px;
+  background: #201d26;
+  color: #d9c9f5;
+  font-size: 10px;
+}
+.stock-quote-card .quote-unit {
+  width: auto;
+  max-width: none;
+  min-width: 0;
+  margin-top: 12px;
+  padding: 11px 0 0;
+  border: 0;
+  border-top: 1px solid #302a38;
+  border-radius: 0;
+  background: transparent;
+  color: #f5f1fa;
+}
+.stock-quote-card .focus-stock-picker > small,
+.stock-quote-card .quote-unit-label small,
+.stock-quote-card .focus-quote-status small,
+.stock-quote-card .focus-quote-updated small { color: #a9a1b1; }
+.stock-quote-card .focus-stock-picker select {
+  border-color: #494151;
+  background: #1b1821;
+  color: #f7f3fb;
+}
+.stock-quote-card .quote-unit-label strong,
+.stock-quote-card .focus-quote-updated time { color: #fff; }
+.stock-quote-card .focus-quote-status .quote-kind {
+  border-color: #4d3b6d;
+  background: #2a2039;
+  color: #e8dcff;
+}
+.stock-quote-card .quote-unit .change-line { border-top-color: #302a38; }
+.stock-quote-card .quote-unit .movement-caption { color: #d1c9d8; }
+.stock-quote-card .quote-unit .price-note { color: #aaa2b1; }
+.stock-quote-card #refresh-status { color: #9e96a5; }
+
+@media (max-width: 650px) {
+  .portfolio-total-card { padding: 8px 14px; border-radius: 15px; }
+  .portfolio-total-card .portfolio-total-block { min-height: 45px; gap: 8px; }
+  .portfolio-total-card .quote-caption { font-size: 15px; }
+  .portfolio-total-card .price-line { flex: 0 1 auto; max-width: 70%; }
+  .portfolio-total-card .price { font-size: var(--total-mobile-size, clamp(23px, 7vw, 30px)); }
+  .portfolio-total-card .currency { font-size: 11px; }
+  .stock-quote-card { padding: 12px; border-radius: 15px; }
+  .stock-quote-header .quote-state { font-size: 9px; }
+  .stock-quote-card .quote-unit { margin-top: 9px; padding-top: 9px; }
+  .stock-quote-card .focus-stock-picker select { background: #1b1821; }
+}
+@media (max-width: 360px) {
+  .portfolio-total-card { padding-inline: 11px; }
+  .portfolio-total-card .portfolio-total-block { gap: 6px; }
+  .portfolio-total-card .price-line { max-width: 72%; }
+  .portfolio-total-card .price { font-size: var(--total-mobile-size, clamp(20px, 6.7vw, 25px)); }
+  .stock-quote-card { padding: 10px; }
 }

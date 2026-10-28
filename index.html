@@ -36,19 +36,22 @@
       <div><span class="eyebrow">لوحة المتابعة</span><h1>أهلاً بك في محفظتي</h1><p>ملخص حيازاتك وأسعار الأسهم في بورصة الجزائر</p></div>
     </section>
 
-    <section class="instrument-card" data-mobile-screen="home" aria-live="polite" aria-atomic="true">
-      <div class="instrument-top">
-        <div class="company-info"><div class="company-avatar"><img id="focus-company-logo" alt="" decoding="async" hidden><span id="focus-company-fallback">أ</span></div><div><div class="company-title"><span id="focus-company-name">أيراد</span> <span id="focus-company-symbol" class="ticker">AYRD</span></div><div class="company-subtitle"><span id="focus-company-full-name">AYRADE SPA</span> <span class="bullet">•</span> بورصة الجزائر</div></div></div>
-        <span class="quote-state">بيانات SGBV</span>
-      </div>
+    <section class="instrument-card portfolio-total-card" data-mobile-screen="home" aria-live="polite" aria-atomic="true">
       <div class="portfolio-total-block">
-        <div class="portfolio-total-label"><span class="quote-caption">إجمالي محفظتي</span><small>مجموع قيمة جميع الحيازات</small></div>
+        <span class="quote-caption">إجمالي</span>
         <div class="price-line"><strong id="price" class="price" dir="ltr">—</strong><span class="currency">دج</span></div>
       </div>
+    </section>
+
+    <section class="stock-quote-card" data-mobile-screen="home" aria-live="polite" aria-atomic="true">
+      <div class="stock-quote-header">
+        <div class="company-info"><div class="company-avatar"><img id="focus-company-logo" alt="" decoding="async" hidden><span id="focus-company-fallback">أ</span></div><div><div class="company-title"><span id="focus-company-name">أيراد</span> <span id="focus-company-symbol" class="ticker">AYRD</span></div><div class="company-subtitle"><span id="focus-company-full-name">AYRADE SPA</span> <span class="bullet">•</span> بورصة الجزائر</div></div></div>
+        <span class="quote-state">سعر السهم المحدد</span>
+      </div>
       <div class="quote-unit" role="group" aria-label="بيانات السهم المحدد">
-        <label class="focus-stock-picker" for="focus-company-select"><small>السهم المحدد</small><select id="focus-company-select" aria-label="اختر السهم لعرض سعره وبياناته"></select></label>
+        <label class="focus-stock-picker" for="focus-company-select"><small>اختر السهم</small><select id="focus-company-select" aria-label="اختر السهم لعرض سعره وبياناته"></select></label>
         <span class="quote-unit-label"><small>سعر السهم المحدد</small><strong id="share-price" dir="ltr">—</strong></span>
-        <div class="focus-quote-status"><small>حالة السعر من SGBV</small><strong id="price-kind" class="quote-kind">بانتظار التحديث</strong></div>
+        <div class="focus-quote-status"><small>حالة السعر · SGBV</small><strong id="price-kind" class="quote-kind">بانتظار التحديث</strong></div>
         <div class="focus-quote-updated"><small>آخر تحديث ناجح</small><time id="focus-quote-updated" dir="auto">—</time></div>
         <div class="change-line"><span id="movement" class="movement" hidden></span><span id="movement-caption" class="movement-caption">لا توجد قراءة سابقة للمقارنة</span></div>
         <p id="price-note" class="price-note">السعر سيظهر بعد نجاح قراءة المصدر الرسمي.</p>

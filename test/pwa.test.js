@@ -36,12 +36,17 @@ test('PWA shell supports offline launch without caching the stock API', () => {
   assert.match(worker, /self\.clients\.claim\(\)/);
 });
 
-test('portfolio hero keeps total holdings distinct from the selected-share quote', () => {
+test('portfolio hero shows only the independent total; selected-share details stay in a separate card', () => {
   const html = read('index.html');
-  assert.match(html, /class="portfolio-total-block"[\s\S]*?إجمالي محفظتي[\s\S]*?مجموع قيمة جميع الحيازات[\s\S]*?id="price"/);
-  assert.match(html, /id="focus-company-select"[\s\S]*?id="share-price"/);
-  assert.match(html, /id="price-kind"/);
-  assert.match(html, /id="focus-quote-updated"/);
+  const hero = html.match(/<section class="instrument-card portfolio-total-card"[\s\S]*?<\/section>/)?.[0];
+  assert.ok(hero);
+  assert.match(hero, /quote-caption">إجمالي<\/span>[\s\S]*?id="price"/);
+  assert.doesNotMatch(hero, /AYRD|focus-company-select|share-price|السهم/);
+  const stockCard = html.match(/<section class="stock-quote-card"[\s\S]*?<\/section>/)?.[0];
+  assert.ok(stockCard);
+  assert.match(stockCard, /id="focus-company-select"[\s\S]*?id="share-price"/);
+  assert.match(stockCard, /id="price-kind"/);
+  assert.match(stockCard, /id="focus-quote-updated"/);
   assert.doesNotMatch(html, /welcome-mark/);
   const app = read('app.js');
   assert.ok(app.includes("new Intl.NumberFormat('de-DE'"));
@@ -70,7 +75,7 @@ test('web app links its manifest, install metadata and service worker registrati
   assert.match(html, /rel="manifest" href="\/manifest\.webmanifest"/);
   assert.match(html, /id="install-app"/);
   assert.match(html, /apple-mobile-web-app-title" content="محفظتي"/);
-  assert.match(html, /<span class="quote-caption">إجمالي محفظتي<\/span>/);
+  assert.match(html, /<span class="quote-caption">إجمالي<\/span>/);
   assert.match(html, /id="share-price"/);
   assert.match(html, /id="focus-company-select"/);
   assert.match(html, /id="focus-company-logo"/);
