@@ -10,7 +10,8 @@
     chartCount: $('observation-count'), chartFirst: $('chart-first'), chartLast: $('chart-last'), activity: $('activity-list'),
     portfolioTotal: $('portfolio-total'), portfolioFeedback: $('portfolio-feedback'), quoteFeedback: $('quote-refresh-feedback'),
     portfolioChart: $('portfolio-total-chart'), portfolioChartLine: $('portfolio-total-line'),
-    portfolioChartArea: $('portfolio-total-area'), portfolioChartPoint: $('portfolio-total-point'), portfolioChartHint: $('portfolio-total-chart-hint'),
+    portfolioChartArea: $('portfolio-total-area'), portfolioChartPoint: $('portfolio-total-point'),
+    portfolioChartPoints: $('portfolio-total-points'), portfolioChartHint: $('portfolio-total-chart-hint'),
     companySelect: $('company-select'), addCompany: $('add-company'), companyList: $('company-list'),
     focusSelect: $('focus-company-select'), focusName: $('focus-company-name'), focusSymbol: $('focus-company-symbol'),
     focusFullName: $('focus-company-full-name'), focusLogo: $('focus-company-logo'), focusFallback: $('focus-company-fallback'),
@@ -88,12 +89,13 @@
   }
 
   function renderPortfolioChart(rows = readPortfolioHistory()) {
-    if (!ui.portfolioChart || !ui.portfolioChartLine || !ui.portfolioChartArea || !ui.portfolioChartPoint || !ui.portfolioChartHint) return;
+    if (!ui.portfolioChart || !ui.portfolioChartLine || !ui.portfolioChartArea || !ui.portfolioChartPoint || !ui.portfolioChartPoints || !ui.portfolioChartHint) return;
     const visible = rows.slice(-36);
     if (visible.length < 2) {
       ui.portfolioChart.hidden = true;
       ui.portfolioChartLine.setAttribute('d', '');
       ui.portfolioChartArea.setAttribute('d', '');
+      ui.portfolioChartPoints.replaceChildren();
       ui.portfolioChartPoint.setAttribute('r', '0');
       ui.portfolioChartHint.hidden = false;
       ui.portfolioChartHint.textContent = Object.keys(positions).length === 0
@@ -117,6 +119,18 @@
     ui.portfolioChart.setAttribute('aria-label', `مسار القيمة الإجمالية المرصودة للمحفظة عبر ${new Intl.NumberFormat('ar-DZ').format(visible.length)} قراءة ناجحة؛ لا يمثل عائداً استثمارياً.`);
     ui.portfolioChartLine.setAttribute('d', line);
     ui.portfolioChartArea.setAttribute('d', `${line} L${last.x.toFixed(1)},40 L${first.x.toFixed(1)},40 Z`);
+    ui.portfolioChartPoints.replaceChildren();
+    const markerCount = Math.min(points.length, 8);
+    const markerIndices = new Set(Array.from({ length: markerCount }, (_, index) =>
+      Math.round(index * (points.length - 1) / Math.max(1, markerCount - 1))));
+    for (const index of markerIndices) {
+      const marker = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+      marker.setAttribute('class', 'portfolio-total-point-marker');
+      marker.setAttribute('cx', points[index].x.toFixed(1));
+      marker.setAttribute('cy', points[index].y.toFixed(1));
+      marker.setAttribute('r', '1.6');
+      ui.portfolioChartPoints.appendChild(marker);
+    }
     ui.portfolioChartPoint.setAttribute('cx', last.x.toFixed(1));
     ui.portfolioChartPoint.setAttribute('cy', last.y.toFixed(1));
     ui.portfolioChartPoint.setAttribute('r', '2.8');

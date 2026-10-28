@@ -60,6 +60,8 @@ test('portfolio total card contains an accessible history sparkline and never in
   assert.ok(hero);
   assert.match(hero, /id="portfolio-total-chart"[^>]*role="img"/);
   assert.match(hero, /id="portfolio-total-chart-hint"/);
+  assert.match(hero, /class="portfolio-total-grid"/);
+  assert.match(hero, /id="portfolio-total-points"/);
   const app = read('app.js');
   assert.match(app, /portfolio\.createSnapshot\(holdings, quoteCache, refreshedSymbols, Date\.now\(\)\)/);
   assert.match(app, /history\.push\(snapshot\)/);
@@ -67,7 +69,7 @@ test('portfolio total card contains an accessible history sparkline and never in
   assert.match(app, /smoothLinePath\(points\)/);
   assert.match(app, /path \+= ` C/);
   assert.match(app, /لا يمثل عائداً استثمارياً/);
-  assert.match(read('sw.js'), /mahfazati-shell-v14/);
+  assert.match(read('sw.js'), /mahfazati-shell-v15/);
 });
 
 test('finance UI uses clear rectangular cards with a single prominent portfolio total', () => {
@@ -78,7 +80,7 @@ test('finance UI uses clear rectangular cards with a single prominent portfolio 
   assert.match(designSystem, /\.portfolio-total-card\s*\{[\s\S]*?min-height:\s*144px[\s\S]*?border-radius:\s*var\(--card-radius\)/);
   assert.match(designSystem, /\.summary-card\.summary-date\s*\{[^}]*background:\s*var\(--card-surface\)/);
   const worker = read('sw.js');
-  assert.match(worker, /mahfazati-shell-v14/);
+  assert.match(worker, /mahfazati-shell-v15/);
 });
 
 test('mobile experience uses four real app tabs with a persistent touch-friendly bottom bar', () => {
