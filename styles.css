@@ -1059,3 +1059,102 @@ footer a { color: #b4a3d5; text-decoration: none; }
   .portfolio-total-card .price { font-size: var(--total-mobile-size, clamp(25px, 7.5vw, 31px)); }
   .stock-quote-card { padding: 10px; }
 }
+
+/* Unified finance-app card system: clear rectangular surfaces, quiet layers, one accent. */
+:root {
+  --card-surface: #17171c;
+  --card-surface-raised: #1d1c22;
+  --card-border: #302e37;
+  --card-radius: 12px;
+}
+
+.stock-quote-card,
+.portfolio-section,
+.chart-panel,
+.summary-card,
+.activity-row,
+.activity-empty,
+.extra-info,
+.holding-card,
+.company-picker {
+  border: 1px solid var(--card-border);
+  border-radius: var(--card-radius);
+  background: var(--card-surface);
+  box-shadow: none;
+}
+
+.portfolio-total-card {
+  min-height: 144px;
+  padding: 20px 22px;
+  border: 1px solid #a984ff;
+  border-radius: var(--card-radius);
+  background: linear-gradient(135deg, #7948db 0%, #693bc9 100%);
+  box-shadow: none;
+}
+.portfolio-total-card .portfolio-total-block { min-height: 102px; gap: 8px; }
+.portfolio-total-card .quote-caption { font-size: 16px; }
+.portfolio-total-card .price { font-size: var(--total-mobile-size, clamp(34px, 4vw, 42px)); }
+.portfolio-total-card .currency { font-size: 14px; }
+
+.stock-quote-card { padding: 16px; }
+.stock-quote-header .quote-state { border-radius: 6px; }
+.stock-quote-card .quote-unit { background: transparent; }
+.portfolio-section { padding: 16px; }
+.chart-panel { padding: 14px; }
+.summary-card { border-radius: var(--card-radius); }
+.summary-card.summary-date { border-color: var(--card-border); background: var(--card-surface); color: var(--ink); }
+.summary-date .summary-icon { background: #292335; color: #c4a9ff; }
+.summary-date .summary-label { color: #a39daa; }
+.summary-date strong { color: #f4f0f8; }
+.summary-icon,
+.activity-icon { border-radius: 7px; }
+.activity-row { background: var(--card-surface); }
+.activity-icon { width: 30px; height: 30px; }
+.extra-info { background: var(--card-surface); }
+.holding-card,
+.company-picker { background: var(--card-surface-raised); }
+.company-picker { border-radius: var(--card-radius); }
+
+.quick-actions {
+  padding: 0;
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+  box-shadow: none;
+}
+.quick-actions .quick-action {
+  min-height: 74px;
+  border: 1px solid var(--card-border);
+  border-radius: 10px;
+  background: var(--card-surface);
+}
+.quick-actions .quick-action:hover { background: var(--card-surface-raised); }
+.quick-actions .action-icon { border-radius: 7px; }
+.quick-actions .refresh-action,
+.quick-actions .refresh-action:hover {
+  border-color: #a984ff;
+  background: #7548d3;
+  color: #fff;
+}
+.quick-actions .refresh-action .action-icon { background: #ffffff20; color: #fff; }
+.quick-actions .source-action { border-color: var(--card-border); background: var(--card-surface); }
+.quick-actions .source-action .action-icon { background: #292335; }
+
+@media (max-width: 650px) {
+  .portfolio-total-card { min-height: 118px; padding: 13px 14px; border-radius: var(--card-radius); }
+  .portfolio-total-card .portfolio-total-block { min-height: 90px; }
+  .portfolio-total-card .quote-caption { font-size: 15px; }
+  .portfolio-total-card .price { font-size: var(--total-mobile-size, clamp(27px, 8vw, 37px)); }
+  .stock-quote-card,
+  .portfolio-section,
+  .chart-panel { padding: 13px; border-radius: var(--card-radius); }
+  .quick-actions .quick-action { min-height: 48px; border-radius: 8px; }
+  .bottom-nav { border-radius: 12px 12px 0 0; }
+  .bottom-nav a,
+  .bottom-nav a.active { border-radius: 8px; }
+}
+@media (max-width: 360px) {
+  .portfolio-total-card { min-height: 112px; padding-inline: 12px; }
+  .portfolio-total-card .portfolio-total-block { min-height: 84px; }
+  .portfolio-total-card .price { font-size: var(--total-mobile-size, clamp(25px, 7.5vw, 31px)); }
+}

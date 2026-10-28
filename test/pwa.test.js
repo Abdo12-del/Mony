@@ -54,6 +54,17 @@ test('portfolio hero shows only the independent total; selected-share details st
   assert.ok(app.includes('إغلاق منشور من SGBV، وليس سعراً مباشراً.'));
 });
 
+test('finance UI uses clear rectangular cards with a single prominent portfolio total', () => {
+  const css = read('styles.css');
+  const designSystem = css.slice(css.lastIndexOf('/* Unified finance-app card system'));
+  assert.match(designSystem, /--card-radius:\s*12px/);
+  assert.match(designSystem, /\.stock-quote-card,[\s\S]*?\.portfolio-section,[\s\S]*?\.chart-panel,[\s\S]*?\.summary-card/);
+  assert.match(designSystem, /\.portfolio-total-card\s*\{[\s\S]*?min-height:\s*144px[\s\S]*?border-radius:\s*var\(--card-radius\)/);
+  assert.match(designSystem, /\.summary-card\.summary-date\s*\{[^}]*background:\s*var\(--card-surface\)/);
+  const worker = read('sw.js');
+  assert.match(worker, /mahfazati-shell-v12/);
+});
+
 test('mobile experience uses four real app tabs with a persistent touch-friendly bottom bar', () => {
   const html = read('index.html');
   for (const screen of ['home', 'portfolio', 'chart', 'history']) {
