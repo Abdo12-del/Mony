@@ -69,7 +69,11 @@ test('portfolio total card contains an accessible history sparkline and never in
   assert.match(app, /smoothLinePath\(points\)/);
   assert.match(app, /path \+= ` C/);
   assert.match(app, /لا يمثل عائداً استثمارياً/);
-  assert.match(read('sw.js'), /mahfazati-shell-v15/);
+  assert.match(app, /latestTotal > previousTotal \? 'positive' : latestTotal < previousTotal \? 'negative' : 'neutral'/);
+  assert.match(app, /trend-\$\{trend\}/);
+  assert.match(read('styles.css'), /trend-positive \.portfolio-total-line/);
+  assert.match(read('styles.css'), /trend-negative \.portfolio-total-line/);
+  assert.match(read('sw.js'), /mahfazati-shell-v16/);
 });
 
 test('finance UI uses clear rectangular cards with a single prominent portfolio total', () => {
@@ -80,7 +84,7 @@ test('finance UI uses clear rectangular cards with a single prominent portfolio 
   assert.match(designSystem, /\.portfolio-total-card\s*\{[\s\S]*?min-height:\s*144px[\s\S]*?border-radius:\s*var\(--card-radius\)/);
   assert.match(designSystem, /\.summary-card\.summary-date\s*\{[^}]*background:\s*var\(--card-surface\)/);
   const worker = read('sw.js');
-  assert.match(worker, /mahfazati-shell-v15/);
+  assert.match(worker, /mahfazati-shell-v16/);
 });
 
 test('mobile experience uses four real app tabs with a persistent touch-friendly bottom bar', () => {

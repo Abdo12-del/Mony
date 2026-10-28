@@ -1219,3 +1219,16 @@ footer a { color: #b4a3d5; text-decoration: none; }
   .portfolio-total-card { min-height: 124px; }
   .portfolio-total-card .portfolio-total-block { min-height: 100px; padding-bottom: 35px; }
 }
+
+.portfolio-total-chart.trend-positive .portfolio-total-line,
+.portfolio-total-chart.trend-positive .portfolio-total-point { stroke: #c7f5d8; fill: #d7ffe5; }
+.portfolio-total-chart.trend-positive .portfolio-total-line { stroke-opacity: .9; }
+.portfolio-total-chart.trend-positive .portfolio-total-area { fill: #c7f5d8; fill-opacity: .13; }
+.portfolio-total-chart.trend-positive .portfolio-total-point-marker { fill: #c7f5d8; }
+.portfolio-total-chart.trend-negative .portfolio-total-line,
+.portfolio-total-chart.trend-negative .portfolio-total-point { stroke: #ffc2c9; fill: #ffd1d6; }
+.portfolio-total-chart.trend-negative .portfolio-total-line { stroke-opacity: .92; }
+.portfolio-total-chart.trend-negative .portfolio-total-area { fill: #ffc2c9; fill-opacity: .12; }
+.portfolio-total-chart.trend-negative .portfolio-total-point-marker { fill: #ffc2c9; }
+.portfolio-total-chart.trend-neutral .portfolio-total-line { stroke: #eee5ff; stroke-opacity: .72; }
+.portfolio-total-chart.trend-neutral .portfolio-total-area { fill: #eee5ff; fill-opacity: .08; }

@@ -97,6 +97,7 @@
       ui.portfolioChartArea.setAttribute('d', '');
       ui.portfolioChartPoints.replaceChildren();
       ui.portfolioChartPoint.setAttribute('r', '0');
+      ui.portfolioChart.classList.remove('trend-positive', 'trend-negative', 'trend-neutral');
       ui.portfolioChartHint.hidden = false;
       ui.portfolioChartHint.textContent = Object.keys(positions).length === 0
         ? 'أضف حيازة لبدء التتبّع'
@@ -113,10 +114,16 @@
     }));
     const line = smoothLinePath(points);
     const first = points[0], last = points[points.length - 1];
+    const previousTotal = visible[visible.length - 2].total;
+    const latestTotal = visible[visible.length - 1].total;
+    const trend = latestTotal > previousTotal ? 'positive' : latestTotal < previousTotal ? 'negative' : 'neutral';
+    const trendLabel = trend === 'positive' ? 'اتجاه القيمة صاعد' : trend === 'negative' ? 'اتجاه القيمة هابط' : 'قيمة مستقرة';
     ui.portfolioChart.hidden = false;
+    ui.portfolioChart.classList.remove('trend-positive', 'trend-negative', 'trend-neutral');
+    ui.portfolioChart.classList.add(`trend-${trend}`);
     ui.portfolioChartHint.hidden = false;
-    ui.portfolioChartHint.textContent = 'قيمة مرصودة · ليست عائداً استثمارياً';
-    ui.portfolioChart.setAttribute('aria-label', `مسار القيمة الإجمالية المرصودة للمحفظة عبر ${new Intl.NumberFormat('ar-DZ').format(visible.length)} قراءة ناجحة؛ لا يمثل عائداً استثمارياً.`);
+    ui.portfolioChartHint.textContent = `${trendLabel} · ليس عائداً استثمارياً`;
+    ui.portfolioChart.setAttribute('aria-label', `مسار القيمة الإجمالية المرصودة للمحفظة؛ ${trendLabel} مقارنة بالقراءة السابقة؛ لا يمثل عائداً استثمارياً.`);
     ui.portfolioChartLine.setAttribute('d', line);
     ui.portfolioChartArea.setAttribute('d', `${line} L${last.x.toFixed(1)},40 L${first.x.toFixed(1)},40 Z`);
     ui.portfolioChartPoints.replaceChildren();
