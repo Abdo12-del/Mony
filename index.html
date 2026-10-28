@@ -2,7 +2,7 @@
 <html lang="ar" dir="rtl">
 <head>
   <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
   <meta name="theme-color" content="#0b0b0e">
   <meta name="application-name" content="محفظتي">
   <meta name="description" content="محفظتي — متابعة أسهم بورصة الجزائر وتسجيل حيازاتك الشخصية من المصدر الرسمي.">
@@ -32,35 +32,36 @@
   </header>
 
   <main class="shell dashboard">
-    <section class="welcome-row">
+    <section class="welcome-row" id="home" data-mobile-screen="home">
       <div><span class="eyebrow">لوحة المتابعة</span><h1>أهلاً بك في محفظتي</h1><p>ملخص حيازاتك وأسعار الأسهم في بورصة الجزائر</p></div>
       <span class="welcome-mark" aria-hidden="true">◌</span>
     </section>
 
-    <section class="instrument-card" aria-live="polite" aria-atomic="true">
+    <section class="instrument-card" data-mobile-screen="home" aria-live="polite" aria-atomic="true">
       <div class="instrument-top">
         <div class="company-info"><div class="company-avatar"><img id="focus-company-logo" alt="" decoding="async" hidden><span id="focus-company-fallback">أ</span></div><div><div class="company-title"><span id="focus-company-name">أيراد</span> <span id="focus-company-symbol" class="ticker">AYRD</span></div><div class="company-subtitle"><span id="focus-company-full-name">AYRADE SPA</span> <span class="bullet">•</span> بورصة الجزائر</div></div></div>
-        <span class="quote-state"><i></i> مجموع الحيازات المسجّلة</span>
+        <span class="quote-state">أسعار SGBV</span>
       </div>
       <div class="quote-main">
         <div><span class="quote-caption">إجمالي محفظتي</span><div class="price-line"><strong id="price" class="price">—</strong><span class="currency">دج</span></div>
+        </div>
+        <div class="quote-unit">
+          <label class="focus-stock-picker" for="focus-company-select"><small>السهم المحدد</small><select id="focus-company-select" aria-label="اختر السهم لعرض سعره وبياناته"></select></label>
+          <span class="quote-unit-label"><small>سعر السهم المحدد</small><strong id="share-price">—</strong></span>
           <div class="change-line"><span id="movement" class="movement" hidden></span><span id="movement-caption" class="movement-caption">تغير السهم المحدد بين آخر فحصين ناجحين</span></div>
         </div>
-        <div class="quote-unit"><label class="focus-stock-picker" for="focus-company-select"><small>السهم المحدد</small><select id="focus-company-select" aria-label="اختر السهم لعرض سعره وبياناته"></select></label><span class="quote-unit-label"><small>سعر السهم المحدد</small><strong id="share-price">—</strong></span></div>
       </div>
       <div class="quote-bottom"><span class="quote-kind-label">حالة سعر السهم</span><strong id="price-kind" class="quote-kind">بانتظار التحديث</strong><p id="price-note">السعر سيظهر بعد قراءة المصدر الرسمي.</p></div>
       <div id="error" class="error" role="status" hidden></div>
       <div id="refresh-status" class="refresh-status" aria-live="polite">يتم التحقق من بيانات المصدر</div>
     </section>
 
-    <nav class="quick-actions" aria-label="إجراءات السوق">
-      <button id="refresh" class="quick-action refresh-action"><span class="action-icon">↻</span><strong>تحديث</strong><small>قراءة جديدة</small></button>
-      <a class="quick-action" href="https://www.sgbv.dz/" target="_blank" rel="noopener"><span class="action-icon">↗</span><strong>المصدر</strong><small>بورصة الجزائر</small></a>
-      <a class="quick-action" href="#details"><span class="action-icon">▤</span><strong>بيانات السعر</strong><small>فتح وإغلاق</small></a>
-      <a class="quick-action" href="#pwa-info"><span class="action-icon">⇩</span><strong>تثبيت التطبيق</strong><small>محفظتي PWA</small></a>
+    <nav class="quick-actions" data-mobile-screen="home" aria-label="إجراءات سريعة">
+      <button id="refresh" class="quick-action refresh-action" type="button"><span class="action-icon" aria-hidden="true">↻</span><strong>تحديث الأسعار</strong><small>قراءة من SGBV</small></button>
+      <a class="quick-action" href="https://www.sgbv.dz/" target="_blank" rel="noopener"><span class="action-icon" aria-hidden="true">↗</span><strong>المصدر الرسمي</strong><small>بورصة الجزائر</small></a>
     </nav>
 
-    <section class="portfolio-section" id="portfolio" aria-labelledby="portfolio-title">
+    <section class="portfolio-section" id="portfolio" data-mobile-screen="portfolio" aria-labelledby="portfolio-title">
       <div class="portfolio-heading">
         <div><span class="section-kicker">محفظتي</span><h2 id="portfolio-title">أسهمي</h2><p>اختر شركة مرشحة مبدئياً، ثم سجّل عدد الأسهم التي تملكها؛ تحفظ الحيازات على هذا الجهاز فقط.</p></div>
         <div class="portfolio-total"><span>إجمالي قيمة المحفظة</span><strong id="portfolio-total">—</strong><small>لا يظهر الإجمالي إذا تعذّر تسعير إحدى الحيازات · دج</small></div>
@@ -76,7 +77,7 @@
       <p id="quote-refresh-feedback" class="portfolio-feedback" role="status" hidden></p>
     </section>
 
-    <section class="summary-section" id="details">
+    <section class="summary-section" id="details" data-mobile-screen="home">
       <div class="section-heading-inline"><div><span class="section-kicker">ملخص السعر</span><h2>بيانات السهم المحدد</h2></div><span class="section-meta"><span id="details-symbol">AYRD</span> · DZD</span></div>
       <div class="summary-grid">
         <article class="summary-card summary-date"><span class="summary-icon">◷</span><span class="summary-label">تاريخ الجلسة</span><strong id="session-date">غير متاح من المصدر</strong></article>
@@ -86,18 +87,18 @@
       </div>
     </section>
 
-    <section class="chart-panel dashboard-panel" id="chart-section">
+    <section class="chart-panel dashboard-panel" id="chart-section" data-mobile-screen="chart">
       <div class="chart-heading"><div><span class="section-kicker">الاتجاه</span><strong>قراءاتك السابقة</strong><span>مخطط محلي للأسعار التي جرى رصدها</span></div><span class="chart-count" id="observation-count">٠ فحص</span></div>
       <div class="chart-wrap"><svg id="price-chart" viewBox="0 0 720 150" preserveAspectRatio="none" role="img" aria-label="مخطط لقراءات السعر المحفوظة محلياً"><defs><linearGradient id="chart-fill" x1="0" x2="0" y1="0" y2="1"><stop offset="0%" stop-color="#b995ff" stop-opacity=".34"/><stop offset="100%" stop-color="#b995ff" stop-opacity="0"/></linearGradient></defs><path id="chart-area" d=""/><path id="chart-line" d=""/><circle id="chart-point" cx="0" cy="0" r="4"/></svg><div class="chart-empty" id="chart-empty"><span class="empty-bars">▁ ▃ ▂ ▅ ▄</span><span>يظهر المخطط بعد فحصين ناجحين على الأقل</span></div></div>
       <div class="chart-foot"><span id="chart-first">—</span><span class="chart-disclaimer">ليس رسماً تاريخياً رسمياً</span><span id="chart-last">—</span></div>
     </section>
 
-    <section class="activity-section" id="activity">
+    <section class="activity-section" id="activity" data-mobile-screen="history">
       <div class="section-heading-inline"><div><span class="section-kicker">نشاط المتابعة</span><h2>سجل الفحوصات</h2></div><span class="section-meta">محفوظ على هذا الجهاز</span></div>
       <div id="activity-list" class="activity-list"></div>
     </section>
 
-    <details class="extra-info" id="pwa-info">
+    <details class="extra-info" id="pwa-info" data-mobile-screen="home">
       <summary><span><small>تفاصيل اختيارية</small><strong>عن التثبيت والسعر</strong></span><span class="disclosure-icon" aria-hidden="true">⌄</span></summary>
       <div class="extra-info-content">
         <section><strong>التثبيت والعمل دون اتصال</strong><p>ثبّت محفظتي من زر التثبيت عند ظهوره أو من قائمة المتصفح. تعمل واجهة المحفظة والبيانات المحفوظة دون اتصال؛ أما تحديث السعر فيتطلب الإنترنت.</p></section>
@@ -105,16 +106,24 @@
         <section><strong>حدود المتابعة</strong><p>نسخة PWA لا تفحص الأسعار في الخلفية ولا ترسل تنبيهات؛ التغير المعروض يقارن آخر فحصين ناجحين فقط. لا تتوفر حالياً نسخة Android للتنزيل.</p></section>
       </div>
     </details>
-    <p class="trust-line">«محفظتي» مشروع مستقل غير تابع لبورصة الجزائر أو أي شركة مدرجة، ولا يقدم نصيحة استثمارية.</p>
+    <p class="trust-line" data-mobile-screen="home">«محفظتي» مشروع مستقل غير تابع لبورصة الجزائر أو أي شركة مدرجة، ولا يقدم نصيحة استثمارية.</p>
   </main>
 
-  <nav class="bottom-nav" aria-label="التنقل السريع">
-    <a class="active" href="#portfolio"><span>◈</span><small>محفظتي</small></a>
-    <a href="#chart-section"><span>⌁</span><small>الرسم</small></a>
-    <a href="#activity"><span>▤</span><small>السجل</small></a>
-    <a href="#pwa-info"><span>⇩</span><small>التثبيت</small></a>
+  <nav class="bottom-nav" aria-label="التنقل الرئيسي">
+    <a class="active" href="#home" data-screen-target="home" aria-current="page">
+      <svg viewBox="0 0 24 24" aria-hidden="true"><path d="m3.5 10 8.5-7 8.5 7v10a1 1 0 0 1-1 1h-5.2v-6.5H9.7V21H4.5a1 1 0 0 1-1-1z"/></svg><small>الرئيسية</small>
+    </a>
+    <a href="#portfolio" data-screen-target="portfolio">
+      <svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3.5" y="6.5" width="17" height="14" rx="2"/><path d="M8 6.5v-2a1.5 1.5 0 0 1 1.5-1.5h5A1.5 1.5 0 0 1 16 4.5v2M3.5 11h17m-10 0v2h3v-2"/></svg><small>محفظتي</small>
+    </a>
+    <a href="#chart-section" data-screen-target="chart">
+      <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 3v18h18M6.5 15l4-4 3 2.5 5.5-7"/><path d="M15.5 6.5H19v3.5"/></svg><small>الرسم</small>
+    </a>
+    <a href="#activity" data-screen-target="history">
+      <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3.5 2"/></svg><small>السجل</small>
+    </a>
   </nav>
-  <footer><span>محفظتي <span class="footer-dot">·</span> أسهم الجزائر</span><a href="https://www.sgbv.dz/" target="_blank" rel="noopener">بورصة الجزائر ↗</a></footer>
+  <footer data-mobile-screen="home"><span>محفظتي <span class="footer-dot">·</span> أسهم الجزائر</span><a href="https://www.sgbv.dz/" target="_blank" rel="noopener">بورصة الجزائر ↗</a></footer>
   <script src="/portfolio.js" defer></script>
   <script src="/companies.js" defer></script>
   <script src="/app.js" defer></script>

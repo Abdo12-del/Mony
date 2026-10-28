@@ -36,6 +36,22 @@ test('PWA shell supports offline launch without caching the stock API', () => {
   assert.match(worker, /self\.clients\.claim\(\)/);
 });
 
+test('mobile experience uses four real app tabs with a persistent touch-friendly bottom bar', () => {
+  const html = read('index.html');
+  for (const screen of ['home', 'portfolio', 'chart', 'history']) {
+    assert.ok(html.includes(`data-screen-target="${screen}"`));
+    assert.ok(html.includes(`data-mobile-screen="${screen}"`));
+  }
+  assert.match(html, /viewport-fit=cover/);
+  assert.match(html, /<nav class="bottom-nav" aria-label="التنقل الرئيسي">/);
+  const css = read('styles.css');
+  assert.match(css, /\.bottom-nav a \{[\s\S]*?min-height: 56px/);
+  assert.match(css, /padding: 7px 9px calc\(8px \+ env\(safe-area-inset-bottom/);
+  const app = read('app.js');
+  assert.match(app, /applyMobileScreen\(link\.dataset\.screenTarget, \{ updateHash: true, scroll: true \}\)/);
+  assert.match(app, /mobileScrollPositions\[previousScreen\] = window\.scrollY/);
+});
+
 test('web app links its manifest, install metadata and service worker registration', () => {
   const html = read('index.html');
   assert.match(html, /rel="manifest" href="\/manifest\.webmanifest"/);

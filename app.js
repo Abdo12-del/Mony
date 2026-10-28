@@ -370,10 +370,54 @@
     renderSelectedQuote();
   });
   ui.button.addEventListener('click', refresh);
-  document.querySelectorAll('.bottom-nav a').forEach(link => link.addEventListener('click', () => {
-    document.querySelectorAll('.bottom-nav a').forEach(item => item.classList.remove('active'));
-    link.classList.add('active');
+  const mobileScreenQuery = window.matchMedia('(max-width: 650px)');
+  const mobileScreenSections = [...document.querySelectorAll('[data-mobile-screen]')];
+  const mobileNavLinks = [...document.querySelectorAll('.bottom-nav [data-screen-target]')];
+  const mobileScreens = new Set(['home', 'portfolio', 'chart', 'history']);
+  const hashScreens = {
+    home: 'home', top: 'home', details: 'home', 'pwa-info': 'home',
+    portfolio: 'portfolio', 'chart-section': 'chart', chart: 'chart',
+    activity: 'history', history: 'history'
+  };
+  let activeMobileScreen = hashScreens[location.hash.slice(1)] || 'home';
+  const mobileScrollPositions = { home: 0, portfolio: 0, chart: 0, history: 0 };
+
+  function applyMobileScreen(screen, { updateHash = false, scroll = false } = {}) {
+    if (!mobileScreens.has(screen)) return;
+    const previousScreen = activeMobileScreen;
+    if (mobileScreenQuery.matches && scroll && previousScreen !== screen) mobileScrollPositions[previousScreen] = window.scrollY;
+    activeMobileScreen = screen;
+    if (updateHash && location.hash !== `#${screen === 'chart' ? 'chart-section' : screen === 'history' ? 'activity' : screen}`) {
+      history.pushState(null, '', `#${screen === 'chart' ? 'chart-section' : screen === 'history' ? 'activity' : screen}`);
+    }
+    const isMobile = mobileScreenQuery.matches;
+    mobileScreenSections.forEach(section => {
+      section.hidden = isMobile && section.dataset.mobileScreen !== screen;
+    });
+    mobileNavLinks.forEach(link => {
+      const selected = link.dataset.screenTarget === screen;
+      link.classList.toggle('active', selected);
+      if (selected) link.setAttribute('aria-current', 'page');
+      else link.removeAttribute('aria-current');
+    });
+    if (isMobile && scroll) {
+      requestAnimationFrame(() => window.scrollTo({ top: mobileScrollPositions[screen] || 0, behavior: 'auto' }));
+    }
+  }
+
+  mobileNavLinks.forEach(link => link.addEventListener('click', event => {
+    if (!mobileScreenQuery.matches) return;
+    event.preventDefault();
+    applyMobileScreen(link.dataset.screenTarget, { updateHash: true, scroll: true });
   }));
+  const syncScreenFromHash = () => {
+    const screen = hashScreens[location.hash.slice(1)] || activeMobileScreen || 'home';
+    applyMobileScreen(screen, { scroll: mobileScreenQuery.matches });
+  };
+  window.addEventListener('hashchange', syncScreenFromHash);
+  window.addEventListener('popstate', syncScreenFromHash);
+  mobileScreenQuery.addEventListener?.('change', () => applyMobileScreen(activeMobileScreen));
+  applyMobileScreen(activeMobileScreen, { scroll: mobileScreenQuery.matches });
 
   let deferredInstallPrompt = null;
   window.addEventListener('beforeinstallprompt', event => {

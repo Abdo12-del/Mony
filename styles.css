@@ -549,3 +549,168 @@ footer a { color: #b4a3d5; text-decoration: none; }
   .focus-stock-picker { min-width: 92px; max-width: 116px; }
   .focus-stock-picker select { font-size: 9px; padding-inline: 4px; }
 }
+
+/* Phone-first application shell and accessible mobile controls. */
+@media (max-width: 650px) {
+  .topbar {
+    position: sticky;
+    top: 0;
+    z-index: 15;
+    height: 58px;
+    padding-inline: 15px;
+    background: #0b0b0ef2;
+    backdrop-filter: blur(14px);
+    border-bottom-color: #27252c;
+  }
+  .brand-name { font-size: 17px; }
+  .topbar-end { gap: 7px; }
+  .market-pill { font-size: 10px; }
+  .market-dot { background: #b6a4d2; box-shadow: 0 0 0 3px #b6a4d222; }
+  .shell.dashboard { gap: 16px; padding: 13px 14px 104px; }
+  .welcome-row { padding: 3px 2px 0 !important; }
+  .welcome-row h1 { font-size: 21px; }
+  .welcome-row p { font-size: 12px; line-height: 1.55; }
+
+  .instrument-card { padding: 17px 15px 14px; border-radius: 20px; }
+  .instrument-top { gap: 8px; }
+  .company-info { min-width: 0; gap: 8px; }
+  .company-avatar { width: 38px; height: 38px; flex-basis: 38px; }
+  .company-title { font-size: 13px; }
+  .company-subtitle { font-size: 10px; }
+  .quote-state { flex: 0 0 auto; max-width: 42%; padding: 5px 8px; font-size: 9px; text-align: center; }
+  .quote-main { align-items: center; gap: 8px; padding: 18px 0 12px; }
+  .quote-caption { font-size: 12px; }
+  .price { font-size: clamp(37px, 11vw, 47px); }
+  .currency { font-size: 14px; }
+  .quote-unit { width: 46%; max-width: 190px; min-width: 132px; display: flex; flex-direction: column; align-items: stretch; gap: 7px; padding: 0; }
+  .focus-stock-picker { width: 100%; min-width: 0; max-width: none; gap: 3px; }
+  .focus-stock-picker > small, .quote-unit-label small { font-size: 10px; }
+  .focus-stock-picker select { min-height: 44px; height: 44px; padding: 7px 10px; font-size: 12px; }
+  .quote-unit-label { gap: 0; }
+  .quote-unit-label strong { font-size: 14px; }
+  .change-line { min-height: 22px; margin: 0; gap: 5px; flex-wrap: wrap; }
+  .movement { font-size: 10px; }
+  .movement-caption { font-size: 9px; line-height: 1.4; }
+  .quote-bottom { margin-top: 10px; gap: 6px; }
+  .quote-kind-label, .quote-kind { font-size: 10px; }
+  .quote-bottom p, .refresh-status { font-size: 10px; line-height: 1.55; }
+
+  .quick-actions { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; padding: 8px; margin: 0; }
+  .quick-action { min-height: 72px; gap: 4px; }
+  .action-icon { width: 34px; height: 34px; font-size: 18px; }
+  .quick-action strong { font-size: 11px; }
+  .quick-action small { font-size: 9px; }
+
+  .portfolio-section { padding: 15px; border-radius: 18px; }
+  .portfolio-heading { gap: 11px; margin-bottom: 14px; }
+  .portfolio-heading h2 { font-size: 18px; }
+  .portfolio-heading p { font-size: 12px; line-height: 1.65; }
+  .portfolio-total span { font-size: 11px; }
+  .portfolio-total strong { font-size: 21px; }
+  .portfolio-total small { font-size: 10px; line-height: 1.5; }
+  .company-picker { gap: 8px; padding: 10px; }
+  .company-picker > label { font-size: 12px; }
+  .company-picker select { min-height: 44px; font-size: 12px; }
+  .company-picker .save-shares-button { min-height: 44px; padding-inline: 12px; font-size: 11px; }
+  .holding-card { padding: 12px; gap: 12px 10px; }
+  .holding-company-copy strong { font-size: 13px; }
+  .holding-company-copy small, .holding-metric > span, .holding-quantity > span { font-size: 10px; }
+  .holding-metric strong { font-size: 12px; }
+  .holding-quantity input { height: 44px; font-size: 13px; }
+  .holding-actions { gap: 8px; }
+  .holding-actions > button { min-height: 44px; font-size: 11px; }
+  .portfolio-status, .portfolio-feedback { font-size: 11px; line-height: 1.7; }
+  .screening-note { font-size: 10px; line-height: 1.65; }
+  .company-list-empty { font-size: 12px; }
+
+  .section-heading-inline { align-items: center; margin-bottom: 10px; }
+  .section-heading-inline h2 { font-size: 17px; }
+  .section-kicker { font-size: 10px; }
+  .section-meta { font-size: 10px; }
+  .summary-grid { gap: 9px; }
+  .summary-card { min-height: 94px; padding: 11px; }
+  .summary-label { font-size: 10px; line-height: 1.4; }
+  .summary-card strong { font-size: 12px; }
+
+  .chart-panel { padding: 13px 12px 9px; border-radius: 16px; }
+  .chart-heading strong { font-size: 13px; }
+  .chart-heading span { font-size: 10px; }
+  .chart-count { font-size: 10px !important; }
+  .chart-wrap { height: 126px; }
+  .chart-empty, .chart-foot { font-size: 10px; }
+  .activity-list { gap: 9px; }
+  .activity-row { min-height: 58px; padding: 10px 11px; }
+  .activity-copy strong { font-size: 12px; }
+  .activity-copy small { font-size: 10px; }
+  .activity-value { font-size: 11px; }
+  .activity-empty { padding: 19px 13px; font-size: 12px; }
+
+  .extra-info summary { min-height: 54px; padding: 12px 14px; }
+  .extra-info summary small { font-size: 10px; }
+  .extra-info summary strong { font-size: 12px; }
+  .extra-info-content { padding: 0 14px 13px; gap: 10px; }
+  .extra-info-content strong { font-size: 11px; }
+  .extra-info-content p { font-size: 11px; line-height: 1.7; }
+  .trust-line { font-size: 10px; line-height: 1.6; }
+
+  .bottom-nav {
+    position: fixed;
+    z-index: 30;
+    inset-inline: 0;
+    bottom: 0;
+    transform: none;
+    width: 100%;
+    display: flex;
+    justify-content: space-around;
+    gap: 4px;
+    padding: 7px 9px calc(8px + env(safe-area-inset-bottom, 0px));
+    border: 1px solid #ffffff12;
+    border-bottom: 0;
+    border-radius: 18px 18px 0 0;
+    background: #18171ff5;
+    backdrop-filter: blur(18px);
+    box-shadow: 0 -8px 28px #0005;
+  }
+  .bottom-nav a {
+    min-width: 0;
+    min-height: 56px;
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 3px;
+    padding: 5px 4px;
+    border-radius: 14px;
+    color: #b3adbd;
+    text-decoration: none;
+    transition: color .15s, background .15s, transform .15s;
+    -webkit-tap-highlight-color: transparent;
+  }
+  .bottom-nav a svg {
+    width: 22px;
+    height: 22px;
+    fill: none;
+    stroke: currentColor;
+    stroke-width: 1.8;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+  }
+  .bottom-nav a small { font-size: 11px; line-height: 1.2; }
+  .bottom-nav a.active { color: #fff; background: #744bd1; }
+  .bottom-nav a:active { transform: scale(.97); }
+  .bottom-nav a:focus-visible { outline-offset: -2px; }
+  footer { padding: 14px 15px 20px; font-size: 10px; }
+}
+
+@media (max-width: 380px) {
+  .shell.dashboard { padding-inline: 11px; }
+  .instrument-card { padding-inline: 12px; }
+  .quote-state { max-width: 38%; font-size: 9px; }
+  .quote-unit { width: 48%; min-width: 125px; }
+  .price { font-size: 38px; }
+  .movement-caption { font-size: 9px; }
+  .portfolio-section { padding: 12px; }
+  .company-picker { grid-template-columns: minmax(0, 1fr) auto; }
+  .company-picker .save-shares-button { padding-inline: 9px; }
+}
