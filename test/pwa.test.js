@@ -46,12 +46,24 @@ test('portfolio hero shows only the independent total; selected-share details st
   assert.ok(stockCard);
   assert.match(stockCard, /id="focus-company-select"[\s\S]*?id="share-price"/);
   assert.match(stockCard, /id="price-kind"/);
-  assert.match(stockCard, /id="focus-quote-updated"/);
+  assert.doesNotMatch(stockCard, /focus-quote-updated|quote-state/);
+  assert.match(html, /id="checked-at"/);
   assert.doesNotMatch(html, /welcome-mark/);
   const app = read('app.js');
   assert.ok(app.includes("new Intl.NumberFormat('de-DE'"));
   assert.ok(app.includes('لم يتغير السعر منذ آخر فحص ناجح'));
   assert.ok(app.includes('إغلاق منشور من SGBV، وليس سعراً مباشراً.'));
+});
+
+test('portfolio explanations are concise and quote metadata is not repeated', () => {
+  const html = read('index.html');
+  const status = html.match(/<p class="portfolio-status">([\s\S]*?)<\/p>/)?.[1] || '';
+  assert.ok(status.length < 180);
+  assert.match(status, /الترشيحات استرشادية/);
+  assert.match(status, /لا فتوى ولا شهادة شرعية/);
+  assert.doesNotMatch(status, /نصيحة استثمارية|SGBV/);
+  assert.equal((html.match(/id="checked-at"/g) || []).length, 1);
+  assert.doesNotMatch(html, /focus-quote-updated/);
 });
 
 test('portfolio total card contains an accessible history sparkline and never invents a trend', () => {
@@ -73,7 +85,7 @@ test('portfolio total card contains an accessible history sparkline and never in
   assert.match(app, /trend-\$\{trend\}/);
   assert.match(read('styles.css'), /trend-positive \.portfolio-total-line/);
   assert.match(read('styles.css'), /trend-negative \.portfolio-total-line/);
-  assert.match(read('sw.js'), /mahfazati-shell-v16/);
+  assert.match(read('sw.js'), /mahfazati-shell-v18/);
 });
 
 test('finance UI uses clear rectangular cards with a single prominent portfolio total', () => {
@@ -84,7 +96,7 @@ test('finance UI uses clear rectangular cards with a single prominent portfolio 
   assert.match(designSystem, /\.portfolio-total-card\s*\{[\s\S]*?min-height:\s*144px[\s\S]*?border-radius:\s*var\(--card-radius\)/);
   assert.match(designSystem, /\.summary-card\.summary-date\s*\{[^}]*background:\s*var\(--card-surface\)/);
   const worker = read('sw.js');
-  assert.match(worker, /mahfazati-shell-v16/);
+  assert.match(worker, /mahfazati-shell-v18/);
 });
 
 test('mobile experience uses four real app tabs with a persistent touch-friendly bottom bar', () => {

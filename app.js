@@ -15,7 +15,7 @@
     companySelect: $('company-select'), addCompany: $('add-company'), companyList: $('company-list'),
     focusSelect: $('focus-company-select'), focusName: $('focus-company-name'), focusSymbol: $('focus-company-symbol'),
     focusFullName: $('focus-company-full-name'), focusLogo: $('focus-company-logo'), focusFallback: $('focus-company-fallback'),
-    quoteUpdated: $('focus-quote-updated'), detailsSymbol: $('details-symbol'), installButton: $('install-app')
+    detailsSymbol: $('details-symbol'), installButton: $('install-app')
   };
   const LEGACY_CACHE_KEY = 'nabd-ayrad-last-success-v1';
   const LEGACY_HISTORY_KEY = 'nabd-ayrad-observations-v1';
@@ -278,7 +278,6 @@
     }
     if (ui.date) ui.date.textContent = quote?.sessionDate || 'غير متاح من المصدر';
     if (ui.checked) ui.checked.textContent = hasPrice ? dateTime(quote.fetchedAt) : '—';
-    if (ui.quoteUpdated) ui.quoteUpdated.textContent = hasPrice ? dateTime(quote.fetchedAt) : '—';
     if (ui.opening) ui.opening.textContent = Number.isFinite(quote?.openingPrice) ? `${number(quote.openingPrice)} دج` : 'غير منشور';
     if (ui.closing) ui.closing.textContent = Number.isFinite(quote?.closingPrice) ? `${number(quote.closingPrice)} دج` : 'غير منشور';
     const hasPreviousReading = Number.isFinite(quote?._observedDelta);
