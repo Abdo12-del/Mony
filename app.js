@@ -57,6 +57,36 @@
     } catch (_) { return []; }
   }
 
+  function smoothLinePath(points) {
+    if (points.length < 2) return '';
+    const secants = points.slice(0, -1).map((point, index) => points[index + 1].y - point.y);
+    const tangents = Array(points.length);
+    tangents[0] = secants[0];
+    tangents[tangents.length - 1] = secants[secants.length - 1];
+    for (let index = 1; index < points.length - 1; index++) {
+      const before = secants[index - 1], after = secants[index];
+      tangents[index] = before * after <= 0 ? 0 : 2 * before * after / (before + after);
+    }
+    let path = `M${points[0].x.toFixed(1)},${points[0].y.toFixed(1)}`;
+    for (let index = 0; index < secants.length; index++) {
+      const delta = secants[index];
+      if (delta === 0) tangents[index] = tangents[index + 1] = 0;
+      else {
+        const alpha = tangents[index] / delta, beta = tangents[index + 1] / delta;
+        const magnitude = alpha * alpha + beta * beta;
+        if (magnitude > 9) {
+          const scale = 3 / Math.sqrt(magnitude);
+          tangents[index] = scale * alpha * delta;
+          tangents[index + 1] = scale * beta * delta;
+        }
+      }
+      const start = points[index], end = points[index + 1];
+      const step = (end.x - start.x) / 3;
+      path += ` C${(start.x + step).toFixed(1)},${(start.y + tangents[index] / 3).toFixed(1)} ${(end.x - step).toFixed(1)},${(end.y - tangents[index + 1] / 3).toFixed(1)} ${end.x.toFixed(1)},${end.y.toFixed(1)}`;
+    }
+    return path;
+  }
+
   function renderPortfolioChart(rows = readPortfolioHistory()) {
     if (!ui.portfolioChart || !ui.portfolioChartLine || !ui.portfolioChartArea || !ui.portfolioChartPoint || !ui.portfolioChartHint) return;
     const visible = rows.slice(-36);
@@ -79,7 +109,7 @@
       x: 4 + index * (252 / (values.length - 1)),
       y: max === min ? 20 : 32 - ((value - min) / spread) * 23
     }));
-    const line = points.map((point, index) => `${index ? 'L' : 'M'}${point.x.toFixed(1)},${point.y.toFixed(1)}`).join(' ');
+    const line = smoothLinePath(points);
     const first = points[0], last = points[points.length - 1];
     ui.portfolioChart.hidden = false;
     ui.portfolioChartHint.hidden = false;
