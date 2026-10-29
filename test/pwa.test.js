@@ -85,7 +85,7 @@ test('portfolio total card contains an accessible history sparkline and never in
   assert.match(app, /trend-\$\{trend\}/);
   assert.match(read('styles.css'), /trend-positive \.portfolio-total-line/);
   assert.match(read('styles.css'), /trend-negative \.portfolio-total-line/);
-  assert.match(read('sw.js'), /mahfazati-shell-v19/);
+  assert.match(read('sw.js'), /mahfazati-shell-v20/);
 });
 
 test('mobile home previews real holdings and labels observed changes without implying returns', () => {
@@ -99,11 +99,15 @@ test('mobile home previews real holdings and labels observed changes without imp
   assert.match(app, /function renderPortfolioObservations\(\)/);
   assert.match(app, /بين فحصين/);
   assert.match(app, /quote\?\.fetchedAt \? dateTime\(quote\.fetchedAt\)/);
+  assert.match(app, /fallback\.textContent = company\.symbol\.slice\(0, 2\); fallback\.hidden = true/);
+  assert.match(app, /logo\.addEventListener\('error', \(\) => \{ logo\.hidden = true; fallback\.hidden = false; \}/);
   assert.match(app, /ليس عائداً استثمارياً/);
   const css = read('styles.css');
   assert.match(css, /\.home-portfolio \{ display: block/);
   assert.match(css, /\.portfolio-total-observed-change\.up/);
   assert.match(css, /\.portfolio-total-observed-change\.down/);
+  assert.match(css, /\.home-company-mark img \{[^}]*background: transparent/);
+  assert.match(css, /\.home-company-fallback/);
 });
 
 test('finance UI uses clear rectangular cards with a single prominent portfolio total', () => {
@@ -114,7 +118,7 @@ test('finance UI uses clear rectangular cards with a single prominent portfolio 
   assert.match(designSystem, /\.portfolio-total-card\s*\{[\s\S]*?min-height:\s*144px[\s\S]*?border-radius:\s*var\(--card-radius\)/);
   assert.match(designSystem, /\.summary-card\.summary-date\s*\{[^}]*background:\s*var\(--card-surface\)/);
   const worker = read('sw.js');
-  assert.match(worker, /mahfazati-shell-v19/);
+  assert.match(worker, /mahfazati-shell-v20/);
 });
 
 test('mobile experience uses four real app tabs with a persistent touch-friendly bottom bar', () => {

@@ -426,11 +426,14 @@
       const heading = document.createElement('div'); heading.className = 'home-holding-heading';
       const identity = document.createElement('div'); identity.className = 'home-holding-identity';
       const mark = document.createElement('span'); mark.className = 'home-company-mark';
-      mark.textContent = company.symbol.slice(0, 2);
       if (company.logoUrl) {
         const logo = document.createElement('img'); logo.src = company.logoUrl; logo.alt = ''; logo.loading = 'lazy'; logo.decoding = 'async';
-        logo.addEventListener('error', () => { logo.remove(); }, { once: true });
-        mark.appendChild(logo);
+        const fallback = document.createElement('span'); fallback.className = 'home-company-fallback';
+        fallback.textContent = company.symbol.slice(0, 2); fallback.hidden = true;
+        logo.addEventListener('error', () => { logo.hidden = true; fallback.hidden = false; }, { once: true });
+        mark.append(logo, fallback);
+      } else {
+        mark.textContent = company.symbol.slice(0, 2);
       }
       const companyCopy = document.createElement('span'); companyCopy.className = 'home-holding-copy';
       const name = document.createElement('strong'); name.textContent = company.arabicName;
