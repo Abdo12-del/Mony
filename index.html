@@ -22,7 +22,7 @@
   <header class="topbar" id="top">
     <a class="brand" href="#top" aria-label="محفظتي، الرئيسية">
       <img class="brand-mark" src="/icons/app-icon.svg" alt="">
-      <span class="brand-name">محفظتي</span>
+      <span class="brand-copy"><span class="brand-name">محفظتي</span><small class="brand-subtitle">تابع استثماراتك في بورصة الجزائر</small></span>
     </a>
     <div class="topbar-end">
       <button id="install-app" class="install-app" type="button" hidden><span aria-hidden="true">⇩</span> تثبيت</button>
@@ -38,8 +38,13 @@
 
     <section class="instrument-card portfolio-total-card" data-mobile-screen="home" aria-live="polite" aria-atomic="true">
       <div class="portfolio-total-block">
-        <span class="quote-caption">إجمالي</span>
-        <div class="price-line"><strong id="price" class="price" dir="ltr">—</strong><span class="currency">دج</span></div>
+        <div class="portfolio-total-copy">
+          <span class="quote-caption">إجمالي قيمة المحفظة</span>
+          <div class="price-line"><strong id="price" class="price" dir="ltr">—</strong><span class="currency">دج</span></div>
+          <span id="portfolio-total-observed-change" class="portfolio-total-observed-change" hidden></span>
+          <span id="portfolio-total-updated" class="portfolio-total-updated">يظهر وقت آخر فحص ناجح هنا</span>
+          <span id="portfolio-total-chart-hint" class="portfolio-total-chart-hint">يظهر المسار بعد قراءتين ناجحتين للمحفظة</span>
+        </div>
         <svg id="portfolio-total-chart" class="portfolio-total-chart" viewBox="0 0 260 42" preserveAspectRatio="none" role="img" aria-label="مسار القيمة الإجمالية المسجلة للمحفظة" focusable="false">
           <path class="portfolio-total-grid" d="M0 8H260 M0 21H260 M0 34H260"></path>
           <path id="portfolio-total-area" class="portfolio-total-area" d=""></path>
@@ -47,11 +52,20 @@
           <g id="portfolio-total-points" class="portfolio-total-points" aria-hidden="true"></g>
           <circle id="portfolio-total-point" class="portfolio-total-point" cx="0" cy="0" r="0"></circle>
         </svg>
-        <span id="portfolio-total-chart-hint" class="portfolio-total-chart-hint">يظهر المسار بعد قراءتين ناجحتين للمحفظة</span>
       </div>
     </section>
 
-    <section class="stock-quote-card" data-mobile-screen="home" aria-live="polite" aria-atomic="true">
+    <section class="home-portfolio" data-mobile-screen="home" aria-labelledby="home-portfolio-title">
+      <div class="home-section-heading"><h2 id="home-portfolio-title">محفظتك</h2><a href="#portfolio">عرض الكل <span aria-hidden="true">‹</span></a></div>
+      <div id="home-holdings-preview" class="home-holdings-preview" aria-live="polite"></div>
+    </section>
+
+    <aside class="market-note" data-mobile-screen="home">
+      <span class="market-note-icon" aria-hidden="true">i</span>
+      <p>قد تكون الأسعار محفوظة وليست مباشرة من السوق.<small>تُحدَّث عند إجراء الفحص.</small></p>
+    </aside>
+
+    <section class="stock-quote-card" data-mobile-screen="portfolio" aria-live="polite" aria-atomic="true">
       <div class="stock-quote-header">
         <div class="company-info"><div class="company-avatar"><img id="focus-company-logo" alt="" decoding="async" hidden><span id="focus-company-fallback">أ</span></div><div><div class="company-title"><span id="focus-company-name">أيراد</span> <span id="focus-company-symbol" class="ticker">AYRD</span></div><div class="company-subtitle"><span id="focus-company-full-name">AYRADE SPA</span> <span class="bullet">•</span> بورصة الجزائر</div></div></div>
       </div>
@@ -87,7 +101,7 @@
       <p id="quote-refresh-feedback" class="portfolio-feedback" role="status" hidden></p>
     </section>
 
-    <section class="summary-section" id="details" data-mobile-screen="home">
+    <section class="summary-section" id="details" data-mobile-screen="portfolio">
       <div class="section-heading-inline"><div><span class="section-kicker">ملخص السعر</span><h2>بيانات السهم المحدد</h2></div><span class="section-meta"><span id="details-symbol">AYRD</span> · دج</span></div>
       <div class="summary-grid">
         <article class="summary-card summary-date"><span class="summary-icon">◷</span><span class="summary-label">تاريخ الجلسة</span><strong id="session-date">غير متاح من المصدر</strong></article>

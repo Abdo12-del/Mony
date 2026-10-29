@@ -12,6 +12,8 @@
     portfolioChart: $('portfolio-total-chart'), portfolioChartLine: $('portfolio-total-line'),
     portfolioChartArea: $('portfolio-total-area'), portfolioChartPoint: $('portfolio-total-point'),
     portfolioChartPoints: $('portfolio-total-points'), portfolioChartHint: $('portfolio-total-chart-hint'),
+    portfolioTotalChange: $('portfolio-total-observed-change'), portfolioUpdated: $('portfolio-total-updated'),
+    homeHoldingsPreview: $('home-holdings-preview'),
     companySelect: $('company-select'), addCompany: $('add-company'), companyList: $('company-list'),
     focusSelect: $('focus-company-select'), focusName: $('focus-company-name'), focusSymbol: $('focus-company-symbol'),
     focusFullName: $('focus-company-full-name'), focusLogo: $('focus-company-logo'), focusFallback: $('focus-company-fallback'),
@@ -402,6 +404,90 @@
     }
   }
 
+  function renderHomePortfolioPreview() {
+    if (!ui.homeHoldingsPreview) return;
+    ui.homeHoldingsPreview.replaceChildren();
+    const held = Object.entries(positions).filter(([, quantity]) => Number.isSafeInteger(quantity) && quantity > 0);
+    if (!held.length) {
+      const empty = document.createElement('div'); empty.className = 'home-holdings-empty';
+      const message = document.createElement('p'); message.textContent = 'لم تضف أي حيازة بعد. أضف أسهمك لتتابع قيمتها هنا.';
+      const link = document.createElement('a'); link.href = '#portfolio'; link.className = 'home-add-holding'; link.textContent = 'إضافة حيازة';
+      empty.append(message, link); ui.homeHoldingsPreview.appendChild(empty); return;
+    }
+
+    for (const [symbol, quantity] of held.slice(0, 3)) {
+      const company = companies.get(symbol);
+      if (!company) continue;
+      const quote = quoteCache[symbol];
+      const price = quote && Number.isFinite(quote.price) && quote.price > 0 ? quote.price : null;
+      const value = price === null ? null : portfolio.estimateValue(quantity, price);
+      const card = document.createElement('article'); card.className = 'home-holding-card';
+
+      const heading = document.createElement('div'); heading.className = 'home-holding-heading';
+      const identity = document.createElement('div'); identity.className = 'home-holding-identity';
+      const mark = document.createElement('span'); mark.className = 'home-company-mark';
+      mark.textContent = company.symbol.slice(0, 2);
+      if (company.logoUrl) {
+        const logo = document.createElement('img'); logo.src = company.logoUrl; logo.alt = ''; logo.loading = 'lazy'; logo.decoding = 'async';
+        logo.addEventListener('error', () => { logo.remove(); }, { once: true });
+        mark.appendChild(logo);
+      }
+      const companyCopy = document.createElement('span'); companyCopy.className = 'home-holding-copy';
+      const name = document.createElement('strong'); name.textContent = company.arabicName;
+      const ticker = document.createElement('small'); ticker.textContent = `${company.symbol} · ${company.sector}`;
+      companyCopy.append(name, ticker); identity.append(mark, companyCopy);
+      const priceBlock = document.createElement('div'); priceBlock.className = 'home-holding-price';
+      const priceLabel = document.createElement('small'); priceLabel.textContent = 'آخر سعر مسجل';
+      const priceText = document.createElement('strong'); priceText.dir = 'auto'; priceText.textContent = price === null ? '—' : `${number(price)} دج`;
+      priceBlock.append(priceLabel, priceText); heading.append(identity, priceBlock);
+
+      const footer = document.createElement('div'); footer.className = 'home-holding-footer';
+      const quantityText = document.createElement('span'); quantityText.textContent = `${new Intl.NumberFormat('ar-DZ').format(quantity)} سهم`;
+      const valueText = document.createElement('span'); valueText.textContent = value === null ? 'القيمة التقديرية —' : `القيمة التقديرية ${number(value)} دج`;
+      footer.append(quantityText, valueText);
+
+      const details = document.createElement('div'); details.className = 'home-holding-details';
+      const history = readHistory(symbol);
+      const previous = history.length > 1 ? history[history.length - 2] : null;
+      const latest = history.length ? history[history.length - 1] : null;
+      const change = previous && latest ? Number((latest.price - previous.price).toFixed(2)) : null;
+      const changeText = document.createElement('span'); changeText.className = 'home-holding-change';
+      if (change === null) changeText.textContent = 'لا توجد مقارنة سابقة';
+      else {
+        changeText.classList.add(change > 0 ? 'up' : change < 0 ? 'down' : 'stable');
+        changeText.textContent = change > 0 ? `↑ +${number(change)} دج بين فحصين` : change < 0 ? `↓ −${number(Math.abs(change))} دج بين فحصين` : '— دون تغير بين فحصين';
+      }
+      const updated = document.createElement('span'); updated.className = 'home-holding-updated';
+      updated.textContent = quote?.fetchedAt ? dateTime(quote.fetchedAt) : 'لم يُحدّث بعد';
+      details.append(changeText, updated); card.append(heading, footer, details);
+      ui.homeHoldingsPreview.appendChild(card);
+    }
+
+    if (held.length > 3) {
+      const more = document.createElement('a'); more.href = '#portfolio'; more.className = 'home-holdings-more';
+      more.textContent = `عرض كل الحيازات (${new Intl.NumberFormat('ar-DZ').format(held.length)})`;
+      ui.homeHoldingsPreview.appendChild(more);
+    }
+  }
+
+  function renderPortfolioObservations() {
+    const history = readPortfolioHistory();
+    const latest = history[history.length - 1];
+    if (ui.portfolioUpdated) ui.portfolioUpdated.textContent = latest
+      ? `آخر قراءة مكتملة · ${dateTime(latest.time)}`
+      : 'يظهر وقت آخر فحص ناجح هنا';
+    if (!ui.portfolioTotalChange) return;
+    const previous = history.length > 1 ? history[history.length - 2] : null;
+    if (!previous || !latest) { ui.portfolioTotalChange.hidden = true; return; }
+    const change = Number((latest.total - previous.total).toFixed(2));
+    const trend = change > 0 ? 'up' : change < 0 ? 'down' : 'stable';
+    ui.portfolioTotalChange.hidden = false;
+    ui.portfolioTotalChange.className = `portfolio-total-observed-change ${trend}`;
+    ui.portfolioTotalChange.textContent = change > 0
+      ? `↑ +${number(change)} دج بين فحصين`
+      : change < 0 ? `↓ −${number(Math.abs(change))} دج بين فحصين` : '— دون تغير بين فحصين';
+  }
+
   function showPortfolioFeedback(message) {
     ui.portfolioFeedback.textContent = message;
     ui.portfolioFeedback.hidden = false;
@@ -420,6 +506,8 @@
     }
     if (ui.portfolioTotal) ui.portfolioTotal.textContent = formattedTotal;
     renderCompanyList();
+    renderHomePortfolioPreview();
+    renderPortfolioObservations();
     renderPortfolioChart();
   }
 

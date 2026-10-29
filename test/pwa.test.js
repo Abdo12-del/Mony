@@ -40,7 +40,7 @@ test('portfolio hero shows only the independent total; selected-share details st
   const html = read('index.html');
   const hero = html.match(/<section class="instrument-card portfolio-total-card"[\s\S]*?<\/section>/)?.[0];
   assert.ok(hero);
-  assert.match(hero, /quote-caption">إجمالي<\/span>[\s\S]*?id="price"/);
+  assert.match(hero, /quote-caption">إجمالي قيمة المحفظة<\/span>[\s\S]*?id="price"/);
   assert.doesNotMatch(hero, /AYRD|focus-company-select|share-price|السهم/);
   const stockCard = html.match(/<section class="stock-quote-card"[\s\S]*?<\/section>/)?.[0];
   assert.ok(stockCard);
@@ -85,7 +85,25 @@ test('portfolio total card contains an accessible history sparkline and never in
   assert.match(app, /trend-\$\{trend\}/);
   assert.match(read('styles.css'), /trend-positive \.portfolio-total-line/);
   assert.match(read('styles.css'), /trend-negative \.portfolio-total-line/);
-  assert.match(read('sw.js'), /mahfazati-shell-v18/);
+  assert.match(read('sw.js'), /mahfazati-shell-v19/);
+});
+
+test('mobile home previews real holdings and labels observed changes without implying returns', () => {
+  const html = read('index.html');
+  assert.match(html, /class="home-portfolio" data-mobile-screen="home"/);
+  assert.match(html, /id="home-holdings-preview"/);
+  assert.match(html, /class="market-note" data-mobile-screen="home"/);
+  assert.match(html, /class="stock-quote-card" data-mobile-screen="portfolio"/);
+  const app = read('app.js');
+  assert.match(app, /function renderHomePortfolioPreview\(\)/);
+  assert.match(app, /function renderPortfolioObservations\(\)/);
+  assert.match(app, /بين فحصين/);
+  assert.match(app, /quote\?\.fetchedAt \? dateTime\(quote\.fetchedAt\)/);
+  assert.match(app, /ليس عائداً استثمارياً/);
+  const css = read('styles.css');
+  assert.match(css, /\.home-portfolio \{ display: block/);
+  assert.match(css, /\.portfolio-total-observed-change\.up/);
+  assert.match(css, /\.portfolio-total-observed-change\.down/);
 });
 
 test('finance UI uses clear rectangular cards with a single prominent portfolio total', () => {
@@ -96,7 +114,7 @@ test('finance UI uses clear rectangular cards with a single prominent portfolio 
   assert.match(designSystem, /\.portfolio-total-card\s*\{[\s\S]*?min-height:\s*144px[\s\S]*?border-radius:\s*var\(--card-radius\)/);
   assert.match(designSystem, /\.summary-card\.summary-date\s*\{[^}]*background:\s*var\(--card-surface\)/);
   const worker = read('sw.js');
-  assert.match(worker, /mahfazati-shell-v18/);
+  assert.match(worker, /mahfazati-shell-v19/);
 });
 
 test('mobile experience uses four real app tabs with a persistent touch-friendly bottom bar', () => {
@@ -108,9 +126,11 @@ test('mobile experience uses four real app tabs with a persistent touch-friendly
   assert.match(html, /viewport-fit=cover/);
   assert.match(html, /<nav class="bottom-nav" aria-label="التنقل الرئيسي">/);
   const css = read('styles.css');
-  assert.match(css, /\.bottom-nav a \{ min-height: 48px; gap: 1px/);
-  assert.match(css, /padding: 7px 9px calc\(8px \+ env\(safe-area-inset-bottom/);
-  assert.match(css, /border-radius: 12px 12px 0 0/);
+  const referenceMobile = css.slice(css.lastIndexOf('/* Responsive portfolio dashboard'));
+  assert.match(referenceMobile, /\.home-portfolio \{ display: block/);
+  assert.match(referenceMobile, /\.bottom-nav \{[^}]*border-radius: 26px 26px 0 0/);
+  assert.match(referenceMobile, /\.bottom-nav a\.active::after/);
+  assert.match(referenceMobile, /padding: 6px 12px calc\(6px \+ env\(safe-area-inset-bottom/);
   const app = read('app.js');
   assert.match(app, /applyMobileScreen\(link\.dataset\.screenTarget, \{ updateHash: true, scroll: true \}\)/);
   assert.match(app, /mobileScrollPositions\[previousScreen\] = window\.scrollY/);
@@ -121,7 +141,7 @@ test('web app links its manifest, install metadata and service worker registrati
   assert.match(html, /rel="manifest" href="\/manifest\.webmanifest"/);
   assert.match(html, /id="install-app"/);
   assert.match(html, /apple-mobile-web-app-title" content="محفظتي"/);
-  assert.match(html, /<span class="quote-caption">إجمالي<\/span>/);
+  assert.match(html, /<span class="quote-caption">إجمالي قيمة المحفظة<\/span>/);
   assert.match(html, /id="share-price"/);
   assert.match(html, /id="focus-company-select"/);
   assert.match(html, /id="focus-company-logo"/);
