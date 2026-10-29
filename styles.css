@@ -1276,7 +1276,7 @@ footer a { color: #b4a3d5; text-decoration: none; }
   .home-holding-heading { justify-content: space-between; gap: 9px; }
   .home-holding-identity { gap: 9px; flex: 1 1 auto; }
   .home-company-mark { width: 39px; height: 39px; flex: 0 0 39px; display: grid; place-items: center; overflow: hidden; border: 1px solid #393342; border-radius: 12px; background: #211d29; color: #d2bfff; font-size: 11px; font-weight: 700; }
-  .home-company-mark img { display: block; width: 100%; height: 100%; object-fit: contain; background: transparent; }
+  .home-company-mark img { display: block; width: 100%; height: 100%; padding: 3px; border-radius: 9px; object-fit: contain; background: #fff; }
   .home-company-fallback { width: 100%; height: 100%; display: grid; place-items: center; color: inherit; font-size: 11px; font-weight: 700; }
   .home-holding-copy { min-width: 0; display: flex; flex-direction: column; gap: 2px; }
   .home-holding-copy strong { overflow: hidden; color: #f4f1f7; font-size: 12px; line-height: 1.35; text-overflow: ellipsis; white-space: nowrap; }

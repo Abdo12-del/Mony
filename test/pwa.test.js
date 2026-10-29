@@ -85,7 +85,7 @@ test('portfolio total card contains an accessible history sparkline and never in
   assert.match(app, /trend-\$\{trend\}/);
   assert.match(read('styles.css'), /trend-positive \.portfolio-total-line/);
   assert.match(read('styles.css'), /trend-negative \.portfolio-total-line/);
-  assert.match(read('sw.js'), /mahfazati-shell-v20/);
+  assert.match(read('sw.js'), /mahfazati-shell-v21/);
 });
 
 test('mobile home previews real holdings and labels observed changes without implying returns', () => {
@@ -106,7 +106,7 @@ test('mobile home previews real holdings and labels observed changes without imp
   assert.match(css, /\.home-portfolio \{ display: block/);
   assert.match(css, /\.portfolio-total-observed-change\.up/);
   assert.match(css, /\.portfolio-total-observed-change\.down/);
-  assert.match(css, /\.home-company-mark img \{[^}]*background: transparent/);
+  assert.match(css, /\.home-company-mark img \{[^}]*background: #fff/);
   assert.match(css, /\.home-company-fallback/);
 });
 
@@ -118,7 +118,7 @@ test('finance UI uses clear rectangular cards with a single prominent portfolio 
   assert.match(designSystem, /\.portfolio-total-card\s*\{[\s\S]*?min-height:\s*144px[\s\S]*?border-radius:\s*var\(--card-radius\)/);
   assert.match(designSystem, /\.summary-card\.summary-date\s*\{[^}]*background:\s*var\(--card-surface\)/);
   const worker = read('sw.js');
-  assert.match(worker, /mahfazati-shell-v20/);
+  assert.match(worker, /mahfazati-shell-v21/);
 });
 
 test('mobile experience uses four real app tabs with a persistent touch-friendly bottom bar', () => {
