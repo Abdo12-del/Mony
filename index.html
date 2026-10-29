@@ -102,14 +102,15 @@
         <form id="gold-form" class="gold-form" novalidate>
           <label>الوزن <span>غرام</span><input id="gold-weight" type="number" min="0.001" step="0.001" inputmode="decimal" placeholder="أدخل الوزن بالغرام" autocomplete="off"></label>
           <label>العيار<select id="gold-karat"><option value="18">18 قيراط</option><option value="21" selected>21 قيراط</option><option value="24">24 قيراط</option></select></label>
-          <label>تكلفة الشراء للغرام <span>دج</span><input id="gold-cost-per-gram" type="number" min="0.01" step="0.01" inputmode="decimal" placeholder="أدخل تكلفة الغرام" autocomplete="off"></label>
+          <label>سعر الشراء السابق للغرام <span>دج</span><input id="gold-cost-per-gram" type="number" min="0.01" step="0.01" inputmode="decimal" placeholder="ما دفعته عند الشراء" autocomplete="off"></label>
           <div class="gold-form-actions"><button id="gold-save" class="save-shares-button" type="submit">حفظ حيازة الذهب</button><button id="gold-remove" class="remove-holding-button" type="button" hidden>إزالة الذهب</button></div>
         </form>
+        <p class="gold-input-hint">أدخل سعر الشراء السابق الذي دفعته للغرام؛ سعر السوق الحالي يُجلب تلقائياً ولا تحتاج إلى إدخاله.</p>
         <div class="gold-valuation" aria-live="polite">
-          <div><span>سعر الغرام في السوق الموازية</span><strong id="gold-unit-price">—</strong></div>
+          <div><span>سعر السوق الحالي للغرام · تلقائي</span><strong id="gold-unit-price">—</strong></div>
           <div><span>القيمة الحالية التقديرية</span><strong id="gold-value">—</strong></div>
-          <div><span>تكلفة الشراء المسجلة</span><strong id="gold-cost-total">—</strong></div>
-          <div id="gold-difference-row" class="gold-difference-row"><span>الفرق عن تكلفة الشراء</span><strong id="gold-difference">—</strong></div>
+          <div><span>إجمالي تكلفة الشراء السابقة</span><strong id="gold-cost-total">—</strong></div>
+          <div id="gold-difference-row" class="gold-difference-row"><span>الربح / الخسارة التقديرية</span><strong id="gold-difference">—</strong><small id="gold-performance-status">بانتظار بيانات المقارنة</small></div>
         </div>
         <p id="gold-status" class="gold-status" aria-live="polite">أدخل بيانات حيازتك لحفظها على هذا الجهاز.</p>
         <p id="gold-feedback" class="portfolio-feedback" role="status" hidden></p>

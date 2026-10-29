@@ -1350,6 +1350,11 @@ footer a { color: #b4a3d5; text-decoration: none; }
 .gold-valuation .gold-difference-row.up strong { color: #78d99a; }
 .gold-valuation .gold-difference-row.down strong { color: #ff8d96; }
 .gold-valuation .gold-difference-row.stable strong { color: #d8d0e1; }
+.gold-valuation .gold-difference-row small { color: #a9a1af; font-size: 9px; line-height: 1.45; }
+.gold-valuation .gold-difference-row.up small { color: #78d99a; }
+.gold-valuation .gold-difference-row.down small { color: #ff8d96; }
+.gold-valuation .gold-difference-row.stable small { color: #d8d0e1; }
+.gold-input-hint { margin: 9px 0 0; color: #a9a1af; font-size: 10px; line-height: 1.5; }
 .gold-status { margin: 10px 0 0; color: #b9b0c2; font-size: 10px; line-height: 1.5; }
 .gold-disclaimer { margin: 8px 0 0; color: #91899a; font-size: 9px; line-height: 1.55; }
 .home-gold-mark { width: 39px; height: 39px; flex: 0 0 39px; display: grid; place-items: center; border: 1px solid #766340; border-radius: 12px; background: linear-gradient(145deg, #514024, #332918); color: #f2d18a; font-size: 12px; font-weight: 700; }

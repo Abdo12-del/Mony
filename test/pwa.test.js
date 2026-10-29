@@ -85,7 +85,7 @@ test('portfolio total card contains an accessible history sparkline and never in
   assert.match(app, /trend-\$\{trend\}/);
   assert.match(read('styles.css'), /trend-positive \.portfolio-total-line/);
   assert.match(read('styles.css'), /trend-negative \.portfolio-total-line/);
-  assert.match(read('sw.js'), /mahfazati-shell-v22/);
+  assert.match(read('sw.js'), /mahfazati-shell-v23/);
 });
 
 test('mobile home previews real holdings and labels observed changes without implying returns', () => {
@@ -112,6 +112,7 @@ test('mobile home previews real holdings and labels observed changes without imp
 
 test('gold is a local portfolio asset priced from a dated parallel-market reference', () => {
   const html = read('index.html');
+  const app = read('app.js');
   assert.match(html, /id="gold-form"/);
   assert.match(html, /id="gold-weight"/);
   assert.match(html, /id="gold-karat"/);
@@ -119,8 +120,12 @@ test('gold is a local portfolio asset priced from a dated parallel-market refere
   assert.match(html, /مرجع EXDZ للسوق الموازية/);
   assert.match(html, /id="gold-value"/);
   assert.match(html, /id="gold-difference"/);
+  assert.match(html, /سعر الشراء السابق للغرام/);
+  assert.match(html, /سعر السوق الحالي للغرام · تلقائي/);
+  assert.match(html, /id="gold-performance-status"/);
+  assert.match(app, /ربح غير محقق تقديري/);
+  assert.match(app, /خسارة غير محققة تقديرية/);
   assert.doesNotMatch(html, /id="gold-weight"[^>]*value=/);
-  const app = read('app.js');
   assert.match(app, /const GOLD_HOLDING_KEY = 'mahfazati-gold-holding-v1'/);
   assert.match(app, /async function refreshGoldQuote\(\)/);
   assert.match(app, /fetch\('\/api\/gold'/);
@@ -145,7 +150,7 @@ test('finance UI uses clear rectangular cards with a single prominent portfolio 
   assert.match(designSystem, /\.portfolio-total-card\s*\{[\s\S]*?min-height:\s*144px[\s\S]*?border-radius:\s*var\(--card-radius\)/);
   assert.match(designSystem, /\.summary-card\.summary-date\s*\{[^}]*background:\s*var\(--card-surface\)/);
   const worker = read('sw.js');
-  assert.match(worker, /mahfazati-shell-v22/);
+  assert.match(worker, /mahfazati-shell-v23/);
 });
 
 test('mobile experience uses four real app tabs with a persistent touch-friendly bottom bar', () => {

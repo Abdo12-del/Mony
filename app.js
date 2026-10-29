@@ -16,7 +16,7 @@
     homeHoldingsPreview: $('home-holdings-preview'),
     goldForm: $('gold-form'), goldWeight: $('gold-weight'), goldKarat: $('gold-karat'), goldCost: $('gold-cost-per-gram'),
     goldSave: $('gold-save'), goldRemove: $('gold-remove'), goldValue: $('gold-value'), goldUnitPrice: $('gold-unit-price'),
-    goldCostTotal: $('gold-cost-total'), goldDifference: $('gold-difference'), goldDifferenceRow: $('gold-difference-row'), goldStatus: $('gold-status'),
+    goldCostTotal: $('gold-cost-total'), goldDifference: $('gold-difference'), goldDifferenceRow: $('gold-difference-row'), goldPerformanceStatus: $('gold-performance-status'), goldStatus: $('gold-status'),
     goldFeedback: $('gold-feedback'),
     companySelect: $('company-select'), addCompany: $('add-company'), companyList: $('company-list'),
     focusSelect: $('focus-company-select'), focusName: $('focus-company-name'), focusSymbol: $('focus-company-symbol'),
@@ -582,7 +582,8 @@
     if (!goldHolding) {
       ui.goldUnitPrice.textContent = '—'; ui.goldValue.textContent = '—'; ui.goldCostTotal.textContent = '—';
       ui.goldDifference.textContent = '—'; ui.goldDifferenceRow.classList.remove('up', 'down', 'stable');
-      ui.goldStatus.textContent = 'أدخل بيانات حيازتك لحفظها على هذا الجهاز.';
+      ui.goldPerformanceStatus.textContent = 'أدخل سعر الشراء السابق لمعرفة الفرق.';
+      ui.goldStatus.textContent = 'أدخل بيانات حيازتك لحفظها على هذا الجهاز. سعر السوق الحالي يُجلب تلقائياً بعد الحفظ.';
       return;
     }
     const unitPrice = goldQuoteCache?.prices?.[goldHolding.karat];
@@ -592,12 +593,18 @@
     ui.goldValue.textContent = currentValue === null ? '—' : `${number(currentValue)} دج`;
     ui.goldCostTotal.textContent = `${number(costTotal)} دج`;
     ui.goldDifferenceRow.classList.remove('up', 'down', 'stable');
-    if (currentValue === null) ui.goldDifference.textContent = '—';
-    else {
+    if (currentValue === null) {
+      ui.goldDifference.textContent = '—';
+      ui.goldPerformanceStatus.textContent = 'بانتظار جلب سعر السوق الحالي تلقائياً للمقارنة.';
+    } else {
       const difference = Number((currentValue - costTotal).toFixed(2));
       const trend = difference > 0 ? 'up' : difference < 0 ? 'down' : 'stable';
       ui.goldDifferenceRow.classList.add(trend);
       ui.goldDifference.textContent = difference > 0 ? `+${number(difference)} دج` : difference < 0 ? `−${number(Math.abs(difference))} دج` : '0 دج';
+      ui.goldPerformanceStatus.textContent = difference > 0
+        ? 'القيمة أعلى من تكلفة الشراء · ربح غير محقق تقديري'
+        : difference < 0 ? 'القيمة أقل من تكلفة الشراء · خسارة غير محققة تقديرية'
+          : 'القيمة تساوي تكلفة الشراء المسجلة';
     }
     if (goldQuoteCache?.asOfDate) {
       ui.goldStatus.textContent = `${goldQuoteIsRecent() ? 'آخر مرجع متاح' : 'آخر مرجع محفوظ وقد يكون قديماً'} من EXDZ · ${goldQuoteCache.asOfDate}`;
