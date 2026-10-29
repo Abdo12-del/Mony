@@ -1321,3 +1321,46 @@ footer a { color: #b4a3d5; text-decoration: none; }
   .home-holding-copy strong { font-size: 11px; }
   .home-holding-price strong { font-size: 10px; }
 }
+
+.gold-section {
+  margin-top: 16px;
+  padding: 15px;
+  border: 1px solid #342d40;
+  border-radius: 16px;
+  background: linear-gradient(145deg, #19161e, #141217);
+}
+.gold-section-heading { display: flex; align-items: center; justify-content: space-between; gap: 10px; margin-bottom: 12px; }
+.gold-section-heading h3 { margin: 0; font-size: 16px; }
+.gold-market-badge { padding: 4px 8px; border: 1px solid #52406d; border-radius: 999px; background: #2a2036; color: #d8c6ff; font-size: 10px; }
+.gold-form { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 10px; }
+.gold-form label { min-width: 0; display: grid; gap: 5px; color: #cfc8d6; font-size: 11px; }
+.gold-form label > span { display: inline; color: #938b9c; font-size: 9px; }
+.gold-form input, .gold-form select {
+  width: 100%; min-width: 0; min-height: 42px; padding: 8px 10px;
+  border: 1px solid #3b3542; border-radius: 10px; background: #100f13; color: #f5f1f8;
+  font: inherit; font-size: 12px; text-align: start;
+}
+.gold-form input:focus, .gold-form select:focus { outline: 2px solid #9a72ea; outline-offset: 1px; }
+.gold-form-actions { grid-column: 1 / -1; display: flex; flex-wrap: wrap; gap: 8px; }
+.gold-form-actions button { min-height: 40px; }
+.gold-valuation { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 9px; margin-top: 13px; }
+.gold-valuation > div { min-width: 0; display: flex; flex-direction: column; gap: 3px; padding: 9px 10px; border: 1px solid #2b2731; border-radius: 11px; background: #100f13; }
+.gold-valuation span { color: #a9a1af; font-size: 9px; line-height: 1.4; }
+.gold-valuation strong { color: #f0ebf5; font-size: 12px; overflow-wrap: anywhere; }
+.gold-valuation .gold-difference-row.up strong { color: #78d99a; }
+.gold-valuation .gold-difference-row.down strong { color: #ff8d96; }
+.gold-valuation .gold-difference-row.stable strong { color: #d8d0e1; }
+.gold-status { margin: 10px 0 0; color: #b9b0c2; font-size: 10px; line-height: 1.5; }
+.gold-disclaimer { margin: 8px 0 0; color: #91899a; font-size: 9px; line-height: 1.55; }
+.home-gold-mark { width: 39px; height: 39px; flex: 0 0 39px; display: grid; place-items: center; border: 1px solid #766340; border-radius: 12px; background: linear-gradient(145deg, #514024, #332918); color: #f2d18a; font-size: 12px; font-weight: 700; }
+@media (max-width: 650px) {
+  .gold-section { margin-top: 13px; padding: 12px; border-radius: 14px; }
+  .gold-form { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; }
+  .gold-form label:last-of-type { grid-column: 1 / -1; }
+  .gold-form-actions { gap: 7px; }
+  .gold-form-actions button { flex: 1 1 auto; }
+  .gold-valuation { gap: 7px; }
+  .gold-valuation > div { padding: 8px; }
+  .gold-valuation strong { font-size: 11px; }
+  .gold-disclaimer { font-size: 8px; }
+}

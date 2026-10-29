@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
   <meta name="theme-color" content="#0b0b0e">
   <meta name="application-name" content="محفظتي">
-  <meta name="description" content="محفظتي — متابعة أسهم بورصة الجزائر وتسجيل حيازاتك الشخصية من المصدر الرسمي.">
+  <meta name="description" content="محفظتي — متابعة الأسهم والذهب وحساب قيمة الحيازات في الجزائر.">
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   <meta name="apple-mobile-web-app-title" content="محفظتي">
@@ -62,7 +62,7 @@
 
     <aside class="market-note" data-mobile-screen="home">
       <span class="market-note-icon" aria-hidden="true">i</span>
-      <p>قد تكون الأسعار محفوظة وليست مباشرة من السوق.<small>تُحدَّث عند إجراء الفحص.</small></p>
+      <p>قد تكون أسعار الأسهم محفوظة وليست مباشرة من السوق.<small>سعر الذهب مرجع من السوق الموازية ويُحدَّث عند الفحص.</small></p>
     </aside>
 
     <section class="stock-quote-card" data-mobile-screen="portfolio" aria-live="polite" aria-atomic="true">
@@ -81,14 +81,14 @@
     </section>
 
     <nav class="quick-actions" data-mobile-screen="home" aria-label="إجراءات سريعة">
-      <button id="refresh" class="quick-action refresh-action" type="button"><span class="action-icon" aria-hidden="true">↻</span><strong>تحديث الأسعار</strong><small>قراءة من SGBV</small></button>
+      <button id="refresh" class="quick-action refresh-action" type="button"><span class="action-icon" aria-hidden="true">↻</span><strong>تحديث الأسعار</strong><small>أسهم + ذهب</small></button>
       <a class="quick-action source-action" href="https://www.sgbv.dz/" target="_blank" rel="noopener"><span class="action-icon" aria-hidden="true">↗</span><strong>المصدر الرسمي</strong><small>بورصة الجزائر</small></a>
     </nav>
 
     <section class="portfolio-section" id="portfolio" data-mobile-screen="portfolio" aria-labelledby="portfolio-title">
       <div class="portfolio-heading">
         <div><span class="section-kicker">محفظتي</span><h2 id="portfolio-title">أسهمي</h2><p>اختر شركة مرشحة مبدئياً، ثم سجّل عدد الأسهم التي تملكها؛ تحفظ الحيازات على هذا الجهاز فقط.</p></div>
-        <div class="portfolio-total"><span>إجمالي قيمة المحفظة</span><strong id="portfolio-total">—</strong><small>لا يظهر الإجمالي إذا تعذّر تسعير إحدى الحيازات · دج</small></div>
+        <div class="portfolio-total"><span>إجمالي قيمة المحفظة</span><strong id="portfolio-total">—</strong><small>الأسهم والذهب · يعتمد الإجمالي على توفر الأسعار · دج</small></div>
       </div>
       <div class="company-picker">
         <label for="company-select">إضافة شركة إلى المحفظة</label>
@@ -96,6 +96,26 @@
         <button id="add-company" class="save-shares-button" type="button">إضافة شركة</button>
       </div>
       <div id="company-list" class="company-list" aria-live="polite"></div>
+
+      <section class="gold-section" aria-labelledby="gold-title">
+        <div class="gold-section-heading"><div><span class="section-kicker">أصل إضافي</span><h3 id="gold-title">الذهب</h3></div><span class="gold-market-badge">السوق الموازية</span></div>
+        <form id="gold-form" class="gold-form" novalidate>
+          <label>الوزن <span>غرام</span><input id="gold-weight" type="number" min="0.001" step="0.001" inputmode="decimal" placeholder="أدخل الوزن بالغرام" autocomplete="off"></label>
+          <label>العيار<select id="gold-karat"><option value="18">18 قيراط</option><option value="21" selected>21 قيراط</option><option value="24">24 قيراط</option></select></label>
+          <label>تكلفة الشراء للغرام <span>دج</span><input id="gold-cost-per-gram" type="number" min="0.01" step="0.01" inputmode="decimal" placeholder="أدخل تكلفة الغرام" autocomplete="off"></label>
+          <div class="gold-form-actions"><button id="gold-save" class="save-shares-button" type="submit">حفظ حيازة الذهب</button><button id="gold-remove" class="remove-holding-button" type="button" hidden>إزالة الذهب</button></div>
+        </form>
+        <div class="gold-valuation" aria-live="polite">
+          <div><span>سعر الغرام في السوق الموازية</span><strong id="gold-unit-price">—</strong></div>
+          <div><span>القيمة الحالية التقديرية</span><strong id="gold-value">—</strong></div>
+          <div><span>تكلفة الشراء المسجلة</span><strong id="gold-cost-total">—</strong></div>
+          <div id="gold-difference-row" class="gold-difference-row"><span>الفرق عن تكلفة الشراء</span><strong id="gold-difference">—</strong></div>
+        </div>
+        <p id="gold-status" class="gold-status" aria-live="polite">أدخل بيانات حيازتك لحفظها على هذا الجهاز.</p>
+        <p id="gold-feedback" class="portfolio-feedback" role="status" hidden></p>
+        <p class="gold-disclaimer">المصدر: <a href="https://www.exchangedz.com/gold" target="_blank" rel="noopener">مرجع EXDZ للسوق الموازية</a>، وليس عرض شراء مضموناً؛ قد يختلف سعر بيع الحلي المستعملة حسب الحالة والمصنعية والعيار.</p>
+      </section>
+
       <p class="portfolio-status">الترشيحات استرشادية، لا فتوى ولا شهادة شرعية؛ لم يُراجع تطهير الدخل. تحقّق شرعياً قبل الاستثمار.</p>
       <p id="portfolio-feedback" class="portfolio-feedback" role="status" hidden></p>
       <p id="quote-refresh-feedback" class="portfolio-feedback" role="status" hidden></p>

@@ -36,7 +36,7 @@ test('PWA shell supports offline launch without caching the stock API', () => {
   assert.match(worker, /self\.clients\.claim\(\)/);
 });
 
-test('portfolio hero shows only the independent total; selected-share details stay in a separate card', () => {
+test('portfolio hero shows the combined portfolio total while selected-share details stay separate', () => {
   const html = read('index.html');
   const hero = html.match(/<section class="instrument-card portfolio-total-card"[\s\S]*?<\/section>/)?.[0];
   assert.ok(hero);
@@ -75,7 +75,7 @@ test('portfolio total card contains an accessible history sparkline and never in
   assert.match(hero, /class="portfolio-total-grid"/);
   assert.match(hero, /id="portfolio-total-points"/);
   const app = read('app.js');
-  assert.match(app, /portfolio\.createSnapshot\(holdings, quoteCache, refreshedSymbols, Date\.now\(\)\)/);
+  assert.match(app, /portfolio\.createSnapshot\(holdings, snapshotQuotes, freshSymbols, Date\.now\(\)\)/);
   assert.match(app, /history\.push\(snapshot\)/);
   assert.match(app, /visible\.length < 2/);
   assert.match(app, /smoothLinePath\(points\)/);
@@ -85,7 +85,7 @@ test('portfolio total card contains an accessible history sparkline and never in
   assert.match(app, /trend-\$\{trend\}/);
   assert.match(read('styles.css'), /trend-positive \.portfolio-total-line/);
   assert.match(read('styles.css'), /trend-negative \.portfolio-total-line/);
-  assert.match(read('sw.js'), /mahfazati-shell-v21/);
+  assert.match(read('sw.js'), /mahfazati-shell-v22/);
 });
 
 test('mobile home previews real holdings and labels observed changes without implying returns', () => {
@@ -110,6 +110,33 @@ test('mobile home previews real holdings and labels observed changes without imp
   assert.match(css, /\.home-company-fallback/);
 });
 
+test('gold is a local portfolio asset priced from a dated parallel-market reference', () => {
+  const html = read('index.html');
+  assert.match(html, /id="gold-form"/);
+  assert.match(html, /id="gold-weight"/);
+  assert.match(html, /id="gold-karat"/);
+  assert.match(html, /id="gold-cost-per-gram"/);
+  assert.match(html, /مرجع EXDZ للسوق الموازية/);
+  assert.match(html, /id="gold-value"/);
+  assert.match(html, /id="gold-difference"/);
+  assert.doesNotMatch(html, /id="gold-weight"[^>]*value=/);
+  const app = read('app.js');
+  assert.match(app, /const GOLD_HOLDING_KEY = 'mahfazati-gold-holding-v1'/);
+  assert.match(app, /async function refreshGoldQuote\(\)/);
+  assert.match(app, /fetch\('\/api\/gold'/);
+  assert.match(app, /calculateCombinedPortfolioTotal\(\)/);
+  assert.match(app, /portfolio\.estimateGoldValue\(goldHolding\.grams/);
+  assert.match(app, /goldHolding\.paidPerGram/);
+  const goldApi = read('api/gold.js');
+  assert.match(goldApi, /https:\/\/www\.exchangedz\.com\/gold/);
+  assert.match(goldApi, /age > 7 \* 86_400_000/);
+  const devServer = read('dev-server.js');
+  assert.match(devServer, /pathname === '\/api\/gold'/);
+  const portfolio = read('portfolio.js');
+  assert.match(portfolio, /function estimateGoldValue\(grams, unitPrice\)/);
+  assert.match(portfolio, /unit === 'gram'/);
+});
+
 test('finance UI uses clear rectangular cards with a single prominent portfolio total', () => {
   const css = read('styles.css');
   const designSystem = css.slice(css.lastIndexOf('/* Unified finance-app card system'));
@@ -118,7 +145,7 @@ test('finance UI uses clear rectangular cards with a single prominent portfolio 
   assert.match(designSystem, /\.portfolio-total-card\s*\{[\s\S]*?min-height:\s*144px[\s\S]*?border-radius:\s*var\(--card-radius\)/);
   assert.match(designSystem, /\.summary-card\.summary-date\s*\{[^}]*background:\s*var\(--card-surface\)/);
   const worker = read('sw.js');
-  assert.match(worker, /mahfazati-shell-v21/);
+  assert.match(worker, /mahfazati-shell-v22/);
 });
 
 test('mobile experience uses four real app tabs with a persistent touch-friendly bottom bar', () => {
@@ -152,7 +179,8 @@ test('web app links its manifest, install metadata and service worker registrati
   assert.match(html, /id="details-symbol"/);
   const app = read('app.js');
   const vercel = JSON.parse(read('vercel.json'));
-  assert.ok(app.includes('portfolio.totalValue(values)'));
+  assert.ok(app.includes('calculateCombinedPortfolioTotal()'));
+  assert.ok(app.includes("fetch('/api/gold'"));
   assert.ok(app.includes('ui.price.textContent = formattedAmount;'));
   assert.match(html, /id="company-select"/);
   assert.match(html, /id="company-list"/);

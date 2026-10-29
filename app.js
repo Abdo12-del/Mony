@@ -14,6 +14,10 @@
     portfolioChartPoints: $('portfolio-total-points'), portfolioChartHint: $('portfolio-total-chart-hint'),
     portfolioTotalChange: $('portfolio-total-observed-change'), portfolioUpdated: $('portfolio-total-updated'),
     homeHoldingsPreview: $('home-holdings-preview'),
+    goldForm: $('gold-form'), goldWeight: $('gold-weight'), goldKarat: $('gold-karat'), goldCost: $('gold-cost-per-gram'),
+    goldSave: $('gold-save'), goldRemove: $('gold-remove'), goldValue: $('gold-value'), goldUnitPrice: $('gold-unit-price'),
+    goldCostTotal: $('gold-cost-total'), goldDifference: $('gold-difference'), goldDifferenceRow: $('gold-difference-row'), goldStatus: $('gold-status'),
+    goldFeedback: $('gold-feedback'),
     companySelect: $('company-select'), addCompany: $('add-company'), companyList: $('company-list'),
     focusSelect: $('focus-company-select'), focusName: $('focus-company-name'), focusSymbol: $('focus-company-symbol'),
     focusFullName: $('focus-company-full-name'), focusLogo: $('focus-company-logo'), focusFallback: $('focus-company-fallback'),
@@ -24,12 +28,17 @@
   const SELECTED_SYMBOL_KEY = 'mahfazati-selected-symbol-v1';
   const PORTFOLIO_KEY = 'mahfazati-portfolio-v2';
   const PORTFOLIO_HISTORY_KEY = 'mahfazati-portfolio-observations-v1';
+  const GOLD_PORTFOLIO_HISTORY_KEY = 'mahfazati-combined-observations-v1';
+  const GOLD_HOLDING_KEY = 'mahfazati-gold-holding-v1';
+  const GOLD_QUOTE_KEY = 'mahfazati-gold-market-quote-v1';
   const LEGACY_PORTFOLIO_KEY = 'nabd-ayrad-portfolio-v1';
   const QUOTES_KEY = 'mahfazati-last-quotes-v1';
   let selectedSymbol = readSelectedSymbol();
   let positions = readPositions();
+  let goldHolding = readGoldHolding();
   let draftSymbols = [];
   let quoteCache = readQuoteCache();
+  let goldQuoteCache = readGoldQuoteCache();
   const number = value => new Intl.NumberFormat('de-DE', { minimumFractionDigits: 2, maximumFractionDigits: 2 }).format(value);
   const dateTime = value => value ? new Intl.DateTimeFormat('ar-DZ', { dateStyle: 'medium', timeStyle: 'short' }).format(new Date(value)) : '—';
 
@@ -51,9 +60,33 @@
     } catch (_) { return []; }
   }
 
+  function isValidGoldHolding(value) {
+    return value && Number.isFinite(value.grams) && value.grams > 0 && value.grams <= 100_000 &&
+      [18, 21, 24].includes(value.karat) && Number.isFinite(value.paidPerGram) && value.paidPerGram > 0;
+  }
+
+  function readGoldHolding() {
+    try {
+      const saved = JSON.parse(localStorage.getItem(GOLD_HOLDING_KEY) || 'null');
+      return isValidGoldHolding(saved) ? saved : null;
+    } catch (_) { return null; }
+  }
+
+  function readGoldQuoteCache() {
+    try {
+      const saved = JSON.parse(localStorage.getItem(GOLD_QUOTE_KEY) || 'null');
+      if (!saved || !saved.prices || ![18, 21, 24].every(karat => Number.isFinite(saved.prices[karat]) && saved.prices[karat] > 0)) return null;
+      return saved;
+    } catch (_) { return null; }
+  }
+
+  function portfolioHistoryStorageKey() {
+    return goldHolding ? GOLD_PORTFOLIO_HISTORY_KEY : PORTFOLIO_HISTORY_KEY;
+  }
+
   function readPortfolioHistory() {
     try {
-      const rows = JSON.parse(localStorage.getItem(PORTFOLIO_HISTORY_KEY) || '[]');
+      const rows = JSON.parse(localStorage.getItem(portfolioHistoryStorageKey()) || '[]');
       return Array.isArray(rows)
         ? rows.filter(row => row && Number.isFinite(row.total) && row.total > 0 && Number.isFinite(row.time)).slice(-60)
         : [];
@@ -101,7 +134,7 @@
       ui.portfolioChartPoint.setAttribute('r', '0');
       ui.portfolioChart.classList.remove('trend-positive', 'trend-negative', 'trend-neutral');
       ui.portfolioChartHint.hidden = false;
-      ui.portfolioChartHint.textContent = Object.keys(positions).length === 0
+      ui.portfolioChartHint.textContent = Object.keys(positions).length === 0 && !goldHolding
         ? 'أضف حيازة لبدء التتبّع'
         : visible.length === 0 ? 'يبدأ التتبّع بعد تحديثين ناجحين' : 'يحتاج المسار إلى قراءة ناجحة أخرى';
       return;
@@ -145,14 +178,29 @@
     ui.portfolioChartPoint.setAttribute('r', '2.8');
   }
 
-  function savePortfolioObservation(refreshedSymbols) {
+  function goldQuoteIsRecent(quote = goldQuoteCache) {
+    const timestamp = quote?.asOfDate ? Date.parse(`${quote.asOfDate}T00:00:00`) : NaN;
+    return Number.isFinite(timestamp) && timestamp <= Date.now() + 86_400_000 && Date.now() - timestamp <= 7 * 86_400_000;
+  }
+
+  function savePortfolioObservation(refreshedSymbols, goldRefreshed = false) {
     try {
       const holdings = Object.entries(positions).map(([symbol, quantity]) => ({ symbol, quantity }));
-      const snapshot = portfolio.createSnapshot(holdings, quoteCache, refreshedSymbols, Date.now());
+      const snapshotQuotes = { ...quoteCache };
+      const freshSymbols = new Set(refreshedSymbols);
+      if (goldHolding) {
+        if (!goldRefreshed || !goldQuoteIsRecent()) return;
+        const goldSymbol = `GOLD${goldHolding.karat}`;
+        holdings.push({ symbol: goldSymbol, quantity: goldHolding.grams, unit: 'gram' });
+        snapshotQuotes[goldSymbol] = { price: goldQuoteCache?.prices?.[goldHolding.karat] };
+        freshSymbols.add(goldSymbol);
+      }
+      if (!holdings.length) return;
+      const snapshot = portfolio.createSnapshot(holdings, snapshotQuotes, freshSymbols, Date.now());
       if (!snapshot) return;
       const history = readPortfolioHistory();
       history.push(snapshot);
-      localStorage.setItem(PORTFOLIO_HISTORY_KEY, JSON.stringify(history.slice(-60)));
+      localStorage.setItem(portfolioHistoryStorageKey(), JSON.stringify(history.slice(-60)));
     } catch (_) { /* Snapshot storage is optional; never block a successful quote refresh. */ }
   }
 
@@ -408,11 +456,45 @@
     if (!ui.homeHoldingsPreview) return;
     ui.homeHoldingsPreview.replaceChildren();
     const held = Object.entries(positions).filter(([, quantity]) => Number.isSafeInteger(quantity) && quantity > 0);
-    if (!held.length) {
+    if (!held.length && !goldHolding) {
       const empty = document.createElement('div'); empty.className = 'home-holdings-empty';
-      const message = document.createElement('p'); message.textContent = 'لم تضف أي حيازة بعد. أضف أسهمك لتتابع قيمتها هنا.';
+      const message = document.createElement('p'); message.textContent = 'لم تضف أسهماً أو ذهباً بعد. أضف حيازاتك لمتابعة قيمتها هنا.';
       const link = document.createElement('a'); link.href = '#portfolio'; link.className = 'home-add-holding'; link.textContent = 'إضافة حيازة';
       empty.append(message, link); ui.homeHoldingsPreview.appendChild(empty); return;
+    }
+
+    if (goldHolding) {
+      const gold = document.createElement('article'); gold.className = 'home-holding-card home-gold-card';
+      const heading = document.createElement('div'); heading.className = 'home-holding-heading';
+      const identity = document.createElement('div'); identity.className = 'home-holding-identity';
+      const mark = document.createElement('span'); mark.className = 'home-gold-mark'; mark.textContent = 'Au';
+      const copy = document.createElement('span'); copy.className = 'home-holding-copy';
+      const name = document.createElement('strong'); name.textContent = `ذهب عيار ${goldHolding.karat}`;
+      const karat = document.createElement('small'); karat.textContent = 'مرجع السوق الموازية';
+      copy.append(name, karat); identity.append(mark, copy);
+      const unitPrice = goldQuoteCache?.prices?.[goldHolding.karat];
+      const priceBlock = document.createElement('div'); priceBlock.className = 'home-holding-price';
+      const label = document.createElement('small'); label.textContent = 'سعر الغرام الموازي';
+      const price = document.createElement('strong'); price.textContent = Number.isFinite(unitPrice) ? `${number(unitPrice)} دج` : '—';
+      priceBlock.append(label, price); heading.append(identity, priceBlock);
+      const footer = document.createElement('div'); footer.className = 'home-holding-footer';
+      const weight = document.createElement('span'); weight.textContent = `${number(goldHolding.grams)} غرام`;
+      const value = document.createElement('span');
+      const currentValue = Number.isFinite(unitPrice) ? portfolio.estimateGoldValue(goldHolding.grams, unitPrice) : null;
+      value.textContent = currentValue === null ? 'القيمة التقديرية —' : `القيمة التقديرية ${number(currentValue)} دج`;
+      footer.append(weight, value);
+      const details = document.createElement('div'); details.className = 'home-holding-details';
+      const difference = document.createElement('span'); difference.className = 'home-holding-change';
+      if (currentValue === null) difference.textContent = 'بانتظار سعر السوق الموازية';
+      else {
+        const delta = Number((currentValue - goldHolding.grams * goldHolding.paidPerGram).toFixed(2));
+        difference.classList.add(delta > 0 ? 'up' : delta < 0 ? 'down' : 'stable');
+        difference.textContent = delta > 0 ? `فرق عن التكلفة +${number(delta)} دج` : delta < 0 ? `فرق عن التكلفة −${number(Math.abs(delta))} دج` : 'القيمة مساوية للتكلفة';
+      }
+      const asOf = document.createElement('span'); asOf.className = 'home-holding-updated';
+      asOf.textContent = goldQuoteCache?.asOfDate ? `مرجع ${goldQuoteCache.asOfDate}` : 'لم يُحدّث بعد';
+      details.append(difference, asOf); gold.append(heading, footer, details);
+      ui.homeHoldingsPreview.appendChild(gold);
     }
 
     for (const [symbol, quantity] of held.slice(0, 3)) {
@@ -491,15 +573,114 @@
       : change < 0 ? `↓ −${number(Math.abs(change))} دج بين فحصين` : '— دون تغير بين فحصين';
   }
 
+  function renderGoldHoldingDetails() {
+    if (!ui.goldForm) return;
+    ui.goldWeight.value = goldHolding ? String(goldHolding.grams) : '';
+    ui.goldKarat.value = String(goldHolding?.karat || 21);
+    ui.goldCost.value = goldHolding ? String(goldHolding.paidPerGram) : '';
+    ui.goldRemove.hidden = !goldHolding;
+    if (!goldHolding) {
+      ui.goldUnitPrice.textContent = '—'; ui.goldValue.textContent = '—'; ui.goldCostTotal.textContent = '—';
+      ui.goldDifference.textContent = '—'; ui.goldDifferenceRow.classList.remove('up', 'down', 'stable');
+      ui.goldStatus.textContent = 'أدخل بيانات حيازتك لحفظها على هذا الجهاز.';
+      return;
+    }
+    const unitPrice = goldQuoteCache?.prices?.[goldHolding.karat];
+    const currentValue = Number.isFinite(unitPrice) ? portfolio.estimateGoldValue(goldHolding.grams, unitPrice) : null;
+    const costTotal = Number((goldHolding.grams * goldHolding.paidPerGram).toFixed(2));
+    ui.goldUnitPrice.textContent = Number.isFinite(unitPrice) ? `${number(unitPrice)} دج / غرام` : 'لا توجد قراءة';
+    ui.goldValue.textContent = currentValue === null ? '—' : `${number(currentValue)} دج`;
+    ui.goldCostTotal.textContent = `${number(costTotal)} دج`;
+    ui.goldDifferenceRow.classList.remove('up', 'down', 'stable');
+    if (currentValue === null) ui.goldDifference.textContent = '—';
+    else {
+      const difference = Number((currentValue - costTotal).toFixed(2));
+      const trend = difference > 0 ? 'up' : difference < 0 ? 'down' : 'stable';
+      ui.goldDifferenceRow.classList.add(trend);
+      ui.goldDifference.textContent = difference > 0 ? `+${number(difference)} دج` : difference < 0 ? `−${number(Math.abs(difference))} دج` : '0 دج';
+    }
+    if (goldQuoteCache?.asOfDate) {
+      ui.goldStatus.textContent = `${goldQuoteIsRecent() ? 'آخر مرجع متاح' : 'آخر مرجع محفوظ وقد يكون قديماً'} من EXDZ · ${goldQuoteCache.asOfDate}`;
+    } else ui.goldStatus.textContent = 'لا توجد قراءة سوق موازية محفوظة؛ اضغط «تحديث الأسعار». ';
+  }
+
+  function saveGoldHolding(event) {
+    event?.preventDefault();
+    const grams = Number(ui.goldWeight.value);
+    const karat = Number(ui.goldKarat.value);
+    const paidPerGram = Number(ui.goldCost.value);
+    const next = { grams, karat, paidPerGram, savedAt: Date.now() };
+    if (!isValidGoldHolding(next)) {
+      showGoldFeedback('تحقق من الوزن والعيار وتكلفة الشراء للغرام.');
+      return;
+    }
+    try {
+      localStorage.setItem(GOLD_HOLDING_KEY, JSON.stringify(next));
+      goldHolding = next;
+      if (ui.goldFeedback) ui.goldFeedback.hidden = true;
+      renderPortfolio();
+      void refreshGoldQuote().then(() => renderPortfolio());
+      showGoldFeedback('حُفظت حيازة الذهب على هذا الجهاز فقط.');
+    } catch (_) { showGoldFeedback('تعذّر حفظ حيازة الذهب في هذا المتصفح.'); }
+  }
+
+  function removeGoldHolding() {
+    try {
+      localStorage.removeItem(GOLD_HOLDING_KEY);
+      goldHolding = null;
+      renderPortfolio();
+      showGoldFeedback('أُزيلت حيازة الذهب من هذا الجهاز.');
+    } catch (_) { showGoldFeedback('تعذّرت إزالة حيازة الذهب من هذا المتصفح.'); }
+  }
+
+  function showGoldFeedback(message) {
+    if (!ui.goldFeedback) return;
+    ui.goldFeedback.textContent = message;
+    ui.goldFeedback.hidden = false;
+  }
+
+  async function refreshGoldQuote() {
+    if (!goldHolding) return false;
+    if (ui.goldStatus) ui.goldStatus.textContent = 'جارٍ جلب مرجع الذهب من السوق الموازية…';
+    try {
+      const response = await fetch('/api/gold', { headers: { Accept: 'application/json' }, cache: 'no-store' });
+      const data = await response.json();
+      const asOf = data?.asOfDate ? Date.parse(`${data.asOfDate}T00:00:00`) : NaN;
+      const validPrices = data?.prices && [18, 21, 24].every(karat => Number.isFinite(data.prices[karat]) && data.prices[karat] > 0);
+      if (!response.ok || !validPrices || !Number.isFinite(asOf) || Date.now() - asOf > 7 * 86_400_000 || asOf > Date.now() + 86_400_000) {
+        throw new Error(data.error || 'لم يقدّم المصدر سعراً حديثاً صالحاً.');
+      }
+      goldQuoteCache = { ...data, _retrievedAt: Date.now() };
+      try { localStorage.setItem(GOLD_QUOTE_KEY, JSON.stringify(goldQuoteCache)); } catch (_) {}
+      if (ui.goldStatus) ui.goldStatus.textContent = `تم تحديث مرجع EXDZ للسوق الموازية · ${data.asOfDate}`;
+      return true;
+    } catch (error) {
+      if (ui.goldStatus) ui.goldStatus.textContent = `${error.message || 'تعذّر تحديث سعر الذهب.'} ${goldQuoteCache ? `نعرض آخر مرجع محفوظ (${goldQuoteCache.asOfDate || 'تاريخه غير معروف'}).` : 'لا يوجد سعر محفوظ.'}`;
+      return false;
+    }
+  }
+
   function showPortfolioFeedback(message) {
     ui.portfolioFeedback.textContent = message;
     ui.portfolioFeedback.hidden = false;
   }
 
+  function calculateCombinedPortfolioTotal() {
+    const held = Object.entries(positions).filter(([, quantity]) => Number.isSafeInteger(quantity) && quantity > 0);
+    const stockTotal = held.length
+      ? portfolio.totalValue(held.map(([symbol, quantity]) => ({ quantity, price: quoteCache[symbol]?.price })))
+      : 0;
+    if (stockTotal === null) return null;
+    const goldValue = goldHolding
+      ? portfolio.estimateGoldValue(goldHolding.grams, goldQuoteCache?.prices?.[goldHolding.karat])
+      : 0;
+    if (goldValue === null || (!held.length && !goldHolding)) return null;
+    return Number((stockTotal + goldValue).toFixed(2));
+  }
+
   function renderPortfolio() {
     const held = Object.entries(positions).filter(([, quantity]) => Number.isSafeInteger(quantity) && quantity > 0);
-    const values = held.map(([symbol, quantity]) => ({ quantity, price: quoteCache[symbol]?.price }));
-    const total = portfolio.totalValue(values);
+    const total = calculateCombinedPortfolioTotal();
     const formattedAmount = total === null ? '—' : number(total);
     const formattedTotal = total === null ? '—' : `${formattedAmount} دج`;
     if (ui.price) {
@@ -508,6 +689,7 @@
       ui.price.style.setProperty('--total-mobile-size', `${compactSize.toFixed(1)}px`);
     }
     if (ui.portfolioTotal) ui.portfolioTotal.textContent = formattedTotal;
+    renderGoldHoldingDetails();
     renderCompanyList();
     renderHomePortfolioPreview();
     renderPortfolioObservations();
@@ -519,6 +701,7 @@
     ui.button.disabled = true; ui.button.classList.add('loading');
     ui.status.textContent = 'جارٍ التحقق من أسعار الأسهم من المصدر الرسمي…';
     ui.error.hidden = true;
+    const goldTask = goldHolding ? refreshGoldQuote() : Promise.resolve(false);
     try {
       const response = await fetch('/api/quotes', { headers: { Accept: 'application/json' }, cache: 'no-store' });
       const data = await response.json();
@@ -535,7 +718,8 @@
         localStorage.setItem(historyKey(symbol), JSON.stringify(history.slice(-60)));
         returnedSymbols.add(symbol);
       }
-      savePortfolioObservation(returnedSymbols);
+      const goldRefreshed = await goldTask;
+      savePortfolioObservation(returnedSymbols, goldRefreshed);
       localStorage.setItem(QUOTES_KEY, JSON.stringify(quoteCache));
       renderPortfolio(); renderSelectedQuote();
       const unavailableHeld = Object.keys(positions).filter(symbol => !returnedSymbols.has(symbol));
@@ -551,6 +735,8 @@
       }
       ui.status.textContent = 'تم فحص الأسعار المتاحة من SGBV';
     } catch (error) {
+      const goldRefreshed = await goldTask;
+      if (goldRefreshed) savePortfolioObservation(new Set(), true);
       renderPortfolio(); renderSelectedQuote();
       ui.error.textContent = `${error.message || 'تعذّر الاتصال بالمصدر الرسمي.'} ${Object.keys(quoteCache).length ? 'نعرض آخر الأسعار المحفوظة وقد لا تكون حديثة.' : 'لا توجد أسعار محفوظة.'}`;
       ui.error.hidden = false;
@@ -589,6 +775,8 @@
     renderSelectedQuote();
   });
   ui.button.addEventListener('click', refresh);
+  ui.goldForm?.addEventListener('submit', saveGoldHolding);
+  ui.goldRemove?.addEventListener('click', removeGoldHolding);
   const mobileScreenQuery = window.matchMedia('(max-width: 650px)');
   const mobileScreenSections = [...document.querySelectorAll('[data-mobile-screen]')];
   const mobileNavLinks = [...document.querySelectorAll('.bottom-nav [data-screen-target]')];

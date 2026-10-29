@@ -2,7 +2,7 @@
 
 const test = require('node:test');
 const assert = require('node:assert/strict');
-const { createSnapshot, estimateValue, parseQuantity, totalValue } = require('../portfolio');
+const { createSnapshot, estimateGoldValue, estimateValue, parseQuantity, totalValue } = require('../portfolio');
 
 test('portfolio quantity accepts only non-negative whole share counts', () => {
   assert.equal(parseQuantity('0'), 0);
@@ -24,6 +24,17 @@ test('single holding value uses its share quantity and available quote', () => {
   assert.equal(estimateValue(3, NaN), null);
 });
 
+test('gold valuation supports fractional gram weights and composes with share values', () => {
+  assert.equal(estimateGoldValue(7, 27280), 190960);
+  assert.equal(estimateGoldValue(1.25, 27280), 34100);
+  assert.equal(estimateGoldValue(0, 27280), null);
+  assert.equal(estimateGoldValue(1, null), null);
+  assert.equal(totalValue([
+    { quantity: 3, price: 830 },
+    { quantity: 7, price: 27280, unit: 'gram' }
+  ]), 193450);
+});
+
 test('overall portfolio value sums each holding and avoids partial totals', () => {
   assert.equal(totalValue([
     { quantity: 3, price: 830 },
@@ -41,4 +52,11 @@ test('portfolio trend snapshots require fresh official readings for every curren
   assert.equal(createSnapshot(holdings, quotes, new Set(['AYRD']), 1234), null);
   assert.equal(createSnapshot(holdings, { AYRD: quotes.AYRD }, new Set(['AYRD', 'BIO']), 1234), null);
   assert.equal(createSnapshot([], quotes, new Set(['AYRD', 'BIO']), 1234), null);
+});
+
+test('combined snapshots include gold only when its current market quote is refreshed', () => {
+  const holdings = [{ symbol: 'AYRD', quantity: 3 }, { symbol: 'GOLD21', quantity: 7, unit: 'gram' }];
+  const quotes = { AYRD: { price: 830 }, GOLD21: { price: 27280 } };
+  assert.deepEqual(createSnapshot(holdings, quotes, new Set(['AYRD', 'GOLD21']), 5678), { time: 5678, total: 193450 });
+  assert.equal(createSnapshot(holdings, quotes, new Set(['AYRD']), 5678), null);
 });
