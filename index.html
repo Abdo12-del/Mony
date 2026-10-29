@@ -1,0 +1,176 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#0b0b0e">
+  <meta name="application-name" content="محفظتي">
+  <meta name="description" content="محفظتي — متابعة الأسهم والذهب وحساب قيمة الحيازات في الجزائر.">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="محفظتي">
+  <title>محفظتي | بورصة الجزائر</title>
+  <link rel="manifest" href="/manifest.webmanifest">
+  <link rel="icon" href="/favicon.svg" type="image/svg+xml">
+  <link rel="apple-touch-icon" href="/icons/icon-180.png">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Arabic:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/styles.css">
+</head>
+<body>
+  <header class="topbar" id="top">
+    <a class="brand" href="#top" aria-label="محفظتي، الرئيسية">
+      <img class="brand-mark" src="/icons/app-icon.svg" alt="">
+      <span class="brand-copy"><span class="brand-name">محفظتي</span><small class="brand-subtitle">تابع استثماراتك في بورصة الجزائر</small></span>
+    </a>
+    <div class="topbar-end">
+      <button id="install-app" class="install-app" type="button" hidden><span aria-hidden="true">⇩</span> تثبيت</button>
+      <span class="market-pill"><i class="market-dot"></i> بورصة الجزائر</span>
+      <span class="top-symbol">دج</span>
+    </div>
+  </header>
+
+  <main class="shell dashboard">
+    <section class="welcome-row" id="home" data-mobile-screen="home">
+      <div><span class="eyebrow">لوحة المتابعة</span><h1>أهلاً بك في محفظتي</h1><p>ملخص حيازاتك وأسعار الأسهم في بورصة الجزائر</p></div>
+    </section>
+
+    <section class="instrument-card portfolio-total-card" data-mobile-screen="home" aria-live="polite" aria-atomic="true">
+      <div class="portfolio-total-block">
+        <div class="portfolio-total-copy">
+          <span class="quote-caption">إجمالي قيمة المحفظة</span>
+          <div class="price-line"><strong id="price" class="price" dir="ltr">—</strong><span class="currency">دج</span></div>
+          <span id="portfolio-total-observed-change" class="portfolio-total-observed-change" hidden></span>
+          <span id="portfolio-total-updated" class="portfolio-total-updated">يظهر وقت آخر فحص ناجح هنا</span>
+          <span id="portfolio-total-chart-hint" class="portfolio-total-chart-hint">يظهر المسار بعد قراءتين ناجحتين للمحفظة</span>
+        </div>
+        <svg id="portfolio-total-chart" class="portfolio-total-chart" viewBox="0 0 260 42" preserveAspectRatio="none" role="img" aria-label="مسار القيمة الإجمالية المسجلة للمحفظة" focusable="false">
+          <path class="portfolio-total-grid" d="M0 8H260 M0 21H260 M0 34H260"></path>
+          <path id="portfolio-total-area" class="portfolio-total-area" d=""></path>
+          <path id="portfolio-total-line" class="portfolio-total-line" d=""></path>
+          <g id="portfolio-total-points" class="portfolio-total-points" aria-hidden="true"></g>
+          <circle id="portfolio-total-point" class="portfolio-total-point" cx="0" cy="0" r="0"></circle>
+        </svg>
+      </div>
+    </section>
+
+    <section class="home-portfolio" data-mobile-screen="home" aria-labelledby="home-portfolio-title">
+      <div class="home-section-heading"><h2 id="home-portfolio-title">محفظتك</h2><a href="#portfolio">عرض الكل <span aria-hidden="true">‹</span></a></div>
+      <div id="home-holdings-preview" class="home-holdings-preview" aria-live="polite"></div>
+    </section>
+
+    <aside class="market-note" data-mobile-screen="home">
+      <span class="market-note-icon" aria-hidden="true">i</span>
+      <p>قد تكون أسعار الأسهم محفوظة وليست مباشرة من السوق.<small>سعر الذهب مرجع من السوق الموازية ويُحدَّث عند الفحص.</small></p>
+    </aside>
+
+    <section class="stock-quote-card" data-mobile-screen="portfolio" aria-live="polite" aria-atomic="true">
+      <div class="stock-quote-header">
+        <div class="company-info"><div class="company-avatar"><img id="focus-company-logo" alt="" decoding="async" hidden><span id="focus-company-fallback">أ</span></div><div><div class="company-title"><span id="focus-company-name">أيراد</span> <span id="focus-company-symbol" class="ticker">AYRD</span></div><div class="company-subtitle"><span id="focus-company-full-name">AYRADE SPA</span> <span class="bullet">•</span> بورصة الجزائر</div></div></div>
+      </div>
+      <div class="quote-unit" role="group" aria-label="بيانات السهم المحدد">
+        <label class="focus-stock-picker" for="focus-company-select"><small>اختر السهم</small><select id="focus-company-select" aria-label="اختر السهم لعرض سعره وبياناته"></select></label>
+        <span class="quote-unit-label"><small>سعر السهم المحدد</small><strong id="share-price" dir="ltr">—</strong></span>
+        <div class="focus-quote-status"><small>حالة السعر · SGBV</small><strong id="price-kind" class="quote-kind">بانتظار التحديث</strong></div>
+        <div class="change-line"><span id="movement" class="movement" hidden></span><span id="movement-caption" class="movement-caption">لا توجد قراءة سابقة للمقارنة</span></div>
+        <p id="price-note" class="price-note">السعر سيظهر بعد نجاح قراءة المصدر الرسمي.</p>
+      </div>
+      <div id="error" class="error" role="status" hidden></div>
+      <div id="refresh-status" class="refresh-status" aria-live="polite">بانتظار تحديث الأسعار</div>
+    </section>
+
+    <nav class="quick-actions" data-mobile-screen="home" aria-label="إجراءات سريعة">
+      <button id="refresh" class="quick-action refresh-action" type="button"><span class="action-icon" aria-hidden="true">↻</span><strong>تحديث الأسعار</strong><small>أسهم + ذهب</small></button>
+      <a class="quick-action source-action" href="https://www.sgbv.dz/" target="_blank" rel="noopener"><span class="action-icon" aria-hidden="true">↗</span><strong>المصدر الرسمي</strong><small>بورصة الجزائر</small></a>
+    </nav>
+
+    <section class="portfolio-section" id="portfolio" data-mobile-screen="portfolio" aria-labelledby="portfolio-title">
+      <div class="portfolio-heading">
+        <div><span class="section-kicker">محفظتي</span><h2 id="portfolio-title">أسهمي</h2><p>اختر شركة مرشحة مبدئياً، ثم سجّل عدد الأسهم التي تملكها؛ تحفظ الحيازات على هذا الجهاز فقط.</p></div>
+        <div class="portfolio-total"><span>إجمالي قيمة المحفظة</span><strong id="portfolio-total">—</strong><small>الأسهم والذهب · يعتمد الإجمالي على توفر الأسعار · دج</small></div>
+      </div>
+      <div class="company-picker">
+        <label for="company-select">إضافة شركة إلى المحفظة</label>
+        <select id="company-select" aria-label="اختر شركة مدرجة لإضافتها للمحفظة"></select>
+        <button id="add-company" class="save-shares-button" type="button">إضافة شركة</button>
+      </div>
+      <div id="company-list" class="company-list" aria-live="polite"></div>
+
+      <section class="gold-section" aria-labelledby="gold-title">
+        <div class="gold-section-heading"><div><span class="section-kicker">أصل إضافي</span><h3 id="gold-title">الذهب</h3></div><span class="gold-market-badge">السوق الموازية</span></div>
+        <form id="gold-form" class="gold-form" novalidate>
+          <label>الوزن <span>غرام</span><input id="gold-weight" type="number" min="0.001" step="0.001" inputmode="decimal" placeholder="أدخل الوزن بالغرام" autocomplete="off"></label>
+          <label>العيار<select id="gold-karat"><option value="18">18 قيراط</option><option value="21" selected>21 قيراط</option><option value="24">24 قيراط</option></select></label>
+          <label>سعر الشراء السابق للغرام <span>دج</span><input id="gold-cost-per-gram" type="number" min="0.01" step="0.01" inputmode="decimal" placeholder="ما دفعته عند الشراء" autocomplete="off"></label>
+          <div class="gold-form-actions"><button id="gold-save" class="save-shares-button" type="submit">حفظ حيازة الذهب</button><button id="gold-remove" class="remove-holding-button" type="button" hidden>إزالة الذهب</button></div>
+        </form>
+        <p class="gold-input-hint">أدخل سعر الشراء السابق الذي دفعته للغرام؛ سعر السوق الحالي يُجلب تلقائياً ولا تحتاج إلى إدخاله.</p>
+        <div class="gold-valuation" aria-live="polite">
+          <div><span>سعر السوق الحالي للغرام · تلقائي</span><strong id="gold-unit-price">—</strong></div>
+          <div><span>القيمة الحالية التقديرية</span><strong id="gold-value">—</strong></div>
+          <div><span>إجمالي تكلفة الشراء السابقة</span><strong id="gold-cost-total">—</strong></div>
+          <div id="gold-difference-row" class="gold-difference-row"><span>الربح / الخسارة التقديرية</span><strong id="gold-difference">—</strong><small id="gold-performance-status">بانتظار بيانات المقارنة</small></div>
+        </div>
+        <p id="gold-status" class="gold-status" aria-live="polite">أدخل بيانات حيازتك لحفظها على هذا الجهاز.</p>
+        <p id="gold-feedback" class="portfolio-feedback" role="status" hidden></p>
+        <p class="gold-disclaimer">المصدر: <a href="https://www.exchangedz.com/gold" target="_blank" rel="noopener">مرجع EXDZ للسوق الموازية</a>، وليس عرض شراء مضموناً؛ قد يختلف سعر بيع الحلي المستعملة حسب الحالة والمصنعية والعيار.</p>
+      </section>
+
+      <p class="portfolio-status">الترشيحات استرشادية، لا فتوى ولا شهادة شرعية؛ لم يُراجع تطهير الدخل. تحقّق شرعياً قبل الاستثمار.</p>
+      <p id="portfolio-feedback" class="portfolio-feedback" role="status" hidden></p>
+      <p id="quote-refresh-feedback" class="portfolio-feedback" role="status" hidden></p>
+    </section>
+
+    <section class="summary-section" id="details" data-mobile-screen="portfolio">
+      <div class="section-heading-inline"><div><span class="section-kicker">ملخص السعر</span><h2>بيانات السهم المحدد</h2></div><span class="section-meta"><span id="details-symbol">AYRD</span> · دج</span></div>
+      <div class="summary-grid">
+        <article class="summary-card summary-date"><span class="summary-icon">◷</span><span class="summary-label">تاريخ الجلسة</span><strong id="session-date">غير متاح من المصدر</strong></article>
+        <article class="summary-card"><span class="summary-icon">↻</span><span class="summary-label">آخر فحص ناجح</span><strong id="checked-at">—</strong></article>
+        <article class="summary-card"><span class="summary-icon">↗</span><span class="summary-label">سعر الافتتاح المنشور</span><strong id="opening-price" dir="auto">غير منشور</strong></article>
+        <article class="summary-card"><span class="summary-icon">↘</span><span class="summary-label">سعر الإغلاق المنشور</span><strong id="closing-price" dir="auto">غير منشور</strong></article>
+      </div>
+    </section>
+
+    <section class="chart-panel dashboard-panel" id="chart-section" data-mobile-screen="chart">
+      <div class="chart-heading"><div><span class="section-kicker">الاتجاه</span><strong>قراءاتك السابقة</strong><span>مخطط محلي للأسعار التي جرى رصدها</span></div><span class="chart-count" id="observation-count">٠ فحص</span></div>
+      <div class="chart-wrap"><svg id="price-chart" viewBox="0 0 720 150" preserveAspectRatio="none" role="img" aria-label="مخطط لقراءات السعر المحفوظة محلياً"><defs><linearGradient id="chart-fill" x1="0" x2="0" y1="0" y2="1"><stop offset="0%" stop-color="#b995ff" stop-opacity=".34"/><stop offset="100%" stop-color="#b995ff" stop-opacity="0"/></linearGradient></defs><path id="chart-area" d=""/><path id="chart-line" d=""/><circle id="chart-point" cx="0" cy="0" r="4"/></svg><div class="chart-empty" id="chart-empty"><span class="empty-bars">▁ ▃ ▂ ▅ ▄</span><span>يظهر المخطط بعد فحصين ناجحين على الأقل</span></div></div>
+      <div class="chart-foot"><span id="chart-first">—</span><span class="chart-disclaimer">ليس رسماً تاريخياً رسمياً</span><span id="chart-last">—</span></div>
+    </section>
+
+    <section class="activity-section" id="activity" data-mobile-screen="history">
+      <div class="section-heading-inline"><div><span class="section-kicker">نشاط المتابعة</span><h2>سجل الفحوصات</h2></div><span class="section-meta">محفوظ على هذا الجهاز</span></div>
+      <div id="activity-list" class="activity-list"></div>
+    </section>
+
+    <details class="extra-info" id="pwa-info" data-mobile-screen="home">
+      <summary><span><small>تفاصيل اختيارية</small><strong>عن التثبيت والسعر</strong></span><span class="disclosure-icon" aria-hidden="true">⌄</span></summary>
+      <div class="extra-info-content">
+        <section><strong>التثبيت والعمل دون اتصال</strong><p>ثبّت محفظتي من زر التثبيت عند ظهوره أو من قائمة المتصفح. تعمل واجهة المحفظة والبيانات المحفوظة دون اتصال؛ أما تحديث السعر فيتطلب الإنترنت.</p></section>
+        <section><strong>مصدر السعر</strong><p>المصدر هو <a href="https://www.sgbv.dz/" target="_blank" rel="noopener">بورصة الجزائر (SGBV)</a>. إذا لم يُنشر سعر إغلاق، نعرض السعر المتاح بوصفه افتتاحاً أو سعراً مرجعياً، ولا نسميه إغلاقاً.</p></section>
+        <section><strong>حدود المتابعة</strong><p>نسخة PWA لا تفحص الأسعار في الخلفية ولا ترسل تنبيهات؛ التغير المعروض يقارن آخر فحصين ناجحين فقط. لا تتوفر حالياً نسخة Android للتنزيل.</p></section>
+      </div>
+    </details>
+    <p class="trust-line" data-mobile-screen="home">«محفظتي» مشروع مستقل غير تابع لبورصة الجزائر أو أي شركة مدرجة، ولا يقدم نصيحة استثمارية.</p>
+  </main>
+
+  <nav class="bottom-nav" aria-label="التنقل الرئيسي">
+    <a class="active" href="#home" data-screen-target="home" aria-current="page">
+      <svg viewBox="0 0 24 24" aria-hidden="true"><path d="m3.5 10 8.5-7 8.5 7v10a1 1 0 0 1-1 1h-5.2v-6.5H9.7V21H4.5a1 1 0 0 1-1-1z"/></svg><small>الرئيسية</small>
+    </a>
+    <a href="#portfolio" data-screen-target="portfolio">
+      <svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3.5" y="6.5" width="17" height="14" rx="2"/><path d="M8 6.5v-2a1.5 1.5 0 0 1 1.5-1.5h5A1.5 1.5 0 0 1 16 4.5v2M3.5 11h17m-10 0v2h3v-2"/></svg><small>محفظتي</small>
+    </a>
+    <a href="#chart-section" data-screen-target="chart">
+      <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 3v18h18M6.5 15l4-4 3 2.5 5.5-7"/><path d="M15.5 6.5H19v3.5"/></svg><small>الرسم</small>
+    </a>
+    <a href="#activity" data-screen-target="history">
+      <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3.5 2"/></svg><small>السجل</small>
+    </a>
+  </nav>
+  <footer data-mobile-screen="home"><span>محفظتي <span class="footer-dot">·</span> أسهم الجزائر</span><a href="https://www.sgbv.dz/" target="_blank" rel="noopener">بورصة الجزائر ↗</a></footer>
+  <script src="/portfolio.js" defer></script>
+  <script src="/companies.js" defer></script>
+  <script src="/app.js" defer></script>
+</body>
+</html>
