@@ -157,6 +157,8 @@ test('projects are device-local portfolio goals that show progress without chang
   assert.match(app, /function readProjects\(\)/);
   assert.match(app, /function renderProjects\(\)/);
   assert.match(app, /role', 'progressbar'/);
+  assert.match(app, /const formattedAmount = total === null \? '—' : wholeDzd\(total\)/);
+  assert.match(app, /wholeDzd\(currentValue\)/);
   assert.match(app, /localStorage\.setItem\(PROJECTS_KEY, JSON\.stringify\(next\)\)/);
   const totalStart = app.indexOf('function calculateCombinedPortfolioTotal() {');
   const totalEnd = app.indexOf('\n  }', totalStart);

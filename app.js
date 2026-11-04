@@ -439,7 +439,7 @@
 
       const valueMetric = document.createElement('div'); valueMetric.className = 'holding-metric holding-value';
       const valueLabel = document.createElement('span'); valueLabel.textContent = 'قيمة الحيازة التقديرية';
-      const valueText = document.createElement('strong'); valueText.dir = 'auto'; valueText.textContent = value === null ? '—' : `${number(value)} دج`;
+      const valueText = document.createElement('strong'); valueText.dir = 'auto'; valueText.textContent = value === null ? '—' : `${wholeDzd(value)} دج`;
       valueMetric.append(valueLabel, valueText);
 
       const actions = document.createElement('div'); actions.className = 'holding-actions';
@@ -498,7 +498,7 @@
       const weight = document.createElement('span'); weight.textContent = `${number(goldHolding.grams)} غرام`;
       const value = document.createElement('span');
       const currentValue = Number.isFinite(unitPrice) ? portfolio.estimateGoldValue(goldHolding.grams, unitPrice) : null;
-      value.textContent = currentValue === null ? 'القيمة التقديرية —' : `القيمة التقديرية ${number(currentValue)} دج`;
+      value.textContent = currentValue === null ? 'القيمة التقديرية —' : `القيمة التقديرية ${wholeDzd(currentValue)} دج`;
       footer.append(weight, value);
       const details = document.createElement('div'); details.className = 'home-holding-details';
       const difference = document.createElement('span'); difference.className = 'home-holding-change';
@@ -506,7 +506,7 @@
       else {
         const delta = Number((currentValue - goldHolding.grams * goldHolding.paidPerGram).toFixed(2));
         difference.classList.add(delta > 0 ? 'up' : delta < 0 ? 'down' : 'stable');
-        difference.textContent = delta > 0 ? `فرق عن التكلفة +${number(delta)} دج` : delta < 0 ? `فرق عن التكلفة −${number(Math.abs(delta))} دج` : 'القيمة مساوية للتكلفة';
+        difference.textContent = delta > 0 ? `فرق عن التكلفة +${wholeDzd(delta)} دج` : delta < 0 ? `فرق عن التكلفة −${wholeDzd(Math.abs(delta))} دج` : 'القيمة مساوية للتكلفة';
       }
       const asOf = document.createElement('span'); asOf.className = 'home-holding-updated';
       asOf.textContent = goldQuoteCache?.asOfDate ? `مرجع ${goldQuoteCache.asOfDate}` : 'لم يُحدّث بعد';
@@ -545,7 +545,7 @@
 
       const footer = document.createElement('div'); footer.className = 'home-holding-footer';
       const quantityText = document.createElement('span'); quantityText.textContent = `${new Intl.NumberFormat('ar-DZ').format(quantity)} سهم`;
-      const valueText = document.createElement('span'); valueText.textContent = value === null ? 'القيمة التقديرية —' : `القيمة التقديرية ${number(value)} دج`;
+      const valueText = document.createElement('span'); valueText.textContent = value === null ? 'القيمة التقديرية —' : `القيمة التقديرية ${wholeDzd(value)} دج`;
       footer.append(quantityText, valueText);
 
       const details = document.createElement('div'); details.className = 'home-holding-details';
@@ -586,8 +586,8 @@
     ui.portfolioTotalChange.hidden = false;
     ui.portfolioTotalChange.className = `portfolio-total-observed-change ${trend}`;
     ui.portfolioTotalChange.textContent = change > 0
-      ? `↑ +${number(change)} دج بين فحصين`
-      : change < 0 ? `↓ −${number(Math.abs(change))} دج بين فحصين` : '— دون تغير بين فحصين';
+      ? `↑ +${wholeDzd(change)} دج بين فحصين`
+      : change < 0 ? `↓ −${wholeDzd(Math.abs(change))} دج بين فحصين` : '— دون تغير بين فحصين';
   }
 
   function renderGoldHoldingDetails() {
@@ -607,8 +607,8 @@
     const currentValue = Number.isFinite(unitPrice) ? portfolio.estimateGoldValue(goldHolding.grams, unitPrice) : null;
     const costTotal = Number((goldHolding.grams * goldHolding.paidPerGram).toFixed(2));
     ui.goldUnitPrice.textContent = Number.isFinite(unitPrice) ? `${number(unitPrice)} دج / غرام` : 'لا توجد قراءة';
-    ui.goldValue.textContent = currentValue === null ? '—' : `${number(currentValue)} دج`;
-    ui.goldCostTotal.textContent = `${number(costTotal)} دج`;
+    ui.goldValue.textContent = currentValue === null ? '—' : `${wholeDzd(currentValue)} دج`;
+    ui.goldCostTotal.textContent = `${wholeDzd(costTotal)} دج`;
     ui.goldDifferenceRow.classList.remove('up', 'down', 'stable');
     if (currentValue === null) {
       ui.goldDifference.textContent = '—';
@@ -617,7 +617,7 @@
       const difference = Number((currentValue - costTotal).toFixed(2));
       const trend = difference > 0 ? 'up' : difference < 0 ? 'down' : 'stable';
       ui.goldDifferenceRow.classList.add(trend);
-      ui.goldDifference.textContent = difference > 0 ? `+${number(difference)} دج` : difference < 0 ? `−${number(Math.abs(difference))} دج` : '0 دج';
+      ui.goldDifference.textContent = difference > 0 ? `+${wholeDzd(difference)} دج` : difference < 0 ? `−${wholeDzd(Math.abs(difference))} دج` : '0 دج';
       ui.goldPerformanceStatus.textContent = difference > 0
         ? 'القيمة أعلى من تكلفة الشراء · ربح غير محقق تقديري'
         : difference < 0 ? 'القيمة أقل من تكلفة الشراء · خسارة غير محققة تقديرية'
@@ -752,6 +752,7 @@
       progress.setAttribute('aria-valuemax', '100');
       const percent = currentValue === null ? 0 : Math.min(100, Math.max(0, currentValue / project.target * 100));
       progress.setAttribute('aria-valuenow', String(Math.round(percent)));
+      if (currentValue !== null && currentValue >= project.target) progress.classList.add('reached');
       const fill = document.createElement('span');
       fill.className = 'project-progress-fill';
       fill.style.width = `${percent.toFixed(1)}%`;
@@ -805,7 +806,7 @@
   function renderPortfolio() {
     const held = Object.entries(positions).filter(([, quantity]) => Number.isSafeInteger(quantity) && quantity > 0);
     const total = calculateCombinedPortfolioTotal();
-    const formattedAmount = total === null ? '—' : number(total);
+    const formattedAmount = total === null ? '—' : wholeDzd(total);
     const formattedTotal = total === null ? '—' : `${formattedAmount} دج`;
     if (ui.price) {
       ui.price.textContent = formattedAmount;

@@ -1411,3 +1411,90 @@ footer a { color: #b4a3d5; text-decoration: none; }
   .project-form .save-shares-button { width: 100%; }
   .projects-list { grid-template-columns: minmax(0, 1fr); }
 }
+
+/* Clearer amounts and a more polished, consistent finish across the wallet. */
+:root {
+  --card-border: #383240;
+  --card-radius: 16px;
+}
+.topbar { border-color: #24202c; }
+.portfolio-total-card {
+  border: 1px solid #c8a8ff8c;
+  border-radius: 21px;
+  background: radial-gradient(ellipse at 82% 0%, #e5d5ff45, transparent 38%), linear-gradient(128deg, #8050e7 0%, #7143d0 55%, #5e35b4 100%);
+  box-shadow: 0 16px 36px #5931b52b, inset 0 1px #ffffff30;
+}
+.stock-quote-card, .portfolio-section, .projects-screen, .chart-panel, .activity-section, .summary-card {
+  border-color: #322d39;
+}
+.portfolio-section, .projects-screen, .stock-quote-card, .chart-panel {
+  box-shadow: 0 10px 28px #0003;
+}
+.home-holding-card, .home-holdings-empty, .project-card {
+  border-color: #383141;
+  background: linear-gradient(145deg, #1b1920, #141318 78%);
+  box-shadow: 0 7px 20px #0003;
+}
+.projects-screen {
+  position: relative;
+  isolation: isolate;
+  overflow: hidden;
+  border-color: #3a3047;
+  background: radial-gradient(ellipse at 0% 0%, #7854ae1c, transparent 42%), linear-gradient(145deg, #19171e, #111115);
+}
+.projects-screen::before {
+  position: absolute;
+  z-index: -1;
+  top: -110px;
+  inset-inline-start: -92px;
+  width: 250px;
+  height: 250px;
+  border-radius: 50%;
+  background: radial-gradient(circle, #a883ff1c, transparent 68%);
+  content: "";
+  pointer-events: none;
+}
+.projects-heading p { max-width: 62ch; font-size: 12px; }
+.projects-local-badge { padding: 7px 11px; font-size: 11px; font-weight: 600; }
+.project-form { border-color: #393342; background: #17151b; }
+.project-form label { font-size: 11px; }
+.project-form input { min-height: 44px; border-color: #433b4a; background: #111015; font-size: 14px; }
+.project-form .save-shares-button { min-height: 44px; padding-inline: 16px; font-size: 12px; }
+.project-hint { font-size: 10px; }
+.project-card { border-color: #3b3345; }
+.project-card-heading h3 { font-size: 14px; }
+.project-values { margin-top: 15px; }
+.project-values span { font-size: 10px; }
+.project-values strong { font-size: 14px; }
+.project-progress-track { height: 10px; background: #302a38; }
+.project-progress-fill { background: linear-gradient(90deg, #8f64ed, #c5a0ff); box-shadow: 0 0 12px #a67cff55; }
+.project-progress-track.reached .project-progress-fill { background: linear-gradient(90deg, #2ba66c, #70df9e); box-shadow: 0 0 12px #55d98a55; }
+.project-progress-status { font-size: 11px; }
+.projects-empty { border-color: #4a4055; background: #17151b; font-size: 12px; }
+.save-shares-button { box-shadow: inset 0 1px #ffffff22; }
+@media (hover: hover) {
+  .home-holding-card, .project-card { transition: border-color .18s ease, transform .18s ease, box-shadow .18s ease; }
+  .home-holding-card:hover, .project-card:hover { transform: translateY(-2px); border-color: #66527f; box-shadow: 0 12px 26px #0004; }
+}
+@media (max-width: 650px) {
+  .portfolio-total-card { border-radius: 21px; }
+  .home-holding-card, .home-holdings-empty { border-radius: 17px; }
+  .home-holding-copy strong { font-size: 13px; }
+  .home-holding-copy small { font-size: 10px; }
+  .home-holding-price small { font-size: 9px; }
+  .home-holding-price strong { font-size: 12px; }
+  .home-holding-footer { font-size: 10px; }
+  .home-holding-details { font-size: 9px; }
+  .projects-screen { padding: 15px; border-radius: 18px; }
+  .projects-heading h2 { font-size: 19px; }
+  .projects-heading p { font-size: 12px; }
+  .project-form { gap: 11px; padding: 12px; border-radius: 15px; }
+  .project-form label { font-size: 12px; }
+  .project-form input { min-height: 47px; font-size: 15px; }
+  .project-form .save-shares-button { min-height: 47px; font-size: 13px; }
+  .project-values span { font-size: 11px; }
+  .project-values strong { font-size: 15px; }
+  .project-progress-status { font-size: 12px; }
+  .project-hint { margin-block: 10px 14px; font-size: 10px; }
+  .project-card { padding: 15px; border-radius: 16px; }
+}
