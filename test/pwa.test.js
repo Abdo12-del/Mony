@@ -28,12 +28,28 @@ test('PWA manifest names محفظتي and declares installable app icons', () =>
 
 test('PWA shell supports offline launch without caching the stock API', () => {
   const worker = read('sw.js');
-  for (const asset of ['/', '/index.html', '/styles.css', '/app.js', '/portfolio.js', '/companies.js', '/manifest.webmanifest', '/icons/icon-192.png', '/icons/icon-512.png']) {
+  for (const asset of ['/', '/index.html', '/styles.css', '/app.js', '/portfolio.js', '/companies.js', '/manifest.webmanifest', '/icons/icon-192.png', '/icons/icon-512.png', '/icons/gold-holding.svg']) {
     assert.ok(worker.includes(`'${asset}'`), `offline shell missing ${asset}`);
   }
   assert.match(worker, /url\.pathname\.startsWith\('\/api\/'\)/);
   assert.match(worker, /cache\.match\('\/'\)/);
   assert.match(worker, /self\.clients\.claim\(\)/);
+});
+
+test('stock holdings show circular brands, history-only movement, mini charts, and gold artwork', () => {
+  const app = read('app.js');
+  const html = read('index.html');
+  const css = read('styles.css');
+  const gold = read('icons/gold-holding.svg');
+  assert.match(app, /function observedShareMovement\(symbol\)/);
+  assert.match(app, /لا توجد مقارنة سابقة/);
+  assert.match(app, /function createMiniPriceChart\(symbol\)/);
+  assert.match(app, /بين فحصين/);
+  assert.match(app, /goldImage\.src = '\/icons\/gold-holding\.svg'/);
+  assert.match(html, /class="gold-section-mark" src="\/icons\/gold-holding\.svg"/);
+  assert.match(css, /\.company-logo-wrap, \.company-avatar, \.home-company-mark \{ border-radius: 50%; \}/);
+  assert.match(gold, /<svg[^>]+viewBox="0 0 64 64"/);
+  assert.match(read('scripts/build.js'), /'gold-holding\.svg'/);
 });
 
 test('portfolio hero shows the combined portfolio total while selected-share details stay separate', () => {
@@ -85,7 +101,7 @@ test('portfolio total card contains an accessible history sparkline and never in
   assert.match(app, /trend-\$\{trend\}/);
   assert.match(read('styles.css'), /trend-positive \.portfolio-total-line/);
   assert.match(read('styles.css'), /trend-negative \.portfolio-total-line/);
-  assert.match(read('sw.js'), /mahfazati-shell-v26/);
+  assert.match(read('sw.js'), /mahfazati-shell-v27/);
 });
 
 test('mobile home previews real holdings and labels observed changes without implying returns', () => {
@@ -176,7 +192,7 @@ test('finance UI uses clear rectangular cards with a single prominent portfolio 
   assert.match(designSystem, /\.portfolio-total-card\s*\{[\s\S]*?min-height:\s*144px[\s\S]*?border-radius:\s*var\(--card-radius\)/);
   assert.match(designSystem, /\.summary-card\.summary-date\s*\{[^}]*background:\s*var\(--card-surface\)/);
   const worker = read('sw.js');
-  assert.match(worker, /mahfazati-shell-v26/);
+  assert.match(worker, /mahfazati-shell-v27/);
 });
 
 test('mobile experience uses five real app tabs with a persistent touch-friendly bottom bar', () => {

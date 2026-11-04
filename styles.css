@@ -1598,3 +1598,32 @@ footer a { color: #b4a3d5; text-decoration: none; }
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after { scroll-behavior: auto !important; transition-duration: .01ms !important; }
 }
+
+/* Stock identity, verified observations, and gold holding artwork */
+.gold-section-title { min-width: 0; display: flex; align-items: center; gap: 11px; }
+.gold-section-mark { width: 44px; height: 44px; flex: 0 0 44px; display: block; }
+.company-logo-wrap, .company-avatar, .home-company-mark { border-radius: 50%; }
+.company-logo-wrap img, .company-avatar img, .home-company-mark img { border-radius: 50%; }
+.company-logo-fallback { border-radius: inherit; }
+.company-avatar { border-radius: 50%; }
+.holding-trend-row { min-width: 0; display: flex; align-items: center; justify-content: space-between; gap: 8px; margin-top: 3px; }
+.holding-movement { min-width: 0; color: #aaa3b1; font-size: 9px; line-height: 1.4; }
+.holding-movement.up, .home-holding-change.up { color: #78d99a; }
+.holding-movement.down, .home-holding-change.down { color: #ff8d96; }
+.holding-movement.stable, .home-holding-change.stable { color: #c7bdcf; }
+.mini-price-chart { width: 62px; height: 22px; flex: 0 0 62px; overflow: visible; }
+.mini-price-line { fill: none; stroke: #c2a1ff; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; }
+.mini-price-area { fill: #b38aff; opacity: .12; }
+.mini-price-chart.trend-up .mini-price-line { stroke: #78d99a; }
+.mini-price-chart.trend-up .mini-price-area { fill: #78d99a; }
+.mini-price-chart.trend-down .mini-price-line { stroke: #ff8d96; }
+.mini-price-chart.trend-down .mini-price-area { fill: #ff8d96; }
+.home-holding-details .mini-price-chart { width: 52px; height: 20px; flex-basis: 52px; }
+.home-gold-mark { overflow: hidden; }
+.home-gold-mark img { width: 100%; height: 100%; object-fit: contain; }
+@media (max-width: 650px) {
+  .gold-section-mark { width: 40px; height: 40px; flex-basis: 40px; }
+  .holding-movement { font-size: 8px; }
+  .mini-price-chart { width: 52px; flex-basis: 52px; }
+  .home-holding-details .mini-price-chart { width: 42px; flex-basis: 42px; }
+}

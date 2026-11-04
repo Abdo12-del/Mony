@@ -241,6 +241,40 @@
     ui.chartLast.textContent = dateTime(visible[visible.length - 1].time).split('،')[0];
   }
 
+  function createMiniPriceChart(symbol) {
+    const rows = readHistory(symbol).slice(-8);
+    if (rows.length < 2) return null;
+    const values = rows.map(row => row.price);
+    const minimum = Math.min(...values), maximum = Math.max(...values);
+    const spread = maximum - minimum || Math.max(Math.abs(maximum) * .01, 1);
+    const points = values.map((value, index) => ({
+      x: 2 + index * (68 / (values.length - 1)),
+      y: 20 - ((value - minimum) / spread) * 14
+    }));
+    const linePath = points.map((point, index) => `${index ? 'L' : 'M'}${point.x.toFixed(1)},${point.y.toFixed(1)}`).join(' ');
+    const svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+    svg.setAttribute('viewBox', '0 0 72 24');
+    svg.setAttribute('focusable', 'false');
+    svg.setAttribute('aria-hidden', 'true');
+    svg.classList.add('mini-price-chart');
+    const trend = values.at(-1) > values[0] ? 'up' : values.at(-1) < values[0] ? 'down' : 'stable';
+    svg.classList.add(`trend-${trend}`);
+    const area = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+    area.setAttribute('d', `${linePath} L70,23 L2,23 Z`);
+    area.classList.add('mini-price-area');
+    const line = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+    line.setAttribute('d', linePath);
+    line.classList.add('mini-price-line');
+    svg.append(area, line);
+    return svg;
+  }
+
+  function observedShareMovement(symbol) {
+    const history = readHistory(symbol);
+    if (history.length < 2) return null;
+    return Number((history[history.length - 1].price - history[history.length - 2].price).toFixed(2));
+  }
+
   function renderActivity(rows) {
     if (!ui.activity) return;
     ui.activity.replaceChildren();
@@ -428,7 +462,18 @@
       const priceText = document.createElement('strong'); priceText.dir = 'auto'; priceText.textContent = price === null ? 'لا توجد قراءة ناجحة' : `${number(price)} دج`;
       const quoteNote = document.createElement('small');
       quoteNote.textContent = price === null ? 'بانتظار قراءة رسمية' : `${quote.priceLabel || 'السعر المنشور'}${quote._retrievedAt && Date.now() - quote._retrievedAt > 60000 ? ' · آخر قراءة محفوظة وقد لا تكون حديثة' : ''}`;
-      priceMetric.append(priceLabel, priceText, quoteNote);
+      const priceTrend = document.createElement('div'); priceTrend.className = 'holding-trend-row';
+      const movement = observedShareMovement(symbol);
+      const movementText = document.createElement('small'); movementText.className = 'holding-movement';
+      if (movement === null) movementText.textContent = 'لا توجد مقارنة سابقة';
+      else {
+        movementText.classList.add(movement > 0 ? 'up' : movement < 0 ? 'down' : 'stable');
+        movementText.textContent = movement > 0 ? `↑ +${number(movement)} دج بين فحصين` : movement < 0 ? `↓ −${number(Math.abs(movement))} دج بين فحصين` : '— دون تغير بين فحصين';
+      }
+      priceTrend.appendChild(movementText);
+      const priceChart = createMiniPriceChart(symbol);
+      if (priceChart) priceTrend.appendChild(priceChart);
+      priceMetric.append(priceLabel, priceText, quoteNote, priceTrend);
 
       const quantityLabel = document.createElement('label'); quantityLabel.className = 'holding-quantity';
       const quantityCaption = document.createElement('span'); quantityCaption.textContent = 'عدد الأسهم التي تملكها';
@@ -484,7 +529,9 @@
       const gold = document.createElement('article'); gold.className = 'home-holding-card home-gold-card';
       const heading = document.createElement('div'); heading.className = 'home-holding-heading';
       const identity = document.createElement('div'); identity.className = 'home-holding-identity';
-      const mark = document.createElement('span'); mark.className = 'home-gold-mark'; mark.textContent = 'Au';
+      const mark = document.createElement('span'); mark.className = 'home-gold-mark';
+      const goldImage = document.createElement('img'); goldImage.src = '/icons/gold-holding.svg'; goldImage.alt = ''; goldImage.decoding = 'async';
+      mark.appendChild(goldImage);
       const copy = document.createElement('span'); copy.className = 'home-holding-copy';
       const name = document.createElement('strong'); name.textContent = `ذهب عيار ${goldHolding.karat}`;
       const karat = document.createElement('small'); karat.textContent = 'مرجع السوق الموازية';
@@ -561,7 +608,10 @@
       }
       const updated = document.createElement('span'); updated.className = 'home-holding-updated';
       updated.textContent = quote?.fetchedAt ? dateTime(quote.fetchedAt) : 'لم يُحدّث بعد';
-      details.append(changeText, updated); card.append(heading, footer, details);
+      const chart = createMiniPriceChart(symbol);
+      if (chart) details.append(changeText, chart, updated);
+      else details.append(changeText, updated);
+      card.append(heading, footer, details);
       ui.homeHoldingsPreview.appendChild(card);
     }
 

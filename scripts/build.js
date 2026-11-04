@@ -9,7 +9,7 @@ for (const file of ['index.html', 'app.js', 'portfolio.js', 'companies.js', 'sty
 }
 const outputIcons = path.join(output, 'icons');
 fs.mkdirSync(outputIcons, { recursive: true });
-for (const file of ['app-icon.svg', 'icon-180.png', 'icon-192.png', 'icon-512.png']) {
+for (const file of ['app-icon.svg', 'icon-180.png', 'icon-192.png', 'icon-512.png', 'gold-holding.svg']) {
   fs.copyFileSync(path.join(root, 'icons', file), path.join(outputIcons, file));
 }
 console.log(`Copied static PWA to ${path.relative(root, output)}`);

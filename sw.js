@@ -1,6 +1,6 @@
 'use strict';
 
-const CACHE_NAME = 'mahfazati-shell-v26';
+const CACHE_NAME = 'mahfazati-shell-v27';
 const APP_SHELL = [
   '/',
   '/index.html',
@@ -14,7 +14,8 @@ const APP_SHELL = [
   '/icons/app-icon.svg',
   '/icons/icon-180.png',
   '/icons/icon-192.png',
-  '/icons/icon-512.png'
+  '/icons/icon-512.png',
+  '/icons/gold-holding.svg'
 ];
 
 self.addEventListener('install', event => {
