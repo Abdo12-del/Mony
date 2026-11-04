@@ -85,7 +85,7 @@ test('portfolio total card contains an accessible history sparkline and never in
   assert.match(app, /trend-\$\{trend\}/);
   assert.match(read('styles.css'), /trend-positive \.portfolio-total-line/);
   assert.match(read('styles.css'), /trend-negative \.portfolio-total-line/);
-  assert.match(read('sw.js'), /mahfazati-shell-v25/);
+  assert.match(read('sw.js'), /mahfazati-shell-v26/);
 });
 
 test('mobile home previews real holdings and labels observed changes without implying returns', () => {
@@ -157,7 +157,7 @@ test('projects are device-local portfolio goals that show progress without chang
   assert.match(app, /function readProjects\(\)/);
   assert.match(app, /function renderProjects\(\)/);
   assert.match(app, /role', 'progressbar'/);
-  assert.match(app, /const formattedAmount = total === null \? '—' : wholeDzd\(total\)/);
+  assert.match(app, /const formattedAmount = total === null \? '—' : number\(total\)/);
   assert.match(app, /wholeDzd\(currentValue\)/);
   assert.match(app, /localStorage\.setItem\(PROJECTS_KEY, JSON\.stringify\(next\)\)/);
   const totalStart = app.indexOf('function calculateCombinedPortfolioTotal() {');
@@ -176,7 +176,7 @@ test('finance UI uses clear rectangular cards with a single prominent portfolio 
   assert.match(designSystem, /\.portfolio-total-card\s*\{[\s\S]*?min-height:\s*144px[\s\S]*?border-radius:\s*var\(--card-radius\)/);
   assert.match(designSystem, /\.summary-card\.summary-date\s*\{[^}]*background:\s*var\(--card-surface\)/);
   const worker = read('sw.js');
-  assert.match(worker, /mahfazati-shell-v25/);
+  assert.match(worker, /mahfazati-shell-v26/);
 });
 
 test('mobile experience uses five real app tabs with a persistent touch-friendly bottom bar', () => {
