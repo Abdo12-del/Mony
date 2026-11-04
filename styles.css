@@ -1369,3 +1369,45 @@ footer a { color: #b4a3d5; text-decoration: none; }
   .gold-valuation strong { font-size: 11px; }
   .gold-disclaimer { font-size: 8px; }
 }
+
+/* Locally stored portfolio goals; never included in portfolio asset totals. */
+.projects-screen {
+  min-width: 0;
+  padding: 17px;
+  border: 1px solid #302a3b;
+  border-radius: 18px;
+  background: linear-gradient(145deg, #17151d, #111115);
+  box-shadow: 0 10px 28px #0003;
+}
+.projects-heading { display: flex; align-items: flex-start; justify-content: space-between; gap: 14px; margin-bottom: 15px; }
+.projects-heading h2 { margin: 2px 0 4px; font-size: 19px; }
+.projects-heading p { margin: 0; color: #a49cab; font-size: 11px; line-height: 1.6; }
+.projects-local-badge { flex: 0 0 auto; padding: 6px 9px; border: 1px solid #355343; border-radius: 999px; background: #14251c; color: #a9e6bc; font-size: 10px; }
+.project-form { display: grid; grid-template-columns: minmax(160px, 1fr) minmax(160px, .8fr) auto; align-items: end; gap: 10px; padding: 12px; border: 1px solid #302a3b; border-radius: 13px; background: #141318; }
+.project-form label { min-width: 0; display: grid; gap: 5px; color: #cfc8d6; font-size: 10px; }
+.project-form label > span { color: #938b9c; font-size: 9px; }
+.project-form input { width: 100%; min-width: 0; min-height: 40px; padding: 8px 10px; border: 1px solid #3b3542; border-radius: 9px; background: #100f13; color: #f5f1f8; font: inherit; font-size: 12px; }
+.project-form input:focus { outline: 2px solid #9a72ea; outline-offset: 1px; }
+.project-hint { margin: 8px 2px 12px; color: #928b9a; font-size: 9px; line-height: 1.5; }
+.projects-list { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 280px), 1fr)); gap: 10px; }
+.projects-empty { margin: 0; padding: 18px 12px; border: 1px dashed #423a4c; border-radius: 12px; color: #a49cab; font-size: 11px; text-align: center; }
+.project-card { min-width: 0; padding: 13px; border: 1px solid #342d40; border-radius: 13px; background: #141318; }
+.project-card-heading { display: flex; align-items: center; justify-content: space-between; gap: 10px; }
+.project-card-heading h3 { min-width: 0; margin: 0; overflow-wrap: anywhere; color: #f5f1fa; font-size: 13px; }
+.project-remove, .remove-holding-button { min-height: 32px; padding: 6px 10px; border: 1px solid #56353c; border-radius: 8px; background: #281a1e; color: #ffb5bb; font: inherit; font-size: 10px; cursor: pointer; }
+.project-values { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; margin: 13px 0 10px; }
+.project-values > div { min-width: 0; display: grid; gap: 3px; }
+.project-values span { color: #a49cab; font-size: 9px; }
+.project-values strong { color: #f0ebf5; font-size: 12px; font-variant-numeric: tabular-nums; overflow-wrap: anywhere; }
+.project-progress-track { height: 9px; overflow: hidden; border-radius: 999px; background: #302a37; direction: rtl; }
+.project-progress-fill { display: block; height: 100%; border-radius: inherit; background: linear-gradient(90deg, #8e65e8, #c19cff); transition: width .25s ease; }
+.project-progress-status { margin: 8px 0 0; color: #b8a3e7; font-size: 10px; line-height: 1.5; }
+.project-progress-status.reached { color: #a9e6bc; }
+@media (max-width: 650px) {
+  .projects-screen { padding: 13px; border-radius: 16px; }
+  .projects-heading { flex-direction: column; gap: 9px; }
+  .projects-heading h2 { font-size: 17px; }
+  .project-form { grid-template-columns: minmax(0, 1fr); gap: 9px; padding: 10px; }
+  .project-form .save-shares-button { width: 100%; }
+  .projects-list { grid-template-columns: minmax(0, 1fr); }
+}

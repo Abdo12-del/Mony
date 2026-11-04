@@ -85,7 +85,7 @@ test('portfolio total card contains an accessible history sparkline and never in
   assert.match(app, /trend-\$\{trend\}/);
   assert.match(read('styles.css'), /trend-positive \.portfolio-total-line/);
   assert.match(read('styles.css'), /trend-negative \.portfolio-total-line/);
-  assert.match(read('sw.js'), /mahfazati-shell-v23/);
+  assert.match(read('sw.js'), /mahfazati-shell-v24/);
 });
 
 test('mobile home previews real holdings and labels observed changes without implying returns', () => {
@@ -142,6 +142,30 @@ test('gold is a local portfolio asset priced from a dated parallel-market refere
   assert.match(portfolio, /unit === 'gram'/);
 });
 
+test('projects are device-local portfolio goals that show progress without changing asset totals', () => {
+  const html = read('index.html');
+  const app = read('app.js');
+  const css = read('styles.css');
+  assert.match(html, /id="projects" data-mobile-screen="projects"/);
+  assert.match(html, /id="project-form"/);
+  assert.match(html, /id="project-name"/);
+  assert.match(html, /id="project-target"/);
+  assert.match(html, /id="projects-list"/);
+  assert.match(html, /محلي على هذا الجهاز/);
+  assert.doesNotMatch(html, /id="project-target"[^>]*value=/);
+  assert.match(app, /const PROJECTS_KEY = 'mahfazati-projects-v1'/);
+  assert.match(app, /function readProjects\(\)/);
+  assert.match(app, /function renderProjects\(\)/);
+  assert.match(app, /role', 'progressbar'/);
+  assert.match(app, /localStorage\.setItem\(PROJECTS_KEY, JSON\.stringify\(next\)\)/);
+  const totalStart = app.indexOf('function calculateCombinedPortfolioTotal() {');
+  const totalEnd = app.indexOf('\n  }', totalStart);
+  const totalCalculation = app.slice(totalStart, totalEnd);
+  assert.ok(totalCalculation);
+  assert.doesNotMatch(totalCalculation, /projects|PROJECTS_KEY/);
+  assert.match(css, /\.project-progress-track/);
+});
+
 test('finance UI uses clear rectangular cards with a single prominent portfolio total', () => {
   const css = read('styles.css');
   const designSystem = css.slice(css.lastIndexOf('/* Unified finance-app card system'));
@@ -150,12 +174,12 @@ test('finance UI uses clear rectangular cards with a single prominent portfolio 
   assert.match(designSystem, /\.portfolio-total-card\s*\{[\s\S]*?min-height:\s*144px[\s\S]*?border-radius:\s*var\(--card-radius\)/);
   assert.match(designSystem, /\.summary-card\.summary-date\s*\{[^}]*background:\s*var\(--card-surface\)/);
   const worker = read('sw.js');
-  assert.match(worker, /mahfazati-shell-v23/);
+  assert.match(worker, /mahfazati-shell-v24/);
 });
 
-test('mobile experience uses four real app tabs with a persistent touch-friendly bottom bar', () => {
+test('mobile experience uses five real app tabs with a persistent touch-friendly bottom bar', () => {
   const html = read('index.html');
-  for (const screen of ['home', 'portfolio', 'chart', 'history']) {
+  for (const screen of ['home', 'portfolio', 'projects', 'chart', 'history']) {
     assert.ok(html.includes(`data-screen-target="${screen}"`));
     assert.ok(html.includes(`data-mobile-screen="${screen}"`));
   }

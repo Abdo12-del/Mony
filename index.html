@@ -122,6 +122,21 @@
       <p id="quote-refresh-feedback" class="portfolio-feedback" role="status" hidden></p>
     </section>
 
+    <section class="projects-screen" id="projects" data-mobile-screen="projects" aria-labelledby="projects-title">
+      <div class="projects-heading">
+        <div><span class="section-kicker">أهداف محفظتك</span><h2 id="projects-title">مشاريعي</h2><p>أضف مبلغ الوصول، وسنقارن به تلقائياً إجمالي قيمة الأسهم والذهب المسجلة في محفظتك.</p></div>
+        <span class="projects-local-badge">محلي على هذا الجهاز</span>
+      </div>
+      <form id="project-form" class="project-form" novalidate>
+        <label>اسم المشروع<input id="project-name" type="text" maxlength="60" placeholder="مثال: هدف المحفظة" autocomplete="off"></label>
+        <label>مبلغ الوصول <span>دج</span><input id="project-target" type="number" min="1" step="1" inputmode="numeric" placeholder="أدخل المبلغ المستهدف" autocomplete="off"></label>
+        <button class="save-shares-button" type="submit">إضافة مشروع</button>
+      </form>
+      <p class="project-hint">تُحفظ أسماء المشاريع وأهدافها على هذا الجهاز فقط، ولا تُضاف إلى كود الموقع.</p>
+      <div id="projects-list" class="projects-list" aria-live="polite"></div>
+      <p id="projects-feedback" class="portfolio-feedback" role="status" hidden></p>
+    </section>
+
     <section class="summary-section" id="details" data-mobile-screen="portfolio">
       <div class="section-heading-inline"><div><span class="section-kicker">ملخص السعر</span><h2>بيانات السهم المحدد</h2></div><span class="section-meta"><span id="details-symbol">AYRD</span> · دج</span></div>
       <div class="summary-grid">
@@ -160,6 +175,9 @@
     </a>
     <a href="#portfolio" data-screen-target="portfolio">
       <svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3.5" y="6.5" width="17" height="14" rx="2"/><path d="M8 6.5v-2a1.5 1.5 0 0 1 1.5-1.5h5A1.5 1.5 0 0 1 16 4.5v2M3.5 11h17m-10 0v2h3v-2"/></svg><small>محفظتي</small>
+    </a>
+    <a href="#projects" data-screen-target="projects">
+      <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="4"/><path d="M12 2v3m10 7h-3M12 22v-3M2 12h3"/></svg><small>المشاريع</small>
     </a>
     <a href="#chart-section" data-screen-target="chart">
       <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 3v18h18M6.5 15l4-4 3 2.5 5.5-7"/><path d="M15.5 6.5H19v3.5"/></svg><small>الرسم</small>

@@ -18,6 +18,8 @@
     goldSave: $('gold-save'), goldRemove: $('gold-remove'), goldValue: $('gold-value'), goldUnitPrice: $('gold-unit-price'),
     goldCostTotal: $('gold-cost-total'), goldDifference: $('gold-difference'), goldDifferenceRow: $('gold-difference-row'), goldPerformanceStatus: $('gold-performance-status'), goldStatus: $('gold-status'),
     goldFeedback: $('gold-feedback'),
+    projectForm: $('project-form'), projectName: $('project-name'), projectTarget: $('project-target'),
+    projectsList: $('projects-list'), projectsFeedback: $('projects-feedback'),
     companySelect: $('company-select'), addCompany: $('add-company'), companyList: $('company-list'),
     focusSelect: $('focus-company-select'), focusName: $('focus-company-name'), focusSymbol: $('focus-company-symbol'),
     focusFullName: $('focus-company-full-name'), focusLogo: $('focus-company-logo'), focusFallback: $('focus-company-fallback'),
@@ -31,6 +33,7 @@
   const GOLD_PORTFOLIO_HISTORY_KEY = 'mahfazati-combined-observations-v1';
   const GOLD_HOLDING_KEY = 'mahfazati-gold-holding-v1';
   const GOLD_QUOTE_KEY = 'mahfazati-gold-market-quote-v1';
+  const PROJECTS_KEY = 'mahfazati-projects-v1';
   const LEGACY_PORTFOLIO_KEY = 'nabd-ayrad-portfolio-v1';
   const QUOTES_KEY = 'mahfazati-last-quotes-v1';
   let selectedSymbol = readSelectedSymbol();
@@ -39,7 +42,9 @@
   let draftSymbols = [];
   let quoteCache = readQuoteCache();
   let goldQuoteCache = readGoldQuoteCache();
+  let projects = readProjects();
   const number = value => new Intl.NumberFormat('de-DE', { minimumFractionDigits: 2, maximumFractionDigits: 2 }).format(value);
+  const wholeDzd = value => new Intl.NumberFormat('de-DE', { maximumFractionDigits: 0 }).format(value);
   const dateTime = value => value ? new Intl.DateTimeFormat('ar-DZ', { dateStyle: 'medium', timeStyle: 'short' }).format(new Date(value)) : '—';
 
   function readSelectedSymbol() {
@@ -78,6 +83,18 @@
       if (!saved || !saved.prices || ![18, 21, 24].every(karat => Number.isFinite(saved.prices[karat]) && saved.prices[karat] > 0)) return null;
       return saved;
     } catch (_) { return null; }
+  }
+
+  function isValidProject(project) {
+    return project && typeof project.id === 'string' && typeof project.name === 'string' && project.name.trim().length > 0 &&
+      Number.isSafeInteger(project.target) && project.target > 0;
+  }
+
+  function readProjects() {
+    try {
+      const saved = JSON.parse(localStorage.getItem(PROJECTS_KEY) || '[]');
+      return Array.isArray(saved) ? saved.filter(isValidProject).slice(0, 50) : [];
+    } catch (_) { return []; }
   }
 
   function portfolioHistoryStorageKey() {
@@ -685,6 +702,106 @@
     return Number((stockTotal + goldValue).toFixed(2));
   }
 
+  function renderProjects() {
+    if (!ui.projectsList) return;
+    ui.projectsList.replaceChildren();
+    if (!projects.length) {
+      const empty = document.createElement('p');
+      empty.className = 'projects-empty';
+      empty.textContent = 'لا توجد مشاريع بعد. أضف هدفاً لتتابع تقدّم محفظتك نحوه.';
+      ui.projectsList.appendChild(empty);
+      return;
+    }
+    const currentValue = calculateCombinedPortfolioTotal();
+    for (const project of projects) {
+      const card = document.createElement('article');
+      card.className = 'project-card';
+      const heading = document.createElement('div');
+      heading.className = 'project-card-heading';
+      const title = document.createElement('h3');
+      title.textContent = project.name;
+      const remove = document.createElement('button');
+      remove.type = 'button';
+      remove.className = 'project-remove';
+      remove.textContent = 'إزالة';
+      remove.setAttribute('aria-label', `إزالة مشروع ${project.name}`);
+      remove.addEventListener('click', () => removeProject(project.id));
+      heading.append(title, remove);
+
+      const values = document.createElement('div');
+      values.className = 'project-values';
+      const current = document.createElement('div');
+      const currentLabel = document.createElement('span');
+      currentLabel.textContent = 'قيمة المحفظة الحالية';
+      const currentAmount = document.createElement('strong');
+      currentAmount.textContent = currentValue === null ? '—' : `${wholeDzd(currentValue)} دج`;
+      current.append(currentLabel, currentAmount);
+      const target = document.createElement('div');
+      const targetLabel = document.createElement('span');
+      targetLabel.textContent = 'مبلغ الوصول';
+      const targetAmount = document.createElement('strong');
+      targetAmount.textContent = `${wholeDzd(project.target)} دج`;
+      target.append(targetLabel, targetAmount);
+      values.append(current, target);
+
+      const progress = document.createElement('div');
+      progress.className = 'project-progress-track';
+      progress.setAttribute('role', 'progressbar');
+      progress.setAttribute('aria-label', `التقدم نحو ${project.name}`);
+      progress.setAttribute('aria-valuemin', '0');
+      progress.setAttribute('aria-valuemax', '100');
+      const percent = currentValue === null ? 0 : Math.min(100, Math.max(0, currentValue / project.target * 100));
+      progress.setAttribute('aria-valuenow', String(Math.round(percent)));
+      const fill = document.createElement('span');
+      fill.className = 'project-progress-fill';
+      fill.style.width = `${percent.toFixed(1)}%`;
+      progress.appendChild(fill);
+
+      const status = document.createElement('p');
+      status.className = `project-progress-status${currentValue !== null && currentValue >= project.target ? ' reached' : ''}`;
+      if (currentValue === null) status.textContent = 'أضف حيازات وحدّث أسعارها لعرض التقدم.';
+      else if (currentValue >= project.target) status.textContent = `تم بلوغ الهدف · تجاوزته المحفظة بـ ${wholeDzd(currentValue - project.target)} دج.`;
+      else status.textContent = `المتبقي للوصول إلى الهدف: ${wholeDzd(project.target - currentValue)} دج · ${percent.toFixed(1)}٪`;
+      card.append(heading, values, progress, status);
+      ui.projectsList.appendChild(card);
+    }
+  }
+
+  function showProjectsFeedback(message) {
+    if (!ui.projectsFeedback) return;
+    ui.projectsFeedback.textContent = message;
+    ui.projectsFeedback.hidden = false;
+  }
+
+  function saveProject(event) {
+    event?.preventDefault();
+    const name = ui.projectName.value.trim() || 'هدف المحفظة';
+    const target = Number(ui.projectTarget.value);
+    if (!Number.isSafeInteger(target) || target <= 0) {
+      showProjectsFeedback('أدخل مبلغ وصول صحيحاً بالدينار الجزائري.');
+      return;
+    }
+    const project = { id: `${Date.now()}-${Math.random().toString(36).slice(2, 8)}`, name: name.slice(0, 60), target };
+    const next = [...projects, project].slice(-50);
+    try {
+      localStorage.setItem(PROJECTS_KEY, JSON.stringify(next));
+      projects = next;
+      ui.projectForm.reset();
+      ui.projectsFeedback.hidden = true;
+      renderProjects();
+    } catch (_) { showProjectsFeedback('تعذّر حفظ المشروع على هذا الجهاز.'); }
+  }
+
+  function removeProject(id) {
+    const next = projects.filter(project => project.id !== id);
+    try {
+      localStorage.setItem(PROJECTS_KEY, JSON.stringify(next));
+      projects = next;
+      renderProjects();
+      showProjectsFeedback('أُزيل المشروع من هذا الجهاز.');
+    } catch (_) { showProjectsFeedback('تعذّرت إزالة المشروع من هذا الجهاز.'); }
+  }
+
   function renderPortfolio() {
     const held = Object.entries(positions).filter(([, quantity]) => Number.isSafeInteger(quantity) && quantity > 0);
     const total = calculateCombinedPortfolioTotal();
@@ -697,6 +814,7 @@
     }
     if (ui.portfolioTotal) ui.portfolioTotal.textContent = formattedTotal;
     renderGoldHoldingDetails();
+    renderProjects();
     renderCompanyList();
     renderHomePortfolioPreview();
     renderPortfolioObservations();
@@ -784,17 +902,18 @@
   ui.button.addEventListener('click', refresh);
   ui.goldForm?.addEventListener('submit', saveGoldHolding);
   ui.goldRemove?.addEventListener('click', removeGoldHolding);
+  ui.projectForm?.addEventListener('submit', saveProject);
   const mobileScreenQuery = window.matchMedia('(max-width: 650px)');
   const mobileScreenSections = [...document.querySelectorAll('[data-mobile-screen]')];
   const mobileNavLinks = [...document.querySelectorAll('.bottom-nav [data-screen-target]')];
-  const mobileScreens = new Set(['home', 'portfolio', 'chart', 'history']);
+  const mobileScreens = new Set(['home', 'portfolio', 'projects', 'chart', 'history']);
   const hashScreens = {
     home: 'home', top: 'home', details: 'home', 'pwa-info': 'home',
-    portfolio: 'portfolio', 'chart-section': 'chart', chart: 'chart',
+    portfolio: 'portfolio', projects: 'projects', 'chart-section': 'chart', chart: 'chart',
     activity: 'history', history: 'history'
   };
   let activeMobileScreen = hashScreens[location.hash.slice(1)] || 'home';
-  const mobileScrollPositions = { home: 0, portfolio: 0, chart: 0, history: 0 };
+  const mobileScrollPositions = { home: 0, portfolio: 0, projects: 0, chart: 0, history: 0 };
 
   function applyMobileScreen(screen, { updateHash = false, scroll = false } = {}) {
     if (!mobileScreens.has(screen)) return;

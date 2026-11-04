@@ -1,6 +1,6 @@
 'use strict';
 
-const CACHE_NAME = 'mahfazati-shell-v23';
+const CACHE_NAME = 'mahfazati-shell-v24';
 const APP_SHELL = [
   '/',
   '/index.html',
