@@ -1,0 +1,25 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" fill="none">
+  <defs>
+    <linearGradient id="barTop" x1="14" y1="13" x2="50" y2="35" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#FFF0A8"/><stop offset=".48" stop-color="#F3C85C"/><stop offset="1" stop-color="#B87919"/>
+    </linearGradient>
+    <linearGradient id="barSide" x1="13" y1="29" x2="39" y2="53" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#F8D879"/><stop offset="1" stop-color="#A66513"/>
+    </linearGradient>
+    <linearGradient id="coin" x1="38" y1="30" x2="56" y2="57" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#FFF0A8"/><stop offset=".52" stop-color="#E9B941"/><stop offset="1" stop-color="#A86616"/>
+    </linearGradient>
+    <filter id="shadow" x="3" y="7" width="61" height="58" color-interpolation-filters="sRGB" filterUnits="userSpaceOnUse">
+      <feGaussianBlur stdDeviation="2.2"/>
+    </filter>
+  </defs>
+  <ellipse cx="33" cy="54" rx="24" ry="5" fill="#5C3513" opacity=".25" filter="url(#shadow)"/>
+  <path d="m10 31 7-16h28l9 16-6 18H15L10 31Z" fill="url(#barSide)" stroke="#9B641B" stroke-width="1.4" stroke-linejoin="round"/>
+  <path d="m17 15 28 0 9 16H10l7-16Z" fill="url(#barTop)" stroke="#FFE79A" stroke-width="1.2" stroke-linejoin="round"/>
+  <path d="m18 19 24 0 5 8H14l4-8Z" fill="#FFF4C6" opacity=".28"/>
+  <path d="M17 34h29l-3 10H20l-3-10Z" fill="#D89C2C" opacity=".58"/>
+  <circle cx="47" cy="43" r="12" fill="url(#coin)" stroke="#FFF0A8" stroke-width="1.5"/>
+  <circle cx="47" cy="43" r="9.2" stroke="#A76C1A" stroke-width="1" opacity=".8"/>
+  <path d="M47 36.5v13M43.5 39.5h5a2 2 0 0 1 0 4h-3a2 2 0 0 0 0 4h5" stroke="#9D661B" stroke-width="1.4" stroke-linecap="round"/>
+  <path d="m25 22 2-3m4 3 2-3m4 3 2-3" stroke="#FFF7D6" stroke-width="1.2" stroke-linecap="round" opacity=".7"/>
+</svg>

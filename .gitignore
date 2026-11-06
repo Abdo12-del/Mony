@@ -1,0 +1,22 @@
+# Node / Vercel
+node_modules/
+.vercel/
+public/
+.env
+.env.*
+!.env.example
+
+# Android / Gradle
+.gradle/
+**/build/
+android/local.properties
+*.iml
+.idea/
+
+# Signing material and generated release binaries — keep these private/out of Git
+*.jks
+*.keystore
+*.pem
+*.p12
+*.apk
+*.aab
